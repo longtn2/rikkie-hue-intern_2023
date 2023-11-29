@@ -1,6 +1,7 @@
 from project.models import db
-from sqlalchemy.orm import validates  
+from sqlalchemy.orm import validates
 from werkzeug.exceptions import BadRequest
+
 
 class Room(db.Model):
     """
@@ -31,3 +32,26 @@ class Room(db.Model):
             'is_blocked': self.is_blocked,
             'deleted_at': self.deleted_at
         }
+
+    @staticmethod
+    def validate_room_name(room_name):
+        if not room_name.strip():
+            return {"field": "room_name", "error": "Room name cannot be empty or contain only whitespace"}
+        elif len(room_name) > 50:
+            return {"field": "room_name", "error": "Room name exceeds maximum length"}
+        return None
+
+    @staticmethod
+    def validate_description(description):
+        if not description.strip():
+            return {"field": "description", "error": "Description cannot be empty or contain only whitespace"}
+        elif len(description) > 255:
+            return {"field": "description", "error": "Description exceeds maximum length (255 characters)"}
+        return None
+
+    def validate_all_fields(self):
+        errors = []
+        errors.append(self.validate_room_name(self.room_name))
+        errors.append(self.validate_description(self.description))
+        errors = [error for error in errors if error is not None]
+        return errors
