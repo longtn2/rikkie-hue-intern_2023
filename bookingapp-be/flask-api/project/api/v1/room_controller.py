@@ -51,14 +51,33 @@ def create_room() -> BaseResponse:
     except BadRequest as e:
         return BaseResponse.error(e)
 
-@room_blueprint.route("/rooms/<int:room_id>", methods=["PUT"])
+@room_blueprint.route("/rooms/<int:room_id>", methods=["GET"])
+@jwt_required()
+@has_permission("view")
+def get_room_detail(room_id: int) -> BaseResponse:
+    try:
+        room_detail: Optional[dict] = RoomService.get_room_detail(room_id)
+        if room_detail:
+            return BaseResponse.success(room_detail)
+        return BaseResponse.error(InternalServerError("Room not found"))
+
+    except InternalServerError as e:
+        return BaseResponse.error(e)
+
+@room_blueprint.route("/rooms/<int:room_id>/blocked", methods=["PUT"])
 @jwt_required()
 @has_permission("update")
-def update_room(room_id: int):
+def delete_room(room_id: int) -> BaseResponse:
     try:
         data: Dict = request.get_json()
-        response_data = RoomService.update_room(room_id, data)
+        response_data: Dict = RoomService.delete_room(room_id, data)
         return BaseResponse.success(response_data)
 
     except NotFound as e:
+        return BaseResponse.error(e)
+
+    except BadRequest as e:
+        return BaseResponse.error(e)
+
+    except InternalServerError as e:
         return BaseResponse.error(e)

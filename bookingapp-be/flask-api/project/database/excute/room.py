@@ -37,3 +37,22 @@ class RoomExecutor:
     @staticmethod
     def commit():
         db.session.commit()
+
+    @staticmethod
+    def get_room_by_id(room_id: int) -> Optional[Room]:
+        return Room.query.get(room_id)
+
+    @staticmethod
+    def get_bookings_by_room_id(room_id: int) -> List[Booking]:
+        return Booking.query.filter_by(room_id=room_id).all()
+    
+    @staticmethod
+    def soft_delete_room_and_bookings(room: Room, bookings: List[Booking], description: Optional[str]) -> None:
+        for booking in bookings:
+            booking.deleted_at = datetime.now()
+            booking.is_deleted = True
+
+        room.deleted_at = datetime.now()
+        room.is_blocked = True
+        room.description = description
+        db.session.commit()
