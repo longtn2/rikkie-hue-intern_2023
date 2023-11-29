@@ -102,3 +102,12 @@ class RoomExecutor:
         room.description = description
         room.deleted_at = None
         db.session.commit()
+    @staticmethod
+    def search_rooms_in_db(page: int, per_page: int, search_name: Optional[str]) -> Tuple[List[Room], int, int]:
+        query = Room.query.filter(or_(Room.room_name.ilike(f"%{search_name}%")) if search_name else True)
+        paginated_rooms = query.paginate(page=page, per_page=per_page, error_out=False).items
+
+        total_items = len(query.all())
+        total_pages = ceil(len(query.all()) / per_page)
+
+        return paginated_rooms, total_items, total_pages
