@@ -81,3 +81,17 @@ def delete_room(room_id: int) -> BaseResponse:
 
     except InternalServerError as e:
         return BaseResponse.error(e)
+
+@room_blueprint.route("/status_rooms", methods=["GET"])
+@jwt_required()
+@has_permission("view")
+def get_status_rooms_endpoint():
+    try:
+        page: int = request.args.get('page', 1, type=int)
+        per_page: int = request.args.get('per_page', 10, type=int)
+
+        response_data = RoomService.get_status_rooms(page, per_page)
+        return BaseResponse.success(response_data)
+
+    except InternalServerError as e:
+        return BaseResponse.error(e)
