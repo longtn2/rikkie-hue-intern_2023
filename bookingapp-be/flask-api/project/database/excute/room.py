@@ -33,4 +33,7 @@ class RoomExecutor:
             db.session.add_all(new_room)
         else:
             raise TypeError("Invalid type for new_room")
+    
+    @staticmethod
+    def commit():
         db.session.commit()

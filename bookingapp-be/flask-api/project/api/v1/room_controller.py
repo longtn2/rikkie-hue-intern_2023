@@ -38,6 +38,7 @@ def get_room_detail(room_id: int) -> BaseResponse:
     except InternalServerError as e:
         return BaseResponse.error(e)
     
+
 @room_blueprint.route("/rooms", methods=["POST"])
 @jwt_required()
 @has_permission("create")
@@ -50,5 +51,14 @@ def create_room() -> BaseResponse:
     except BadRequest as e:
         return BaseResponse.error(e)
 
-    except Conflict as e:
+@room_blueprint.route("/rooms/<int:room_id>", methods=["PUT"])
+@jwt_required()
+@has_permission("update")
+def update_room(room_id: int):
+    try:
+        data: Dict = request.get_json()
+        response_data = RoomService.update_room(room_id, data)
+        return BaseResponse.success(response_data)
+
+    except NotFound as e:
         return BaseResponse.error(e)
