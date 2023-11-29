@@ -21,3 +21,7 @@ jwt = JWTManager(app)
 with app.app_context():
     from project import models
     db.create_all()
+
+from project.api.common.base_response import BaseResponse
+from werkzeug.exceptions import HTTPException 
+app.register_error_handler(HTTPException, BaseResponse.error)
