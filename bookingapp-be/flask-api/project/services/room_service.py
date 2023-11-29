@@ -2,7 +2,7 @@ from project.database.excute.room import RoomExecutor
 from math import ceil
 from project.models import Room
 from werkzeug.exceptions import Conflict, BadRequest, NotFound
-
+from typing import Optional
 
 class RoomService:
     @staticmethod
@@ -17,3 +17,7 @@ class RoomService:
             "per_page": per_page,
             "total_pages": total_pages
         }
+
+    @staticmethod
+    def get_room_detail(room_id: int) -> Optional[Room]:
+        return RoomExecutor.get_room_detail(room_id)
