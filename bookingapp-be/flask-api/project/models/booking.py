@@ -1,7 +1,8 @@
 from project.models import db
-from sqlalchemy.orm import validates  
+from sqlalchemy.orm import validates
 from werkzeug.exceptions import BadRequest
 from datetime import datetime
+
 
 class Booking(db.Model):
     """
@@ -21,15 +22,15 @@ class Booking(db.Model):
     """
     __tablename__ = "booking"
     booking_id = db.Column(db.Integer, primary_key=True)
-    title=  db.Column(db.String(255), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
     time_start = db.Column(db.TIMESTAMP, nullable=False)
     time_end = db.Column(db.TIMESTAMP, nullable=False)
-    is_accepted= db.Column(db.Boolean, nullable=False)
+    is_accepted = db.Column(db.Boolean, nullable=False)
     deleted_at = db.Column(db.TIMESTAMP)
-    is_deleted= db.Column(db.Boolean, nullable=False)
+    is_deleted = db.Column(db.Boolean, nullable=False)
     room_id = db.Column(db.Integer, db.ForeignKey('room.room_id'))
     booking_user = db.relationship('BookingUser', backref='booking')
-    
+
     def serialize(self):
         return {
             'booking_id': self.booking_id,
@@ -38,3 +39,27 @@ class Booking(db.Model):
             'room_id': self.room_id,
             'booking_user': [be.serialize() for be in self.booking_user]
         }
+
+    @staticmethod
+    def validate_title(title):
+        if not title.strip():
+            return {"field": "title", "error": "Title cannot be empty or contain only whitespace"}
+        elif len(title) > 255:
+            return {"field": "title", "error": "Title exceeds maximum length"}
+        return None
+
+    @staticmethod
+    def validate_time(time_start, time_end):
+        current_time = datetime.now()  # Thời gian hiện tại
+        if time_start >= time_end:
+            return {"field": "time_end", "error": "Time end must be after time start"}
+        elif time_start < current_time or time_end < current_time:
+            return {"field": "time_start/time_end", "error": "Cannot select time in the past"}
+        return None
+
+    def validate_all_fields(self):
+        errors = []
+        errors.append(self.validate_title(self.title))
+        errors.append(self.validate_time(self.time_start, self.time_end))
+        errors = [error for error in errors if error is not None]
+        return errors
