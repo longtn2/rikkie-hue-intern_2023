@@ -32,6 +32,7 @@ class User(db.Model):
     created_at = db.Column(db.TIMESTAMP, nullable=False)
     updated_at = db.Column(db.TIMESTAMP, nullable=False)
     is_deleted = db.Column(db.Boolean, nullable=False)
+    booking = db.relationship('Booking', backref='user')
     booking_user = db.relationship('BookingUser', backref='user')
     user_has_role = db.relationship('UserHasRole', backref='user')
 

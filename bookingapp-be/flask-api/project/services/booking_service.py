@@ -234,3 +234,21 @@ class BookingService:
             'total_pages': total_pages
         }
         return result
+
+    @staticmethod
+    def user_view_list_booked(page: int, per_page: int) -> List[Booking]:
+        creator_id=get_jwt_identity()
+        bookings=BookingExecutor.user_view_list_booked(page, per_page, creator_id)
+        list_bookings = BookingService.show_list_booking(bookings)   
+        total_items = bookings.total
+        total_pages = ceil(total_items / per_page)
+        per_page = per_page
+        current_page = page
+        result = {
+            'list_bookings': list_bookings,
+            'total_items': total_items,
+            'per_page': per_page,
+            'current_page': current_page,
+            'total_pages': total_pages
+        }
+        return result
