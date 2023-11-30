@@ -12,6 +12,7 @@ import CalendarBooking from './components/Bookings/Bookings';
 import Notification from './components/Notification/Notification';
 import WaitingBookingList from './components/Bookings/WaitingBookingList';
 import InfoUser from './components/InfoAccount/InfoUser';
+import Dashboard from './components/DashBoard/DashBoard';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path='/invitations' element={<InvitationList />} />
             <Route path='/informationaccount' element={<InfoUser/>}/>
             <Route element={<PrivateRoute />}>
+              <Route path='/' element={<Dashboard/>}/>
               <Route path='/roomManager' element={<Rooms />} />
               <Route path='/usermanager' element={<UsersManager />} />
               <Route path='/bookingmanager' element={<WaitingBookingList />} />
