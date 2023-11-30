@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";
 import React, { useState } from "react";
 import axios from "axios";
@@ -12,6 +13,27 @@ interface FormAddProps {
 
 const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
   const [form] = Form.useForm();
+=======
+import {
+  Button,
+  Checkbox,
+  Col,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Spin,
+  notification,
+} from "antd";
+import React from "react";
+import axios from "axios";
+import { url } from "../ultils/urlApi";
+import getCookie from "../route/Cookie";
+
+const FormAdd = ({ onModalAddUser, onAddUser }) => {
+  const [form] = Form.useForm();
+  const token = getCookie("token");
+>>>>>>> e8031da (WIBA-506 update add new user)
   const [loading, setLoading] = useState<boolean>(false);
   const handleSubmit = async (value: any) => {
     setLoading(true);
@@ -22,6 +44,7 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
         })
         .then((response) => {
           onAddUser(value);
+<<<<<<< HEAD
           handleSuccessShow(response);
           onModalAddUser(false);
         });
@@ -29,6 +52,27 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
       handleErrorShow(error);
     } finally {
       setLoading(false);
+=======
+          Modal.success({
+            content: response.data.message,
+          });
+          onModalAddUser(false);
+        });
+    } catch (error: any) {
+      setLoading(false);
+      error.response.data.message === "Conflict"
+        ? notification.error({
+            message: error.response.data.errors,
+            duration: 5,
+          })
+        : error.response.data.errors.map((error: any) => {
+            notification.error({
+              message: error.field,
+              description: error.error,
+              duration: 5,
+            });
+          });
+>>>>>>> e8031da (WIBA-506 update add new user)
     }
   };
   return (
@@ -143,9 +187,17 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
             </Row>
           </Checkbox.Group>
         </Form.Item>
+<<<<<<< HEAD
         <Button type="primary" htmlType="submit" loading={loading}>
           Submit
         </Button>
+=======
+        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Button type="primary" htmlType="submit" disabled={loading}>
+            {loading ? <Spin spinning={loading} /> : "Submit"}
+          </Button>
+        </Form.Item>
+>>>>>>> e8031da (WIBA-506 update add new user)
       </Form>
     </div>
   );

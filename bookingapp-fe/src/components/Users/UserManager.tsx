@@ -16,6 +16,10 @@ import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 import FormEdit from "./FormEdit";
 
 const UsersManager = () => {
+<<<<<<< HEAD
+=======
+  const token = getCookie("token");
+>>>>>>> e8031da (WIBA-506 update add new user)
   const [listUsers, setListUsers] = useState<DataType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
@@ -185,9 +189,15 @@ const UsersManager = () => {
     setIsModalOpen(true);
   };
   const handleAddUser = (user: DataType) => {
+<<<<<<< HEAD
     const listUserSet = listUsers.concat(user);
     setListUsers(listUserSet);
   };
+=======
+    const listUserSet = listUsers.concat(user)
+    setListUsers(listUserSet)
+  }
+>>>>>>> e8031da (WIBA-506 update add new user)
   const handleModalAddUser = (status: boolean) => {
     setIsModalOpen(status);
   };
@@ -244,6 +254,19 @@ const UsersManager = () => {
           dataSource={listUsers}
           pagination={pagination}
         />
+<<<<<<< HEAD
+=======
+        <Modal
+          title="User Infomation"
+          destroyOnClose={true}
+          open={isModalOpen}
+          footer={[]}
+          onCancel={handleCancel}
+          style={{ width: "500px", textAlign: "center" }}
+        >
+          <FormAdd onModalAddUser={handleModalAddUser} onAddUser={handleAddUser}/>
+        </Modal>
+>>>>>>> e8031da (WIBA-506 update add new user)
       </Spin>
 
       <Modal
