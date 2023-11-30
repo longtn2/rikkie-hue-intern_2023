@@ -4,7 +4,7 @@ from project import db
 from datetime import datetime
 from itertools import islice
 from sqlalchemy import or_
-from typing import Optional
+from typing import Optional, Union, List
 
 
 class RoomExecutor:
@@ -20,3 +20,17 @@ class RoomExecutor:
         if room:
             return room.serialize()
         return None
+
+    @staticmethod
+    def get_room_by_name(room_name: str) -> Optional[Room]:
+        return Room.query.filter_by(room_name=room_name).first()
+
+    @staticmethod
+    def add_room(new_room: Union[Room, List[Room]]) -> None:
+        if isinstance(new_room, Room):
+            db.session.add(new_room)
+        elif isinstance(new_room, list):
+            db.session.add_all(new_room)
+        else:
+            raise TypeError("Invalid type for new_room")
+        db.session.commit()
