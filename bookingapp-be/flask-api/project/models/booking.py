@@ -41,7 +41,7 @@ class Booking(db.Model):
         }
 
     @staticmethod
-    def validate_title(title):
+    def validate_title(title: str) -> dict[str, str] | None:
         if not title.strip():
             return {"field": "title", "error": "Title cannot be empty or contain only whitespace"}
         elif len(title) > 255:
@@ -49,7 +49,7 @@ class Booking(db.Model):
         return None
 
     @staticmethod
-    def validate_time(time_start, time_end):
+    def validate_time(time_start: str, time_end: str) -> dict[str, str] | None:
         current_time = datetime.now()  # Thời gian hiện tại
         if time_start >= time_end:
             return {"field": "time_end", "error": "Time end must be after time start"}

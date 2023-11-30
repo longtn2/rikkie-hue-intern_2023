@@ -34,7 +34,7 @@ class Room(db.Model):
         }
 
     @staticmethod
-    def validate_room_name(room_name):
+    def validate_room_name(room_name: str) -> dict[str, str] | None:
         if not room_name.strip():
             return {"field": "room_name", "error": "Room name cannot be empty or contain only whitespace"}
         elif len(room_name) > 50:
@@ -42,7 +42,7 @@ class Room(db.Model):
         return None
 
     @staticmethod
-    def validate_description(description):
+    def validate_description(description: str) -> dict[str, str] | None:
         if not description.strip():
             return {"field": "description", "error": "Description cannot be empty or contain only whitespace"}
         elif len(description) > 255:

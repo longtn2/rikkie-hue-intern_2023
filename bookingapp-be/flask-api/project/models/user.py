@@ -56,7 +56,7 @@ class User(db.Model):
         }
 
     @staticmethod
-    def validate_user_name(user_name):
+    def validate_user_name(user_name: str) -> dict[str, str] | None:
         if not user_name.strip():
             return {"field": "user_name", "error": "User name cannot be empty or contain only whitespace"}
         elif len(user_name) > 50:
@@ -64,7 +64,7 @@ class User(db.Model):
         return None
 
     @staticmethod
-    def validate_email(email):
+    def validate_email(email: str) -> dict[str, str] | None:
         if not email.strip():
             return {"field": "email", "error": "Email cannot be empty or contain only whitespace"}
         elif not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
@@ -72,7 +72,7 @@ class User(db.Model):
         return None
 
     @staticmethod
-    def validate_phone_number(phone_number):
+    def validate_phone_number(phone_number: str) -> dict[str, str] | None:
         if not phone_number.strip():
             return {"field": "phone_number", "error": "Phone number cannot be empty or contain only whitespace"}
         elif not re.match(r'^0\d{9}$', phone_number):
@@ -80,7 +80,7 @@ class User(db.Model):
         return None
 
     @staticmethod
-    def validate_password(password):
+    def validate_password(password: str) -> dict[str, str] | None:
         if not password.strip():
             return {"field": "password", "error": "Password cannot be empty or contain only whitespace"}
         elif not re.match(r'^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{8,}$', password):
