@@ -8,7 +8,7 @@ import FormAdd from "./FormAdd";
 
 const UsersManager = () => {
   const token = getCookie("token");
-  const [list_users, setListUsers] = useState<DataType[]>([]);
+  const [listUsers, setListUsers] = useState<DataType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [perPage, setPerPage] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -132,6 +132,10 @@ const UsersManager = () => {
   const showModal = () => {
     setIsModalOpen(true);
   };
+  const handleAddUser = (user: DataType) => {
+    const listUserSet = listUsers.concat(user)
+    setListUsers(listUserSet)
+  }
   const handleModalAddUser = (status: boolean) => {
     setIsModalOpen(status);
   };
@@ -177,7 +181,7 @@ const UsersManager = () => {
           onCancel={handleCancel}
           style={{ width: "500px", textAlign: "center" }}
         >
-          <FormAdd onModalAddUser={handleModalAddUser} />
+          <FormAdd onModalAddUser={handleModalAddUser} onAddUser={handleAddUser}/>
         </Modal>
       </Spin>
     </>

@@ -6,44 +6,18 @@ import {
   Input,
   Modal,
   Row,
+  Spin,
   notification,
 } from "antd";
 import React from "react";
 import axios from "axios";
 import { url } from "../ultils/urlApi";
 import getCookie from "../route/Cookie";
-import { useEffect, useState } from "react";
-import { DataType } from "../constant/constant";
 
-const FormAdd = ({ onModalAddUser }) => {
+const FormAdd = ({ onModalAddUser, onAddUser }) => {
   const [form] = Form.useForm();
   const token = getCookie("token");
-  const [list_users, setListUsers] = useState<DataType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const getData = async () => {
-    setLoading(true);
-    try {
-      await axios
-        .get(url + "/v1/users", {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          setListUsers(response.data.data.users);
-        });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    getData();
-  }, []);
-
   const handleSubmit = async (value: any) => {
     setLoading(true);
     try {
@@ -54,27 +28,27 @@ const FormAdd = ({ onModalAddUser }) => {
           },
         })
         .then((response) => {
-          getData();
+          onAddUser(value);
           Modal.success({
             content: response.data.message,
           });
           onModalAddUser(false);
-        })
-        .catch((error) => {
-          error.response.data.message === "Conflict"
-            ? notification.error({
-                message: error.response.data.errors,
-                duration: 5,
-              })
-            : error.response.data.errors.map((error: any) => {
-                notification.error({
-                  message: error.field,
-                  description: error.error,
-                  duration: 5,
-                });
-              });
         });
-    } catch (error) {}
+    } catch (error: any) {
+      setLoading(false);
+      error.response.data.message === "Conflict"
+        ? notification.error({
+            message: error.response.data.errors,
+            duration: 5,
+          })
+        : error.response.data.errors.map((error: any) => {
+            notification.error({
+              message: error.field,
+              description: error.error,
+              duration: 5,
+            });
+          });
+    }
   };
   return (
     <div style={{ padding: 20 }}>
@@ -163,8 +137,8 @@ const FormAdd = ({ onModalAddUser }) => {
           </Checkbox.Group>
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
-            Submit
+          <Button type="primary" htmlType="submit" disabled={loading}>
+            {loading ? <Spin spinning={loading} /> : "Submit"}
           </Button>
         </Form.Item>
       </Form>
