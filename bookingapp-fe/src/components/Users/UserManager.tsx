@@ -1,20 +1,21 @@
-import { Tag, Space, Modal, Form, Button, Spin, notification } from "antd";
+import { Tag, Space, Modal, Button, message, Spin, notification } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import getCookie from "../route/Cookie";
-import { url } from "../../ultils/urlApi";
+import Search from "antd/es/input/Search";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { url } from "../ultils/urlApi";
+import { TYPE_USER } from "../constant/constant";
 import FormAdd from "./FormAdd";
+import FormEdit from "./FormEdit";
 
 const UsersManager = () => {
   const token = getCookie("token");
-  const [listUsers, setListUsers] = useState<DataType[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [perPage, setPerPage] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const [loading, setLoading] = useState<boolean>(true);
-
   interface DataType {
     user_id: number;
     role_id: number[];
@@ -24,9 +25,16 @@ const UsersManager = () => {
     email: string;
     is_deleted: boolean;
   }
-  useEffect(() => {
-    getData();
-  }, [currentPage, totalItems]);
+
+  const [listUsers, setListUsers] = useState<DataType[]>([]);
+  const [isModalEditOpen, setIsModalEditOpen] = useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<DataType>();
+  const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const getData = async () => {
     setLoading(true);
     try {
@@ -52,11 +60,12 @@ const UsersManager = () => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    getData();
+  }, [currentPage, totalItems]);
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
   const handlePageSizeChange = (pageSize: number) => {
     const newPerPage = pageSize;
     const newCurrentPage =
@@ -119,29 +128,78 @@ const UsersManager = () => {
       key: "action",
       render: (_text, user) => (
         <Space size="middle">
-          <EditOutlined />
-          <DeleteOutlined />
+          <EditOutlined onClick={() => handleSelectUser(user)} />
+          <DeleteOutlined onClick={() => handleToggleDelete(user)} />
         </Space>
       ),
     },
   ];
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
+  const handleToggleDelete = (user: DataType) => {
+    setSelectedUser(user);
+    setIsModalDeleteOpen(true);
   };
-  const showModal = () => {
-    setIsModalOpen(true);
+  const handleSelectUser = (user: DataType) => {
+    handleModalEditUser(true);
+    setSelectedUser(user);
   };
   const handleAddUser = (user: DataType) => {
-    const listUserSet = listUsers.concat(user)
-    setListUsers(listUserSet)
-  }
+    const listUserSet = listUsers.concat(user);
+    setListUsers(listUserSet);
+  };
+  const handleEditUser = (editUser: DataType) => {
+    if (selectedUser) {
+      setListUsers((prevListUsers) =>
+        prevListUsers.map((user) =>
+          user.user_id === selectedUser.user_id
+            ? { ...user, ...editUser }
+            : user
+        )
+      );
+    }
+  };
+
+  const handleDelete = (_id: any) => {
+    if (selectedUser) {
+      try {
+        axios
+          .delete(url + "/v1/users/" + selectedUser.user_id, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((response) => {
+            setListUsers(response.data.users);
+            Modal.success({
+              content: response.data.message,
+            });
+            setIsModalDeleteOpen(false);
+            getData();
+          });
+      } catch (error: any) {
+        notification.error(error.response.data.description);
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalDeleteOpen(false);
+    handleModalEditUser(false);
+    handleModalAddUser(false);
+  };
+
+  const showModal = () => {
+    handleModalAddUser(true);
+  };
   const handleModalAddUser = (status: boolean) => {
     setIsModalOpen(status);
   };
+  const handleModalEditUser = (status: boolean) => {
+    setIsModalEditOpen(status);
+  };
 
   return (
-    <>
+    <div>
       <Spin
         spinning={loading}
         size="large"
@@ -152,39 +210,75 @@ const UsersManager = () => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           fontSize: "24px",
-          color: "#ff0000",
         }}
       >
-        <Space
-          style={{
-            marginBottom: 20,
-            justifyContent: "space-between",
-            columnGap: 20,
-            width: "100%",
-          }}
-          className="search"
-        >
-          <Button type="primary" onClick={showModal}>
-            Add New User
-          </Button>
-        </Space>
-        <Table
-          columns={columns}
-          dataSource={list_users}
-          pagination={pagination}
-        />
-        <Modal
-          title="User Infomation"
-          destroyOnClose={true}
-          open={isModalOpen}
-          footer={[]}
-          onCancel={handleCancel}
-          style={{ width: "500px", textAlign: "center" }}
-        >
-          <FormAdd onModalAddUser={handleModalAddUser} onAddUser={handleAddUser}/>
-        </Modal>
+        <>
+          <Space
+            style={{
+              marginBottom: 20,
+              justifyContent: "space-between",
+              columnGap: 20,
+              width: "100%",
+            }}
+            className="search"
+          >
+            <Search
+              placeholder="Search..."
+              enterButton={<SearchOutlined />}
+              onSearch={handleSearch}
+            />
+            <Button type="primary" onClick={showModal}>
+              Add New User
+            </Button>
+          </Space>
+
+          <Table
+            columns={columns}
+            dataSource={listUsers}
+            pagination={pagination}
+          />
+
+          <Modal
+            title="Delete"
+            open={isModalDeleteOpen}
+            onOk={handleDelete}
+            onCancel={handleCancel}
+            okText="Delete"
+            cancelText="Cancel"
+          >
+            <p>Confirm delete this user ??</p>
+          </Modal>
+
+          <Modal
+            title="User Infomation"
+            destroyOnClose={true}
+            open={isModalOpen}
+            footer={[]}
+            onCancel={handleCancel}
+            style={{ width: "500px", textAlign: "center" }}
+          >
+            <FormAdd
+              onModalAddUser={handleModalAddUser}
+              onAddUser={handleAddUser}
+            />
+          </Modal>
+          <Modal
+            title="Edit User Information"
+            open={isModalEditOpen}
+            destroyOnClose={true}
+            footer={[]}
+            onCancel={handleCancel}
+            style={{ width: "500px", textAlign: "center" }}
+          >
+            <FormEdit
+              onModalEditUser={handleModalEditUser}
+              data={selectedUser}
+              onEditUser={handleEditUser}
+            />
+          </Modal>
+        </>
       </Spin>
-    </>
+    </div>
   );
 };
 
