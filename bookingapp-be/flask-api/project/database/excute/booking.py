@@ -74,3 +74,11 @@ class BookingExecutor:
     @staticmethod
     def is_room_blocked(room_id: int) -> Union[bool, None]:
         return Room.query.filter_by(room_id=room_id).value(Room.is_blocked)
+
+    @staticmethod
+    def get_bookings_in_date_range_user(start_date, end_date, user_id) -> List[Booking]:
+        return Booking.query.join(BookingUser,Booking.booking_id==BookingUser.booking_id).filter(
+            Booking.is_deleted == False,
+            Booking.time_end.between(start_date, end_date),
+            BookingUser.user_id == user_id
+        ).all()
