@@ -1,5 +1,6 @@
 from project.database.excute.room import RoomExecutor
 from math import ceil
+from project import db
 from project.models import Room
 from werkzeug.exceptions import Conflict, BadRequest, NotFound
 from typing import Optional, Dict
@@ -44,12 +45,12 @@ class RoomService:
         if existing_room:
             raise BadRequest("Room name already exists")
 
-        room_to_update = Room.query.get(room_id)
+        room_to_update = db.query.get(room_id)
 
         if not room_to_update:
             raise NotFound("Room not found")
 
         room_to_update.room_name = room_name
-        RoomExecutor.commit()
+        db.commit()
 
         return {"message": "Room updated successfully"}
