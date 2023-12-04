@@ -4,6 +4,7 @@ from project import db
 from project.models import Room
 from werkzeug.exceptions import Conflict, BadRequest, NotFound
 from typing import Optional, Dict
+from project.api.common.base_response import BaseResponse
 
 class RoomService:
     @staticmethod
@@ -38,19 +39,23 @@ class RoomService:
 
         return {"message": "Room created successfully"}
     
+    @staticmethod
     def update_room(room_id: int, data: Dict) -> None:
         room_name = data.get("room_name")
-
-        existing_room = RoomExecutor.get_room_by_name(room_name)
-        if existing_room:
-            raise BadRequest("Room name already exists")
 
         room_to_update = Room.query.get(room_id)
 
         if not room_to_update:
             raise NotFound("Room not found")
+        
+        validate_room_name=Room.validate_room_name(room_name)
+        if validate_room_name:
+            return BaseResponse.error_validate(validate_room_name)
+        
+        existing_room = RoomExecutor.get_room_by_name(room_name)
+        if existing_room:
+            raise BadRequest("Room name already exists")
 
         room_to_update.room_name = room_name
         db.commit()
-
-        return {"message": "Room updated successfully"}
+        return BaseResponse.success(message="update room successfully!")
