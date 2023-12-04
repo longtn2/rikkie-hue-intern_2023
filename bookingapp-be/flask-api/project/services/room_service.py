@@ -45,7 +45,7 @@ class RoomService:
         if existing_room:
             raise BadRequest("Room name already exists")
 
-        room_to_update = db.query.get(room_id)
+        room_to_update = Room.query.get(room_id)
 
         if not room_to_update:
             raise NotFound("Room not found")
