@@ -138,8 +138,7 @@ const CalendarBooking = () => {
       setUsers(response.data.data.users);
     } catch (error: any) {
       handleErrorShow(error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -212,6 +211,38 @@ const CalendarBooking = () => {
     setModalShow(true);
   };
 
+  const handleUpdate = async (values: BookingDataApi) => {
+    const formattedBookingData = {
+      ...values,
+      booking_id: values.booking_id
+        ? values.booking_id
+        : selectedBookingData?.booking_id,
+      user_id: values.user_id,
+      room_id: selectedBookingData?.room_id,
+      time_start: dayjs(values.time_start).format('YYYY-MM-DD HH:mm:ss'),
+      time_end: dayjs(values.time_end).format('YYYY-MM-DD HH:mm:ss'),
+    };
+    try {
+      const response = await axios.put(
+        `${url}/v1/bookings/${formattedBookingData!.booking_id}`,
+        formattedBookingData,
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'ngrok-skip-browser-warning': true,
+          },
+        }
+      );
+      fetchBookingData(startDate, endDate);
+      handleEditModalClose();
+      handleSuccessShow(response);
+    } catch (error: any) {
+      handleErrorShow(error);
+      fetchBookingData(startDate, endDate);
+    }
+  };
+
   const eventContent = (eventInfo: EventContentArg) => {
     const { event, view } = eventInfo;
 
@@ -254,6 +285,21 @@ const CalendarBooking = () => {
 
     fetchBookingData(startDate, endDate);
   };
+
+  const handleEventDrop = (eventInfo: EventClickArg) => {
+    const { event } = eventInfo;
+    const selectedData: BookingDataApi = {
+      title: event.title,
+      booking_id: event.extendedProps.booking_id || null,
+      time_start: dayjs(event.start).format('YYYY-MM-DD HH:mm:ss'),
+      time_end: dayjs(event.end).format('YYYY-MM-DD HH:mm:ss'),
+      user_id: event.extendedProps.user_id,
+      room_id: event.extendedProps.room_id,
+      room_name: event.extendedProps.room_name,
+      user_name: event.extendedProps.user_name,
+    };
+    handleUpdate(selectedData);
+  };
   return (
     <FullCalendar
       plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
@@ -272,6 +318,8 @@ const CalendarBooking = () => {
       selectMirror={true}
       select={handleDateSelect}
       datesSet={handleDatesSet}
+      editable={true}
+      eventDrop={handleEventDrop}
     />
   );
 };
