@@ -46,7 +46,6 @@ const InfoUser = () => {
   };
   const handleShowModal = () => {
     handleModalEditUser(true);
-    console.log(infoUser);
   };
   const handleCancel = () => {
     handleModalEditUser(false);
