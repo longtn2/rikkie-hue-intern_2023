@@ -8,6 +8,7 @@ import { url } from "../ultils/urlApi";
 import { handleError } from "../ultils/ultilsApi";
 import { showPopup } from "../ultils/Popup";
 import avatar from "../../../public/avatar.png";
+import "./InfoAccount.css"
 
 const InfoUser = () => {
   const [infoUser, setInfoUser] = useState<DataType>();
@@ -63,7 +64,7 @@ const InfoUser = () => {
   return (
     <>
       <h1 className="component-name">Account information</h1>
-      <div style={{ display: "flex", justifyContent: "center", padding: 50 }}>
+      <div  className="show-info">
         <Descriptions className="info-detail" layout="horizontal" column={1}>
           <Descriptions.Item
             contentStyle={customContentStyle}
@@ -88,11 +89,7 @@ const InfoUser = () => {
           </Descriptions.Item>
           <Descriptions.Item>
             <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                width: "100%",
-              }}
+             className= "btn-edit-info"
             >
               <Button
                 style={{ marginTop: 20 }}
