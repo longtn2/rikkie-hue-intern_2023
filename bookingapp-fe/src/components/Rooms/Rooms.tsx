@@ -337,7 +337,11 @@ const Rooms: React.FC = () => {
           onCancel={handleCloseEditModal}
           footer={null}
         >
-          <MyForm status="update" onFinish={handleUpdate} onCancel={handleCloseEditModal} />
+          <MyForm
+            status='update'
+            onFinish={handleUpdate}
+            onCancel={handleCloseEditModal}
+          />
         </Modal>
 
         <Modal
@@ -346,7 +350,11 @@ const Rooms: React.FC = () => {
           onCancel={handleCancel}
           footer={null}
         >
-          <MyForm status="add" onFinish={handleAddRoom} onCancel={handleCancel} />
+          <MyForm
+            status='add'
+            onFinish={handleAddRoom}
+            onCancel={handleCancel}
+          />
         </Modal>
       </div>
     </>

@@ -5,12 +5,12 @@ interface MyFormProps {
   onCancel: () => void;
 }
 
-const MyForm: React.FC<MyFormProps> = ({ status , onFinish, onCancel }) => {
+const MyForm: React.FC<MyFormProps> = ({ status, onFinish, onCancel }) => {
   const { form } = Form.useForm();
   const handleCancel = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
     onCancel();
-    form.resetFields(); 
+    form.resetFields();
   };
 
   return (
@@ -23,7 +23,7 @@ const MyForm: React.FC<MyFormProps> = ({ status , onFinish, onCancel }) => {
       </Form.Item>
       <Form.Item>
         <Button type='primary' htmlType='submit' style={{ marginRight: '5px' }}>
-          {status === "update" ? 'Save Changes' : 'Add'}
+          {status === 'update' ? 'Save Changes' : 'Add'}
         </Button>
         <Button htmlType='button' onClick={handleCancel}>
           Cancel

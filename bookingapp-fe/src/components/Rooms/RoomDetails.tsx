@@ -56,14 +56,19 @@ const RoomDetails = () => {
       setRoom(response.data.data);
     } catch (error: any) {
       handleErrorShow(error);
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
-  
-  const handleModal = (isOpen: boolean, roomDescription: string, modalType: 'look' | 'open') => {
+
+  const handleModal = (
+    isOpen: boolean,
+    roomDescription: string,
+    modalType: 'look' | 'open'
+  ) => {
     const formInstance = modalType === 'look' ? form : form1;
-    const setIsModalVisible = modalType === 'look' ? setIsLookModalVisible : setIsOpenModalVisible;
+    const setIsModalVisible =
+      modalType === 'look' ? setIsLookModalVisible : setIsOpenModalVisible;
     formInstance.setFieldsValue({ description: roomDescription });
     setIsModalVisible(isOpen);
   };
@@ -75,8 +80,8 @@ const RoomDetails = () => {
 
   const handleLookRoom = async (values: { description: string }) => {
     try {
-    setLoading(true);
-    const response = await axios.put(
+      setLoading(true);
+      const response = await axios.put(
         `${url}/v1/rooms/${id}/blocked`,
         {
           description: values.description,
@@ -89,10 +94,10 @@ const RoomDetails = () => {
       );
       fetchRoomId(roomId);
       handleSuccessShow(response);
-      handleModal(false,"","look");
+      handleModal(false, '', 'look');
     } catch (error: any) {
       handleErrorShow(error);
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -100,7 +105,7 @@ const RoomDetails = () => {
   const handleOpenLookRoom = async (values: { description: string }) => {
     try {
       setLoading(true);
-      const response =  await axios.put(
+      const response = await axios.put(
         `${url}/v1/rooms/${id}/opened`,
         {
           description: values.description,
@@ -112,11 +117,11 @@ const RoomDetails = () => {
         }
       );
       fetchRoomId(roomId);
-      handleModal(false,"","open");
+      handleModal(false, '', 'open');
       handleSuccessShow(response);
     } catch (error: any) {
       handleErrorShow(error);
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -138,18 +143,18 @@ const RoomDetails = () => {
   return (
     <>
       <Spin
-          size='large'
-          tip='Loading...'
-          spinning={loading}
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            fontSize: '24px',
-          }}
-        />
-        {room?.is_blocked ? (
+        size='large'
+        tip='Loading...'
+        spinning={loading}
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: '24px',
+        }}
+      />
+      {room?.is_blocked ? (
         <Result
           status='error'
           title='Phòng bị khóa'
@@ -162,7 +167,7 @@ const RoomDetails = () => {
             <div>
               <Text>Bạn có muốn mở lại phòng này không</Text>
               <Button
-                onClick={() => handleModal(true, room?.description,'look')}
+                onClick={() => handleModal(true, room?.description, 'look')}
                 style={{ marginLeft: '10px' }}
                 type='primary'
               >
@@ -174,12 +179,18 @@ const RoomDetails = () => {
       ) : (
         <Modal
           title={
-            <div style={{ textAlign: 'center', width: '100%', borderBottom: '2px solid black' }}>
+            <div
+              style={{
+                textAlign: 'center',
+                width: '100%',
+                borderBottom: '2px solid black',
+              }}
+            >
               <Title level={4}>{room?.room_name}</Title>
             </div>
           }
           visible={open}
-          onOk={() => handleModal(true,room!.description,"open")}
+          onOk={() => handleModal(true, room!.description, 'open')}
           okText='Look'
           onCancel={handleModalClose}
           cancelText='Cancel'
@@ -189,8 +200,8 @@ const RoomDetails = () => {
       )}
       <CustomModal
         title='Look Rooms'
-        visible={isLookModalVisible} 
-        onCancel={() => handleModal(false,"","look")}
+        visible={isLookModalVisible}
+        onCancel={() => handleModal(false, '', 'look')}
         formId='lookForm'
         formConfig={lookFormConfig}
         onFinish={handleLookRoom}
@@ -199,13 +210,13 @@ const RoomDetails = () => {
       <CustomModal
         title='Open Rooms'
         visible={isOpenModalVisible}
-        onCancel={() => handleModal(false,"","open")}
+        onCancel={() => handleModal(false, '', 'open')}
         formId='openForm'
         formConfig={openFormConfig}
         onFinish={handleOpenLookRoom}
       />
     </>
   );
-}
+};
 
 export default RoomDetails;
