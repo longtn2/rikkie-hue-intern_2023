@@ -1,7 +1,5 @@
 import React from 'react';
 import { Modal, Form, Input, Button, Typography } from 'antd';
-
-
 const { Title } = Typography;
 
 interface FormConfigItem {
@@ -64,5 +62,4 @@ const CustomModal: React.FC<CustomModalProps> = ({
     </Modal>
   );
 };
-
 export default CustomModal;

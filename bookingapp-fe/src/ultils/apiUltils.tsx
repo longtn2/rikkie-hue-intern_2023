@@ -11,7 +11,6 @@ type axiosApi = {
 
 export const handleSuccess = (response: AxiosResponse<axiosApi>) => {
   const { data } = response;
-
   const status = data.status;
   const message = data.message;
 
@@ -21,7 +20,7 @@ export const handleSuccess = (response: AxiosResponse<axiosApi>) => {
 export const handleError = (error: any) => {
   const { response } = error;
 
-  if (response && response.data) {
+  if (response?.data) {
     const { data } = response;
     if (Array.isArray(data)) {
       if (data.length > 0) {

@@ -28,5 +28,4 @@ const RoomModalContent: React.FC<RoomModalContentProps> = ({ room }) => {
     </Card>
   );
 };
-
 export default RoomModalContent;
