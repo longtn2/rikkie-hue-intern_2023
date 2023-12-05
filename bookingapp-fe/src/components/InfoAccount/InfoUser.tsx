@@ -1,10 +1,13 @@
 import { Button, Descriptions, Image, Modal } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { url } from "../../ultils/urlApi";
-import { DataType } from "../../constant/constant";
-import getCookie from "../../route/Cookie";
 import FormEdit from "../UserManager/FormEdit";
+import { DataType } from "../constant/constant";
+import getCookie from "../route/Cookie";
+import { url } from "../ultils/urlApi";
+import { handleError } from "../ultils/ultilsApi";
+import { showPopup } from "../ultils/Popup";
+import avatar from "../../../public/avatar.png"
 
 const InfoUser = () => {
   const [infoUser, setInfoUser] = useState<DataType>();
@@ -23,8 +26,10 @@ const InfoUser = () => {
         .then((response) => {
           setInfoUser(response.data.data);
         });
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      const { message, errors }: any = handleError(error);
+      const messageErrors = message + " " + errors;
+      showPopup(false, messageErrors);
     } finally {
     }
   };
@@ -33,7 +38,7 @@ const InfoUser = () => {
   }, []);
   const handleEditUser = (editUser: DataType) => {
     if (editUser) {
-      setInfoUser((prevUser) => ({
+      setInfoUser((prevUser: any) => ({
         ...prevUser,
         ...editUser,
       }));
@@ -110,7 +115,7 @@ const InfoUser = () => {
         </Descriptions>
         <Image
           width={200}
-          src="https://www.kindpng.com/picc/m/421-4212275_transparent-default-avatar-png-avatar-img-png-download.png"
+          src= {avatar}
         />
       </div>
       <Modal
