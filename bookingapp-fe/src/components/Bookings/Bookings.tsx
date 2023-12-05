@@ -109,6 +109,7 @@ const CalendarBooking = () => {
 
   const fetchRooms = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${url}/v1/rooms`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -119,11 +120,14 @@ const CalendarBooking = () => {
       setRooms(response.data.data.rooms);
     } catch (error: any) {
       handleErrorShow(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchUser = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${url}/v1/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -134,6 +138,9 @@ const CalendarBooking = () => {
       setUsers(response.data.data.users);
     } catch (error: any) {
       handleErrorShow(error);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -221,7 +228,11 @@ const CalendarBooking = () => {
     } else {
       return (
         <>
-          <div>{event.title}</div>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+          >
+            <Title level={2}>{event.title}</Title>
+          </div>
         </>
       );
     }
@@ -230,7 +241,6 @@ const CalendarBooking = () => {
     const { start, end } = arg;
     const startTime = dayjs(start);
     const endTime = dayjs(end);
-    console.log('Start TIme: ', startTime, 'End Time: ', endTime);
     setTimeStartAdd(startTime);
     setTimeEndAdd(endTime);
   };
