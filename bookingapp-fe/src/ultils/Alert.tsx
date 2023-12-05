@@ -8,23 +8,22 @@ type AlertProps = {
   style?: React.CSSProperties;
 };
 
-const CustomAlert: React.FC<AlertProps> = ({
+const CustomAlert: React.FC< AlertProps > = ({
   status,
   visible,
   message,
   error,
   style,
 }) => {
-
   return (
     <>
-      {visible && (
+      { visible && (
         <Alert
-          type={status === 200 ? 'success' : 'warning'}
+          type={ status === 200 ? 'success' : 'warning' }
           message={
             <>
               <h3>
-                {message}: {error}
+                 { message }: { error }
               </h3>
             </>
           }

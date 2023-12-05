@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import CustomAlert from '../../ultils/Alert';
 import { handleSuccessShow, handleErrorShow } from '../../ultils/apiUltils';
 import { url } from '../../ultils/apiUrl';
+import CustomModal from './Modal';
 
 
 const { Title, Text } = Typography;
@@ -28,8 +29,6 @@ interface RoomManager {
   is_blocked: boolean;
 }
 
-
-
 const RoomDetails = () => {
   const { id } = useParams();
   const roomId: number = parseInt(id as string);
@@ -40,52 +39,49 @@ const RoomDetails = () => {
   const [open, setOpen] = useState<boolean>(Boolean(id));
   const [isLookModalVisible, setIsLookModalVisible] = useState<boolean>(false);
   const [isOpenModalVisible, setIsOpenModalVisible] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleModalClose = () => {
-    setOpen(false);
-    navigate('/roomManager');
-  };
-
+  useEffect(() => {
+    fetchRoomId(roomId);
+    setOpen(Boolean(id));
+  }, []);
 
   const fetchRoomId = async (roomId: number) => {
     try {
+      setLoading(true);
       const response = await axios.get(`${url}/v1/rooms/${roomId}`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      handleSuccessShow(response);
+      setRoom(response.data.data);
     } catch (error: any) {
       handleErrorShow(error);
     }
+    finally{
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    fetchRoomId(roomId);
-  }, [roomId]);
-
-  const handleOpenModalLook = (roomDescription: string) => {
-    form.setFieldValue('description', roomDescription);
-    setIsLookModalVisible(true);
+  console.log(room?.is_blocked);
+  
+  const handleModal = (isOpen: boolean, roomDescription: string, modalType: 'look' | 'open') => {
+    const formInstance = modalType === 'look' ? form : form1;
+    const setIsModalVisible = modalType === 'look' ? setIsLookModalVisible : setIsOpenModalVisible;
+    formInstance.setFieldsValue({ description: roomDescription });
+    setIsModalVisible(isOpen);
   };
 
-  const handleCloseModalLook = () => {
-    setIsLookModalVisible(false);
-  };
-
-  const handleOpenModalOpenLook = (roomDescription: string) => {
-    form1.setFieldValue('description', roomDescription);
-    setIsOpenModalVisible(true);
-  };
-
-  const handleCloseModalOpenLook = () => {
-    setIsOpenModalVisible(false);
+  const handleModalClose = () => {
+    setOpen(false);
+    navigate('/roomManager');
   };
 
   const handleLookRoom = async (values: { description: string }) => {
     try {
+    setLoading(true);
     const response = await axios.put(
         `${url}/v1/rooms/${id}/blocked`,
         {
@@ -99,14 +95,17 @@ const RoomDetails = () => {
       );
       fetchRoomId(roomId);
       handleSuccessShow(response);
-      handleCloseModalLook();
+      handleModal(false,"","look");
     } catch (error: any) {
       handleErrorShow(error);
+    }finally{
+      setLoading(false);
     }
   };
 
   const handleOpenLookRoom = async (values: { description: string }) => {
     try {
+      setLoading(true);
       const response =  await axios.put(
         `${url}/v1/rooms/${id}/opened`,
         {
@@ -119,144 +118,118 @@ const RoomDetails = () => {
         }
       );
       fetchRoomId(roomId);
-      handleCloseModalOpenLook();
+      handleModal(false,"","open");
       handleSuccessShow(response);
     } catch (error: any) {
       handleErrorShow(error);
     }
+    finally{
+      setLoading(false);
+    }
   };
 
+  const lookFormConfig = [
+    {
+      name: 'description',
+      label: 'Description',
+    },
+  ];
 
-  if (!room) {
-    return (
-      <Spin
-        size='large'
-        tip='Loading...'
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          fontSize: '24px',
-        }}
-      />
-    );
-  }
+  const openFormConfig = [
+    {
+      name: 'description',
+      label: 'Description',
+    },
+  ];
 
   return (
     <>
-      {room.is_blocked ? (
-        <>
-          <Result
-            status='error'
-            title='Phòng bị khóa'
-            subTitle={
-              <div>
-                <Text>Description: {room.description}</Text>
-              </div>
-            }
-            extra={
-              <div>
-                <Text>Bạn có muốn mở lại phòng này không</Text>
-                <Button
-                  onClick={() => handleOpenModalOpenLook(room.description)}
-                  style={{ marginLeft: '10px' }}
-                  type='primary'
-                >
-                  Opened
-                </Button>
-              </div>
-            }
-          />
-        </>
-      ) : (
-        <>
-          <Modal
-            title={
-              <div
-                style={{textAlign:'center',width:"100%",borderBottom:'2px solid black'}}
+      {loading ? (
+        <Spin
+          size='large'
+          tip='Loading...'
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontSize: '24px',
+          }}
+        />
+      ) : room?.is_blocked ? (
+        <Result
+          status='error'
+          title='Phòng bị khóa'
+          subTitle={
+            <div>
+              <Text>Description: {room?.description}</Text>
+            </div>
+          }
+          extra={
+            <div>
+              <Text>Bạn có muốn mở lại phòng này không</Text>
+              <Button
+                onClick={() => handleModal(true, room?.description,'look')}
+                style={{ marginLeft: '10px' }}
+                type='primary'
               >
-                <Title level={4}>{room.room_name}</Title>
-              </div>
-            }
-            visible={open}
-            onOk={() => handleOpenModalLook(room.description)}
-            okText='Look'
-            onCancel={handleModalClose}
-            cancelText='Cancel'
+                Opened
+              </Button>
+            </div>
+          }
+        />
+      ) : (
+        <Modal
+          title={
+            <div style={{ textAlign: 'center', width: '100%', borderBottom: '2px solid black' }}>
+              <Title level={4}>{room?.room_name}</Title>
+            </div>
+          }
+          visible={open}
+          onOk={() => handleModal(true,room!.description,"open")}
+          okText='Look'
+          onCancel={handleModalClose}
+          cancelText='Cancel'
+        >
+          <Card
+            style={{ width: '100%' }}
+            bodyStyle={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+            }}
           >
-            <Card
-              style={{ width: '100%' }}
-              bodyStyle={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-              }}
-            >
-              <div style={{ marginBottom: 8 }}>
-                <Text strong>Room ID:</Text> {room.room_id}
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <Text strong>Status:</Text>{' '}
-                {room.status ? 'Active' : 'Inactive'}
-              </div>
-              <div style={{ marginBottom: 8 }}>
-                <Text strong>Description:</Text> {room.description}
-              </div>
-            </Card>
-          </Modal>
-        </>
+            <div style={{ marginBottom: 8 }}>
+              <Text strong>Room ID:</Text> {room?.room_id}
+            </div>
+            <div style={{ marginBottom: 8 }}>
+              <Text strong>Status:</Text> {room?.status ? 'Active' : 'Inactive'}
+            </div>
+            <div style={{ marginBottom: 8 }}>
+              <Text strong>Description:</Text> {room?.description}
+            </div>
+          </Card>
+        </Modal>
       )}
+      <CustomModal
+        title='Look Rooms'
+        visible={isLookModalVisible} 
+        onCancel={() => handleModal(false,"","look")}
+        formId='lookForm'
+        formConfig={lookFormConfig}
+        onFinish={handleLookRoom}
+      />
 
-      <Modal
-        title={<Title level={2}>Look Rooms</Title>}
-        visible={isLookModalVisible}
-        onCancel={handleCloseModalLook}
-        footer={[
-          <Button key='cancel' onClick={handleCloseModalLook}>
-            Cancel
-          </Button>,
-          <Button key='look' type='default' form='lookForm' htmlType='submit'>
-            Look
-          </Button>,
-        ]}
-      >
-        <Form form={form} id='lookForm' onFinish={handleLookRoom}>
-          <Form.Item
-            name='description'
-            label='Description'
-            rules={[{ required: true, message: 'Please enter description' }]}
-          >
-            <Input type='text' />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      <Modal
-        title={<Title level={2}>Open Rooms</Title>}
+      <CustomModal
+        title='Open Rooms'
         visible={isOpenModalVisible}
-        onCancel={handleCloseModalOpenLook}
-        footer={[
-          <Button key='cancel' onClick={handleCloseModalOpenLook}>
-            Cancel
-          </Button>,
-          <Button key='open' type='primary' form='openForm' htmlType='submit'>
-            Open
-          </Button>,
-        ]}
-      >
-        <Form form={form1} id='openForm' onFinish={handleOpenLookRoom}>
-          <Form.Item
-            name='description'
-            label='Description'
-            rules={[{ required: true, message: 'Please enter description' }]}
-          >
-            <Input type='text' />
-          </Form.Item>
-        </Form>
-      </Modal>
+        onCancel={() => handleModal(false,"","open")}
+        formId='openForm'
+        formConfig={openFormConfig}
+        onFinish={handleOpenLookRoom}
+      />
     </>
   );
-};
+}
 
 export default RoomDetails;
