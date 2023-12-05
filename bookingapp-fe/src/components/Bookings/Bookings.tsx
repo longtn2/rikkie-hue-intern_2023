@@ -323,4 +323,5 @@ const CalendarBooking = () => {
     />
   );
 };
+
 export default CalendarBooking;
