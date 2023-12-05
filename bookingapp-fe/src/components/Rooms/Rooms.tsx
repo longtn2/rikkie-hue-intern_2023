@@ -15,10 +15,11 @@ import {
   AutoComplete,
 } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import {  EditOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import getCookie from '../route/Cookie';
 import { url } from '../../ultils/apiUrl';
 import { handleErrorShow, handleSuccessShow } from '../../ultils/apiUltils';
+import MyForm from './ModalRooms';
 interface Room {
   room_id: number;
   room_name: string;
@@ -40,6 +41,10 @@ const Rooms: React.FC = () => {
   const perPage = 6;
   const [totalRooms, setTotalRooms] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, [currentPage, totalRooms]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -72,9 +77,6 @@ const Rooms: React.FC = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-  useEffect(() => {
-    fetchData();
-  }, [currentPage, totalRooms]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -93,7 +95,6 @@ const Rooms: React.FC = () => {
     onChange: handlePageChange,
     onShowSizeChange: handlePageSizeChange,
   };
- 
 
   const handleShowAdd = () => {
     setIsModalVisible(true);
@@ -101,8 +102,9 @@ const Rooms: React.FC = () => {
 
   const handleAddRoom = async (values: any) => {
     try {
+      setLoading(true);
       const { room_name, description } = values;
-      const response =  await axios.post(
+      const response = await axios.post(
         `${url}/v1/rooms`,
         {
           room_name,
@@ -117,8 +119,10 @@ const Rooms: React.FC = () => {
       handleSuccessShow(response);
     } catch (error: any) {
       handleErrorShow(error);
+    } finally {
+      handleCancel();
+      setLoading(false);
     }
-    handleCancel();
   };
   const handleEdit = (id: number, name: string) => {
     setSelectedRoom({
@@ -136,7 +140,7 @@ const Rooms: React.FC = () => {
       setLoading(true);
       const values = await form.validateFields();
       if (selectedRoom) {
-        const response =  await axios.put(
+        const response = await axios.put(
           `${url}/v1/rooms/${selectedRoom.room_id}`,
           { room_name: values.room_name },
           {
@@ -150,41 +154,44 @@ const Rooms: React.FC = () => {
         fetchData();
       }
     } catch (error: any) {
-        handleErrorShow(error)
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
   const handleCloseEditModal = () => {
     setShowEditModal(false);
   };
   const fetchSearch = async (value: string) => {
-    const requestUrl = `${url}/v1/rooms/search`;
-    await axios
-      .get(requestUrl, {
-        params: {
-          name: value,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': true,
-        },
-      })
-      .then(response => {
-        setRooms(response.data.data.rooms);
-        setCurrentPage(response.data.data.total_items);
-      })
-      .catch(error => {
-        handleErrorShow(error);
-      });
+    try {
+      const requestUrl = `${url}/v1/rooms/search`;
+      await axios
+        .get(requestUrl, {
+          params: {
+            name: value,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': true,
+          },
+        })
+        .then(response => {
+          setRooms(response.data.data.rooms);
+          setCurrentPage(response.data.data.total_items);
+        })
+        .catch(error => {
+          handleErrorShow(error);
+        });
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSearch = async (value: string) => {
-    if (value.length === 0) {
-      fetchData();
-    } else {
-      fetchSearch(value);
-    }
+    value.length ? fetchSearch(value) : fetchData();
   };
   return (
     <>
@@ -233,92 +240,89 @@ const Rooms: React.FC = () => {
           </div>
         </Space>
         <div className='action'>
-
-          {loading ? (
-            <Spin
-              size='large'
-              tip='Loading...'
-              style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                fontSize: '24px',
-                color: '#ff0000',
-              }}
-            />
-          ) : (
-            <div
-              className='card-group'
-              style={{
-                width: '100%',
-                height: '80%',
-                padding: '10px 0px 10px 80px',
-              }}
-            >
-              <List
-                dataSource={rooms}
-                grid={{ gutter: 20, column: 3 }}
-                pagination={pagination}
-                renderItem={room => (
-                  <List.Item
+          <Spin
+            size='large'
+            tip='Loading...'
+            spinning={loading}
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: '24px',
+              color: '#ff0000',
+            }}
+          />
+          <div
+            className='card-group'
+            style={{
+              width: '100%',
+              height: '80%',
+              padding: '10px 0px 10px 80px',
+            }}
+          >
+            <List
+              dataSource={rooms}
+              grid={{ gutter: 20, column: 3 }}
+              pagination={pagination}
+              renderItem={room => (
+                <List.Item
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-evenly',
+                    minWidth: '100px',
+                    minHeight: '80px',
+                    maxHeight: '370px',
+                    maxWidth: '280px',
+                    padding: '20px 0',
+                  }}
+                >
+                  <div
+                    key={room.room_id}
+                    className='room-card'
                     style={{
+                      width: '100%',
+                      height: '100%',
+                      border: '2px solid #dadada',
+                      borderRadius: '1rem',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-evenly',
-                      minWidth: '100px',
-                      minHeight: '80px',
-                      maxHeight: '370px',
-                      maxWidth: '280px',
-                      padding: '20px 0',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <div
-                      key={room.room_id}
-                      className='room-card'
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        border: '2px solid #dadada',
-                        borderRadius: '1rem',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <div className='room-info'>
-                        <h2>
-                          <Link to={`/roomManager/${room.room_id}`}>
-                            {room.room_name}
-                          </Link>
-                        </h2>
-                        <p
-                          style={{
-                            color: room.is_blocked ? 'red' : 'black',
-                            fontSize: '20px',
-                          }}
-                        >
-                          Trạng thái: {room.is_blocked ? 'Bận' : 'Rảnh'}
-                        </p>
-                      </div>
-                      <div className='room-actions'>
-                        <Space style={{ marginBottom: '10px' }}>
-                          <Popover content='Edit Room'>
-                            <EditOutlined
-                              style={{ justifyContent: 'flex-end' }}
-                              onClick={() =>
-                                handleEdit(room.room_id, room.room_name)
-                              }
-                            />
-                          </Popover>
-                        </Space>
-                      </div>
+                    <div className='room-info'>
+                      <h2>
+                        <Link to={`/roomManager/${room.room_id}`}>
+                          {room.room_name}
+                        </Link>
+                      </h2>
+                      <p
+                        style={{
+                          color: room.is_blocked ? 'red' : 'black',
+                          fontSize: '20px',
+                        }}
+                      >
+                        Trạng thái: {room.is_blocked ? 'Bận' : 'Rảnh'}
+                      </p>
                     </div>
-                  </List.Item>
-                )}
-              />
-            </div>
-          )}
+                    <div className='room-actions'>
+                      <Space style={{ marginBottom: '10px' }}>
+                        <Popover content='Edit Room'>
+                          <EditOutlined
+                            style={{ justifyContent: 'flex-end' }}
+                            onClick={() =>
+                              handleEdit(room.room_id, room.room_name)
+                            }
+                          />
+                        </Popover>
+                      </Space>
+                    </div>
+                  </div>
+                </List.Item>
+              )}
+            />
+          </div>
         </div>
 
         <Modal
@@ -333,39 +337,7 @@ const Rooms: React.FC = () => {
           onCancel={handleCloseEditModal}
           footer={null}
         >
-          <Form form={form} onFinish={handleUpdate}>
-            <Form.Item name='room_name'>
-              <Input
-                type='text'
-                style={{ padding: '10px 20px', fontSize: '16px' }}
-              />
-            </Form.Item>
-            <Form.Item name='description'>
-              <Input 
-                type='text'
-                style={{ padding: '10px 20px', fontSize: '16px' }}
-              />
-            </Form.Item>
-            <Form.Item>
-              <Button
-                type='primary'
-                htmlType='submit'
-                style={{ marginRight: '5px' }}
-              >
-                Save Changes
-              </Button>
-              <Button
-                htmlType='button'
-                onClick={event => {
-                  event.preventDefault();
-                  setShowEditModal(false);
-                  form.resetFields();
-                }}
-              >
-                Cancel
-              </Button>
-            </Form.Item>
-          </Form>
+          <MyForm status="update" onFinish={handleUpdate} onCancel={handleCloseEditModal} />
         </Modal>
 
         <Modal
@@ -374,54 +346,11 @@ const Rooms: React.FC = () => {
           onCancel={handleCancel}
           footer={null}
         >
-          <Form form={form} onFinish={handleAddRoom} preserve={false}>
-            <Form.Item
-              name='room_name'
-              label='Room Name:'
-              rules={[
-                {
-                  required: true,
-                  message: 'Room not empty',
-                },
-              ]}
-            >
-              <Input type='text' />
-            </Form.Item>
-            <Form.Item
-              name='description'
-              label='Description:'
-              rules={[
-                {
-                  required: true,
-                  message: 'Room not empty',
-                },
-              ]}
-            >
-              <Input type='text' />
-            </Form.Item>
-            <Form.Item>
-              <Button
-                type='primary'
-                htmlType='submit'
-                style={{ marginRight: '5px' }}
-              >
-                Add
-              </Button>
-              <Button
-                htmlType='button'
-                onClick={event => {
-                  event.preventDefault();
-                  handleCancel();
-                  form.resetFields();
-                }}
-              >
-                Cancel
-              </Button>
-            </Form.Item>
-          </Form>
+          <MyForm status="add" onFinish={handleAddRoom} onCancel={handleCancel} />
         </Modal>
       </div>
     </>
   );
 };
+
 export default Rooms;

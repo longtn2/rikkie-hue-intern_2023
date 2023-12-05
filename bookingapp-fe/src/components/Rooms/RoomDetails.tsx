@@ -17,10 +17,7 @@ import { handleSuccessShow, handleErrorShow } from '../../ultils/apiUltils';
 import { url } from '../../ultils/apiUrl';
 import CustomModal from './Modal';
 import RoomModalContent from './ModalContent';
-
-
 const { Title, Text } = Typography;
-
 interface RoomManager {
   room_id: number;
   room_name: string;
@@ -59,13 +56,10 @@ const RoomDetails = () => {
       setRoom(response.data.data);
     } catch (error: any) {
       handleErrorShow(error);
-    }
-    finally{
+    } finally{
       setLoading(false);
     }
   };
-
-  console.log(room?.is_blocked);
   
   const handleModal = (isOpen: boolean, roomDescription: string, modalType: 'look' | 'open') => {
     const formInstance = modalType === 'look' ? form : form1;
@@ -98,7 +92,7 @@ const RoomDetails = () => {
       handleModal(false,"","look");
     } catch (error: any) {
       handleErrorShow(error);
-    }finally{
+    } finally{
       setLoading(false);
     }
   };
@@ -122,8 +116,7 @@ const RoomDetails = () => {
       handleSuccessShow(response);
     } catch (error: any) {
       handleErrorShow(error);
-    }
-    finally{
+    } finally{
       setLoading(false);
     }
   };
@@ -214,4 +207,5 @@ const RoomDetails = () => {
     </>
   );
 }
+
 export default RoomDetails;
