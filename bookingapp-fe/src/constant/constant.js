@@ -8,7 +8,6 @@ export interface DataType {
     email: string;
     is_deleted: boolean;
   }
-
   export interface RoomManager {
     room_id: number;
     room_name: string;

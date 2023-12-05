@@ -7,7 +7,6 @@ interface FormConfigItem {
   name: string;
   label: string;
 }
-
 interface CustomModalProps {
   title: string;
   visible: boolean;
@@ -16,7 +15,6 @@ interface CustomModalProps {
   formConfig: FormConfigItem[];
   onFinish: (values: any) => void;
 }
-
 const CustomModal: React.FC<CustomModalProps> = ({
   title,
   visible,

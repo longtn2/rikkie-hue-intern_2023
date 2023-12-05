@@ -5,7 +5,6 @@ const { Text } = Typography;
 interface RoomModalContentProps {
   room: RoomManager | null;
 }
-
 const RoomModalContent: React.FC<RoomModalContentProps> = ({ room }) => {
   return (
     <Card

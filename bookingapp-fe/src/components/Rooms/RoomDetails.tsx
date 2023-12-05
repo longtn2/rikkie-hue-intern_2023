@@ -17,8 +17,6 @@ import { handleSuccessShow, handleErrorShow } from '../../ultils/apiUltils';
 import { url } from '../../ultils/apiUrl';
 import CustomModal from './Modal';
 import RoomModalContent from './ContentModal';
-
-
 const { Title, Text } = Typography;
 
 interface RoomManager {
@@ -59,8 +57,7 @@ const RoomDetails = () => {
       setRoom(response.data.data);
     } catch (error: any) {
       handleErrorShow(error);
-    }
-    finally{
+    } finally{
       setLoading(false);
     }
   };
@@ -102,7 +99,6 @@ const RoomDetails = () => {
       setLoading(false);
     }
   };
-
   const handleOpenLookRoom = async (values: { description: string }) => {
     try {
       setLoading(true);
