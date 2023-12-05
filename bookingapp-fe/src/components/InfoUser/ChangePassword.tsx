@@ -55,6 +55,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onChange }) => {
             rules={[
               { required: true, message: "Please input password!" },
               { whitespace: true, message: "Please input password!" },
+              { min: 8, message: "Password has at least 8 numbers" },
             ]}
             hasFeedback
           >
