@@ -17,10 +17,10 @@ const RoomModalContent: React.FC<RoomModalContentProps> = ({ room }) => {
       }}
     >
       <div style={{ marginBottom: 8 }}>
-        <Text strong>Room ID: {room?.room_id}</Text> 
+        <Text strong>Room ID: {room?.room_id}</Text>
       </div>
       <div style={{ marginBottom: 8 }}>
-        <Text strong>Status: {room?.status ? 'Active' : 'Inactive'}</Text> 
+        <Text strong>Status: {room?.status ? 'Active' : 'Inactive'}</Text>
       </div>
       <div style={{ marginBottom: 8 }}>
         <Text strong>Description:</Text> {room?.description}
@@ -28,4 +28,5 @@ const RoomModalContent: React.FC<RoomModalContentProps> = ({ room }) => {
     </Card>
   );
 };
+
 export default RoomModalContent;

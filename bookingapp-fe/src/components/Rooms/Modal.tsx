@@ -53,7 +53,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
             key={item.name}
             name={item.name}
             label={item.label}
-            rules={[{ required: true, message: `Please enter ${item.label}` }]}
+            rules={[{ required: true, message: Please enter ${item.label} }]}
           >
             <Input type='text' />
           </Form.Item>
