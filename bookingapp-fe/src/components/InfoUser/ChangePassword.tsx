@@ -5,6 +5,7 @@ import { url } from "../ultils/urlApi";
 import { handleError, handleSuccess } from "../ultils/ultilsApi";
 import { showPopup } from "../ultils/Popup";
 import { token } from "../constant/constant";
+import "./ChangePassword.css"
 
 interface ChangePasswordProps {
   onChange: (status: boolean) => void;
@@ -37,7 +38,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onChange }) => {
 
   return (
     <div>
-      <div style={{ padding: 20 }}>
+      <div className="form-change">
         <Form
           name="validateOnly"
           labelCol={{ flex: "200px" }}
@@ -46,7 +47,6 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onChange }) => {
           wrapperCol={{ flex: 1 }}
           preserve={false}
           colon={false}
-          style={{ maxWidth: 800 }}
           onFinish={handleChangepassword}
         >
           <Form.Item
