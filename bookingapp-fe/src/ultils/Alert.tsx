@@ -23,7 +23,7 @@ const CustomAlert: React.FC< AlertProps > = ({
           message={
             <>
               <h3>
-                 { message }: { error }
+                 {message}: {error}
               </h3>
             </>
           }

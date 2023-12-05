@@ -13,10 +13,10 @@ import axios from 'axios';
 import getCookie from '../route/Cookie';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import CustomAlert from '../../ultils/Alert';
 import { handleSuccessShow, handleErrorShow } from '../../ultils/apiUltils';
 import { url } from '../../ultils/apiUrl';
 import CustomModal from './Modal';
+import RoomModalContent from './ContentModal';
 
 
 const { Title, Text } = Typography;
@@ -144,7 +144,6 @@ const RoomDetails = () => {
 
   return (
     <>
-      {loading ? (
         <Spin
           size='large'
           tip='Loading...'
@@ -156,7 +155,7 @@ const RoomDetails = () => {
             fontSize: '24px',
           }}
         />
-      ) : room?.is_blocked ? (
+        {room?.is_blocked ? (
         <Result
           status='error'
           title='Phòng bị khóa'
@@ -191,24 +190,7 @@ const RoomDetails = () => {
           onCancel={handleModalClose}
           cancelText='Cancel'
         >
-          <Card
-            style={{ width: '100%' }}
-            bodyStyle={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-            }}
-          >
-            <div style={{ marginBottom: 8 }}>
-              <Text strong>Room ID:</Text> {room?.room_id}
-            </div>
-            <div style={{ marginBottom: 8 }}>
-              <Text strong>Status:</Text> {room?.status ? 'Active' : 'Inactive'}
-            </div>
-            <div style={{ marginBottom: 8 }}>
-              <Text strong>Description:</Text> {room?.description}
-            </div>
-          </Card>
+          <RoomModalContent room={room} />
         </Modal>
       )}
       <CustomModal
@@ -231,5 +213,4 @@ const RoomDetails = () => {
     </>
   );
 }
-
 export default RoomDetails;
