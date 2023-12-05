@@ -4,7 +4,7 @@ from project.api.v1.has_permission import has_permission
 from werkzeug.exceptions import BadRequest, NotFound, Conflict, InternalServerError
 from project.api.common.base_response import BaseResponse
 from project.services.room_service import RoomService
-from typing import Optional
+from typing import Optional, Dict
 
 room_blueprint = Blueprint('room_controller', __name__)
 
@@ -34,6 +34,50 @@ def get_room_detail(room_id: int) -> BaseResponse:
         if room_detail:
             return BaseResponse.success(room_detail)
         return BaseResponse.error(InternalServerError("Room not found"))
+
+    except InternalServerError as e:
+        return BaseResponse.error(e)
+    
+
+@room_blueprint.route("/rooms", methods=["POST"])
+@jwt_required()
+@has_permission("create")
+def create_room() -> BaseResponse:
+    try:
+        data: Dict = request.get_json()
+        response_data = RoomService.create_room(data)
+        return BaseResponse.success(response_data)
+
+    except BadRequest as e:
+        return BaseResponse.error(e)
+
+@room_blueprint.route("/rooms/<int:room_id>", methods=["GET"])
+@jwt_required()
+@has_permission("view")
+def get_room_detail(room_id: int) -> BaseResponse:
+    try:
+        room_detail: Optional[dict] = RoomService.get_room_detail(room_id)
+        if room_detail:
+            return BaseResponse.success(room_detail)
+        return BaseResponse.error(InternalServerError("Room not found"))
+
+    except InternalServerError as e:
+        return BaseResponse.error(e)
+
+@room_blueprint.route("/rooms/<int:room_id>/blocked", methods=["PUT"])
+@jwt_required()
+@has_permission("update")
+def delete_room(room_id: int) -> BaseResponse:
+    try:
+        data: Dict = request.get_json()
+        response_data: Dict = RoomService.delete_room(room_id, data)
+        return BaseResponse.success(response_data)
+
+    except NotFound as e:
+        return BaseResponse.error(e)
+
+    except BadRequest as e:
+        return BaseResponse.error(e)
 
     except InternalServerError as e:
         return BaseResponse.error(e)
