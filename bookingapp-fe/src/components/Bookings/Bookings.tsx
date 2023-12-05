@@ -190,7 +190,6 @@ const CalendarBooking = () => {
 
   const handleEventClick = (eventInfo: EventClickArg) => {
     const { event } = eventInfo;
-
     const selectedData: BookingData = {
       title: event.title,
       booking_id: event.extendedProps.booking_id || null,
@@ -240,7 +239,6 @@ const CalendarBooking = () => {
     const { start, end } = arg;
     const startDate = dayjs(start).format('YYYY-MM-DD');
     const endDate = dayjs(end).format('YYYY-MM-DD');
-
     setStartDate(startDate);
     setEndDate(endDate);
 
