@@ -7,15 +7,17 @@ import getCookie from "../route/Cookie";
 import { url } from "../ultils/urlApi";
 import { handleError } from "../ultils/ultilsApi";
 import { showPopup } from "../ultils/Popup";
-import avatar from "../../../public/avatar.png"
+import avatar from "../../../public/avatar.png";
 
 const InfoUser = () => {
   const [infoUser, setInfoUser] = useState<DataType>();
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const id = getCookie("id");
   const token = getCookie("token");
   const getData = async () => {
     try {
+      setLoading(true);
       await axios
         .get(url + "/v1/users/" + id, {
           withCredentials: true,
@@ -30,7 +32,9 @@ const InfoUser = () => {
       const { message, errors }: any = handleError(error);
       const messageErrors = message + " " + errors;
       showPopup(false, messageErrors);
-    } 
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     getData();
@@ -42,12 +46,6 @@ const InfoUser = () => {
         ...editUser,
       }));
     }
-  };
-  const handleShowModal = () => {
-    handleModalEditUser(true);
-  };
-  const handleCancel = () => {
-    handleModalEditUser(false);
   };
   const handleModalEditUser = (status: boolean) => {
     setIsModalEditOpen(status);
@@ -66,11 +64,7 @@ const InfoUser = () => {
     <>
       <h1 className="component-name">Account information</h1>
       <div style={{ display: "flex", justifyContent: "center", padding: 50 }}>
-        <Descriptions
-          style={{ width: 500, paddingRight: 100 }}
-          layout="horizontal"
-          column={1}
-        >
+        <Descriptions className="info-detail" layout="horizontal" column={1}>
           <Descriptions.Item
             contentStyle={customContentStyle}
             labelStyle={customLabelStyle}
@@ -83,7 +77,7 @@ const InfoUser = () => {
             labelStyle={customLabelStyle}
             label="Email"
           >
-            {infoUser?.email}{" "}
+            {infoUser?.email}
           </Descriptions.Item>
           <Descriptions.Item
             contentStyle={customContentStyle}
@@ -104,24 +98,21 @@ const InfoUser = () => {
                 style={{ marginTop: 20 }}
                 type="primary"
                 htmlType="submit"
-                onClick={handleShowModal}
+                onClick={() => handleModalEditUser(false)}
               >
                 Edit
               </Button>
             </div>
           </Descriptions.Item>
         </Descriptions>
-        <Image
-          width={200}
-          src= {avatar}
-        />
+        <Image width={200} src={avatar} />
       </div>
       <Modal
         title="Edit User Information"
         open={isModalEditOpen}
         destroyOnClose={true}
         footer={[]}
-        onCancel={handleCancel}
+        onCancel={() => handleModalEditUser(false)}
         style={{ width: "500px", textAlign: "center" }}
       >
         <FormEdit
