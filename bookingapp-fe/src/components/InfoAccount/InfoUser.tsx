@@ -30,8 +30,7 @@ const InfoUser = () => {
       const { message, errors }: any = handleError(error);
       const messageErrors = message + " " + errors;
       showPopup(false, messageErrors);
-    } finally {
-    }
+    } 
   };
   useEffect(() => {
     getData();
