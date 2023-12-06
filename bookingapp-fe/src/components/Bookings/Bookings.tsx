@@ -14,7 +14,7 @@ import {
   Alert,
   AutoComplete,
 } from 'antd';
-import moment from "moment"; 
+import moment from 'moment';
 import axios from 'axios';
 import { getCookie } from '../helper/CookiesHelper';
 import { url } from '../ultils/apiUrl';
@@ -22,7 +22,7 @@ import {
   DateSelectArg,
   EventClickArg,
   EventContentArg,
-} from '@fullcalendar/core'; // must go before plugins
+} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
@@ -30,6 +30,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
 import { formatDate, timeEndWeek, timeStartWeek } from '../../ultils/ultils';
+import './BookingCalendar.css';
 const { Title } = Typography;
 
 interface BookingData {
@@ -135,8 +136,7 @@ const CalendarBooking = () => {
       setUsers(response.data.data.users);
     } catch (error: any) {
       handleErrorShow(error);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -145,32 +145,29 @@ const CalendarBooking = () => {
     try {
       setLoading(true);
       let response;
-
-      if (roles.includes('admin')) {
-        response = await axios.get(`${url}/v1/bookings`, {
-          params: {
-            start_date: startDate,
-            end_date: endDate,
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': true,
-          },
-        });
-      } else {
-        response = await axios.get(`${url}/v1/user/bookings`, {
-          params: {
-            start_date: startDate,
-            end_date: endDate,
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': true,
-          },
-        });
-      }
+      roles.includes('admin')
+        ? (response = await axios.get(`${url}/v1/bookings`, {
+            params: {
+              start_date: startDate,
+              end_date: endDate,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'ngrok-skip-browser-warning': true,
+            },
+          }))
+        : (response = await axios.get(`${url}/v1/user/bookings`, {
+            params: {
+              start_date: startDate,
+              end_date: endDate,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'ngrok-skip-browser-warning': true,
+            },
+          }));
 
       if (response.data.data) {
         const updatedData = response.data.data.map(
@@ -209,30 +206,59 @@ const CalendarBooking = () => {
     setModalShow(true);
   };
 
+  const handleUpdate = async (values: BookingDataApi) => {
+    const formattedBookingData = {
+      ...values,
+      booking_id: values.booking_id
+        ? values.booking_id
+        : selectedBookingData?.booking_id,
+      user_id: values.user_id,
+      room_id: selectedBookingData?.room_id,
+      time_start: formatDate(values.time_start),
+      time_end: formatDate(values.time_end),
+    };
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `${url}/v1/bookings/${formattedBookingData!.booking_id}`,
+        formattedBookingData,
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'ngrok-skip-browser-warning': true,
+          },
+        }
+      );
+      fetchBookingData(startDate, endDate);
+      handleSuccessShow(response);
+    } catch (error: any) {
+      handleErrorShow(error);
+      fetchBookingData(startDate, endDate);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const eventContent = (eventInfo: EventContentArg) => {
     const { event, view } = eventInfo;
+    let content;
 
     if (view.type === 'listWeek') {
-      return (
-        <>
-          <div
-            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
-          >
-            <Title level={2}>{event.title}</Title>
-          </div>
-        </>
+      content = (
+        <div className='fc-list-event-title'>
+          <Title level={2}>{event.title}</Title>
+        </div>
       );
     } else {
-      return (
-        <>
-          <div
-            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
-          >
-            <Title level={2}>{event.title}</Title>
-          </div>
-        </>
+      content = (
+        <div className='fc-event-main fc-daygrid-event-harness'>
+          <Title level={2}>{event.title}</Title>
+        </div>
       );
     }
+
+    return content;
   };
   const handleDateSelect = (arg: DateSelectArg) => {
     const { start, end } = arg;
@@ -244,12 +270,26 @@ const CalendarBooking = () => {
 
   const handleDatesSet = (arg: { start: Date; end: Date }) => {
     const { start, end } = arg;
-    const startDate = moment(start).format('YYYY-MM-DD');
-    const endDate = moment(end).format('YYYY-MM-DD');
+    const startDate = formatDate(start);
+    const endDate = formatDate(end);
     setStartDate(startDate);
     setEndDate(endDate);
-
     fetchBookingData(startDate, endDate);
+  };
+
+  const handleEventDrop = (eventInfo: EventClickArg) => {
+    const { event } = eventInfo;
+    const selectedData: BookingDataApi = {
+      title: event.title,
+      booking_id: event.extendedProps.booking_id || null,
+      time_start: formatDate(event.start),
+      time_end: formatDate(event.end),
+      user_id: event.extendedProps.user_id,
+      room_id: event.extendedProps.room_id,
+      room_name: event.extendedProps.room_name,
+      user_name: event.extendedProps.user_name,
+    };
+    handleUpdate(selectedData);
   };
   return (
     <FullCalendar
@@ -269,7 +309,10 @@ const CalendarBooking = () => {
       selectMirror={true}
       select={handleDateSelect}
       datesSet={handleDatesSet}
+      editable={true}
+      eventDrop={handleEventDrop}
     />
   );
 };
+
 export default CalendarBooking;
