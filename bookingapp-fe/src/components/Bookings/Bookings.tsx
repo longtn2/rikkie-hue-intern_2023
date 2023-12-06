@@ -29,7 +29,7 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
-import './Booking.css'
+import './Booking.css';
 const { Title } = Typography;
 
 interface BookingData {
@@ -246,28 +246,23 @@ const CalendarBooking = () => {
 
   const eventContent = (eventInfo: EventContentArg) => {
     const { event, view } = eventInfo;
-
+    let content;
+  
     if (view.type === 'listWeek') {
-      return (
-        <>
-          <div
-            className='fc-list-event-title'
-          >
-            <Title level={2}>{event.title}</Title>
-          </div>
-        </>
+      content = (
+        <div className='fc-list-event-title'>
+          <Title level={2}>{event.title}</Title>
+        </div>
       );
     } else {
-      return (
-        <>
-          <div
-            className='fc-event-main fc-daygrid-event-harness'
-          >
-            <Title level={2}>{event.title}</Title>
-          </div>
-        </>
+      content = (
+        <div className='fc-event-main fc-daygrid-event-harness'>
+          <Title level={2}>{event.title}</Title>
+        </div>
       );
     }
+  
+    return content;
   };
   const handleDateSelect = (arg: DateSelectArg) => {
     const { start, end } = arg;
@@ -283,7 +278,7 @@ const CalendarBooking = () => {
     const endDate = moment(end).format('YYYY-MM-DD');
     setStartDate(startDate);
     setEndDate(endDate);
-
+-529
     fetchBookingData(startDate, endDate);
   };
 
