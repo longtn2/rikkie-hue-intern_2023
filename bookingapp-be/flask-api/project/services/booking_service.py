@@ -277,4 +277,34 @@ class BookingService:
 
         except Exception as e:
             db.session.rollback()
-            raise UnprocessableEntity(str(e)
+            raise UnprocessableEntity(str(e))
+        
+    @staticmethod
+    def detail_booking(booking_id: int):
+        booking=BookingExecutor.get_booking(booking_id)
+        if not booking:
+            raise NotFound('Booking not found')
+        user_ids = [booking_user.user.user_id for booking_user in booking.booking_user]
+        user_names = [booking_user.user.user_name for booking_user in booking.booking_user]
+
+        user_created = User.query.filter_by(user_id=booking.creator_id).first()
+        creator_name = user_created.user_name if user_created else None
+
+        room = RoomExecutor.get_room_by_id(booking.room_id)
+        room_name = room.room_name if room else None
+
+        booking_info = {
+            "booking_id": booking.booking_id,
+            "title": booking.title,
+            "time_start": booking.time_start.strftime('%Y-%m-%d %H:%M:%S'),
+            "time_end": booking.time_end.strftime('%Y-%m-%d %H:%M:%S'),
+            "room_id": booking.room_id,
+            "room_name": room_name,
+            "user_ids": user_ids,
+            "user_names": user_names,
+            "creator_id": booking.creator_id,
+            "creator_name": creator_name,
+            "is_accepted": booking.is_accepted,
+            "is_deleted": booking.is_deleted
+        }
+        return  booking_info

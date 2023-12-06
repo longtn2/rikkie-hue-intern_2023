@@ -220,3 +220,15 @@ def user_view_list_booked() -> dict:
         return BaseResponse.success(result)
     except Exception as e:
         raise NotFound(str(e))
+
+@booking_blueprint.route("/bookings/<int:booking_id>", methods=["GET"])
+@jwt_required()
+@has_permission("view")
+def detail_booking(booking_id: int) -> dict:
+    try:
+        result = BookingService.detail_booking(booking_id)
+        return BaseResponse.success(result)
+    except NotFound as e:
+        return BaseResponse.error(e)
+    except Exception as e:
+        raise InternalServerError(e) 
