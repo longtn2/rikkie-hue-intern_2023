@@ -29,7 +29,7 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
-import { formatDate } from '../../ultils/ultils';
+import { formatDate, timeEndWeek, timeStartWeek } from '../../ultils/ultils';
 const { Title } = Typography;
 
 interface BookingData {
@@ -82,12 +82,8 @@ const CalendarBooking = () => {
   const [isDeleted, setIsDeleted] = useState<Boolean>(false);
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
-  const [startDate, setStartDate] = useState<string>(
-    moment().startOf('week').format('YYYY-MM-DD')
-  );
-  const [endDate, setEndDate] = useState<string>(
-    moment().endOf('week').format('YYYY-MM-DD')
-  );
+  const [startDate, setStartDate] = useState<string>(timeStartWeek);
+  const [endDate, setEndDate] = useState<string>(timeEndWeek);
   const roles: string[] = getCookie('roles');
   const id: number = parseInt(getCookie('user_id'));
   const checkAdmin: boolean = roles.includes('admin');
