@@ -31,6 +31,7 @@ import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
 import { formatDate, timeEndWeek, timeStartWeek } from '../../ultils/ultils';
 import './BookingCalendar.css';
+import ReusableForm from './ResaubleForm';
 const { Title } = Typography;
 
 interface BookingData {
@@ -291,6 +292,57 @@ const CalendarBooking = () => {
     };
     handleUpdate(selectedData);
   };
+
+  const showAddModal = () => {
+    setUpdateModal(true);
+  };
+
+  const closeShowAddModal = () => {
+    setUpdateModal(false);
+  };
+
+  const handleAddBooking = async (values: BookingDataApi) => {
+    try {
+      setLoading(true);
+      const formattedBookingData = {
+        ...values,
+        time_start: formatDate(values.time_start),
+        time_end: formatDate(values.time_end),
+      };
+      let response;
+      roles.includes('admin')
+        ? (response = await axios.post(
+            `${url}/v1/bookings`,
+            formattedBookingData,
+            {
+              withCredentials: true,
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'ngrok-skip-browser-warning': true,
+              },
+            }
+          ))
+        : (response = await axios.post(
+            `${url}/v1/user/bookings`,
+            formattedBookingData,
+            {
+              withCredentials: true,
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'ngrok-skip-browser-warning': true,
+              },
+            }
+          ));
+      closeShowAddModal();
+      fetchBookingData(startDate, endDate);
+      handleSuccessShow(response);
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <FullCalendar
       plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
@@ -312,6 +364,40 @@ const CalendarBooking = () => {
       editable={true}
       eventDrop={handleEventDrop}
     />
+
+    <Modal
+    title={
+      <div>
+        <Title
+          level={2}
+          style={{
+            display: 'flex',
+            width: '100%',
+            justifyContent: 'center',
+            borderBottom: '4px solid #D6E4EC',
+            marginBottom: '15px',
+            paddingBottom: '10px',
+          }}
+        >
+          Add Booking
+        </Title>
+      </div>
+    }
+    visible={updateModal}
+    onCancel={closeShowAddModal}
+    footer={null}
+    bodyStyle={{
+      border: '1px solid #ccc',
+      borderRadius: '5px',
+      padding: '20px',
+    }}
+    destroyOnClose={true}
+    maskClosable={false}
+    afterClose={closeShowAddModal}
+  >
+    <ReusableForm onSubmit={handleAddBooking} timeStart={timeStartAdd} timeEnd={timeEndAdd} rooms={rooms ?? []} users={users ?? []} />
+  </Modal>
+
   );
 };
 
