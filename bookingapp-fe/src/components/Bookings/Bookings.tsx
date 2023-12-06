@@ -14,7 +14,11 @@ import {
   Alert,
   AutoComplete,
 } from 'antd';
+<<<<<<< HEAD
 import moment from 'moment';
+=======
+import moment from "moment"; 
+>>>>>>> 6a99da08fb0a318c6c293f4eeea947b93bb64c92
 import axios from 'axios';
 import { getCookie } from '../helper/CookiesHelper';
 import { url } from '../ultils/apiUrl';
@@ -29,7 +33,12 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
+<<<<<<< HEAD
 import './Booking.css';
+import { formatDate } from '../../ultils/ultils';
+=======
+import { formatDate } from '../../ultils/ultils';
+>>>>>>> 6a99da08fb0a318c6c293f4eeea947b93bb64c92
 const { Title } = Typography;
 
 interface BookingData {
@@ -197,8 +206,13 @@ const CalendarBooking = () => {
     const selectedData: BookingData = {
       title: event.title,
       booking_id: event.extendedProps.booking_id || null,
+<<<<<<< HEAD
       start: moment(event.start).format(),
       end: moment(event.end).format(),
+=======
+      start: formatDate(event.start),
+      end: formatDate(event.end),
+>>>>>>> 6a99da08fb0a318c6c293f4eeea947b93bb64c92
       user_id: event.extendedProps.user_id,
       room_id: event.extendedProps.room_id,
       room_name: event.extendedProps.room_name,
@@ -217,8 +231,8 @@ const CalendarBooking = () => {
         : selectedBookingData?.booking_id,
       user_id: values.user_id,
       room_id: selectedBookingData?.room_id,
-      time_start: moment(values.time_start).format('YYYY-MM-DD HH:mm:ss'),
-      time_end: moment(values.time_end).format('YYYY-MM-DD HH:mm:ss'),
+      time_start: formatDate(values.time_start),
+      time_end: formatDate(values.time_end),
     };
     try {
       setLoading(true);
@@ -274,11 +288,10 @@ const CalendarBooking = () => {
 
   const handleDatesSet = (arg: { start: Date; end: Date }) => {
     const { start, end } = arg;
-    const startDate = moment(start).format('YYYY-MM-DD');
-    const endDate = moment(end).format('YYYY-MM-DD');
+    const startDate = formatDate(start);
+    const endDate = formatDate(end);
     setStartDate(startDate);
     setEndDate(endDate);
--529
     fetchBookingData(startDate, endDate);
   };
 
@@ -287,8 +300,8 @@ const CalendarBooking = () => {
     const selectedData: BookingDataApi = {
       title: event.title,
       booking_id: event.extendedProps.booking_id || null,
-      time_start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-      time_end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+      time_start: formatDate(event.start),
+      time_end: formatDate(event.end),
       user_id: event.extendedProps.user_id,
       room_id: event.extendedProps.room_id,
       room_name: event.extendedProps.room_name,
