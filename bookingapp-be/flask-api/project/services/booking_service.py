@@ -137,3 +137,19 @@ class BookingService:
 
         BookingExecutor.commit()
         return BaseResponse.success( 'Booking deleted successfully')
+    
+    @staticmethod
+    def accept_booking(booking_id: int):
+        booking = BookingExecutor.get_booking(booking_id)
+        try:
+            booking.is_accepted = True
+            booking.is_deleted = False
+            booking.deleted_at = None 
+
+            db.session.commit()
+
+            return BaseResponse.success('Booking accepted successfully')
+
+        except Exception as e:
+            db.session.rollback()
+            raise InternalServerError(e)
