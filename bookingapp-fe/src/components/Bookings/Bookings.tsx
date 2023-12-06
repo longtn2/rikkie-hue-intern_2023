@@ -14,11 +14,7 @@ import {
   Alert,
   AutoComplete,
 } from 'antd';
-<<<<<<< HEAD
 import moment from 'moment';
-=======
-import moment from "moment"; 
->>>>>>> 6a99da08fb0a318c6c293f4eeea947b93bb64c92
 import axios from 'axios';
 import { getCookie } from '../helper/CookiesHelper';
 import { url } from '../ultils/apiUrl';
@@ -26,19 +22,14 @@ import {
   DateSelectArg,
   EventClickArg,
   EventContentArg,
-} from '@fullcalendar/core'; // must go before plugins
+} from '@fullcalendar/core'; 
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
-<<<<<<< HEAD
-import './Booking.css';
 import { formatDate } from '../../ultils/ultils';
-=======
-import { formatDate } from '../../ultils/ultils';
->>>>>>> 6a99da08fb0a318c6c293f4eeea947b93bb64c92
 const { Title } = Typography;
 
 interface BookingData {
@@ -243,7 +234,6 @@ const CalendarBooking = () => {
         }
       );
       fetchBookingData(startDate, endDate);
-      handleEditModalClose();
       handleSuccessShow(response);
     } catch (error: any) {
       handleErrorShow(error);
