@@ -1,3 +1,5 @@
+import getCookie from "../Route/Cookie";
+
 export const TYPE_USER = { ADMIN: "admin" };
 export interface DataType {
   user_id: number;
@@ -20,12 +22,6 @@ export interface BookingData {
 }
 export const token = getCookie("token");
 
-export const formatTime = (time: any) => {
-  return moment(time).format("HH:mm");
-};
-export const formatDate = (time: any) => {
-  return moment(time).format("DD:MM:YYYY");
-};
 export const statuTag = (item: BookingData) => {
   if (item.is_deleted) {
     return (
