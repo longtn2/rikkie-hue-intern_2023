@@ -91,3 +91,14 @@ class RoomExecutor:
         total_pages = ceil(total_items / per_page)
 
         return paginated_rooms, total_items, total_pages
+    
+    @staticmethod
+    def open_room(room: Room, bookings: List[Booking], description: str) -> None:
+        for booking in bookings:
+            booking.deleted_at = None
+            booking.is_deleted = False
+
+        room.is_blocked = False
+        room.description = description
+        room.deleted_at = None
+        db.session.commit()

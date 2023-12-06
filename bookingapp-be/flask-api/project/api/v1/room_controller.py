@@ -71,6 +71,24 @@ def delete_room(room_id: int) -> BaseResponse:
     try:
         data: Dict = request.get_json()
         response_data: Dict = RoomService.delete_room(room_id, data)
+        return response_data
+
+    except NotFound as e:
+        return BaseResponse.error(e)
+
+    except BadRequest as e:
+        return BaseResponse.error(e)
+
+    except InternalServerError as e:
+        return BaseResponse.error(e)
+    
+@room_blueprint.route("/rooms/<int:room_id>/opened", methods=["PUT"])
+@jwt_required()
+@has_permission("update")
+def open_room(room_id: int):
+    try:
+        data = request.get_json()
+        response_data = RoomService.open_room(room_id, data)
         return BaseResponse.success(response_data)
 
     except NotFound as e:
