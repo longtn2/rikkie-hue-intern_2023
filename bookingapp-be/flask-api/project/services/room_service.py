@@ -82,8 +82,22 @@ class RoomService:
         except Exception as e:
             raise InternalServerError(e)
         
+    @staticmethod
     def get_status_rooms(page: int, per_page: int):
         paginated_rooms, total_items, total_pages = RoomExecutor.get_rooms_with_status(page, per_page)
+
+        return {
+            "rooms": [room.serialize() for room in paginated_rooms],
+            "total_items": total_items,
+            "current_page": page,
+            "per_page": per_page,
+            "total_pages": total_pages
+        }
+        
+
+    @staticmethod
+    def search_rooms(page: int, per_page: int, search_name: Optional[str]) -> Dict[str, int]:
+        paginated_rooms, total_items, total_pages = RoomExecutor.search_rooms_in_db(page, per_page, search_name)
 
         return {
             "rooms": [room.serialize() for room in paginated_rooms],

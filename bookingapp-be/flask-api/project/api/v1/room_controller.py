@@ -97,6 +97,18 @@ def open_room(room_id: int):
     except BadRequest as e:
         return BaseResponse.error(e)
 
+@room_blueprint.route("/rooms/search", methods=["GET"])
+@jwt_required()
+@has_permission("view")
+def search_rooms_endpoint():
+    try:
+        page: int = request.args.get('page', 1, type=int)
+        per_page: int = request.args.get('per_page', 10, type=int)
+        search_name: str = request.args.get('name', '')
+
+        response_data = RoomService.search_rooms(page, per_page, search_name)
+        return BaseResponse.success(response_data)
+
     except InternalServerError as e:
         return BaseResponse.error(e)
 
