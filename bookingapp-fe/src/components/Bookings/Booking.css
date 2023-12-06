@@ -1,0 +1,35 @@
+.item-booked{
+    width: 1100px;
+    margin: auto;
+    border: 1px black solid;
+    justify-content: center;
+    height: 200px;
+}
+.item-booked .ant-card-body{
+    padding: 15px;
+}
+.status-tag{
+    font-size: 17px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+
+}
+.title-booked{
+    font-size: 25px;
+}
+.info-booked{
+    display: flex;
+    justify-content: center;
+}
+.detail-booked {
+    width: 700px;
+}
+.status-booked{
+    display: flex;
+    margin-left: 50px;
+}
+.title-booked{
+    font-size: 30px;
+}
