@@ -206,13 +206,8 @@ const CalendarBooking = () => {
     const selectedData: BookingData = {
       title: event.title,
       booking_id: event.extendedProps.booking_id || null,
-<<<<<<< HEAD
-      start: moment(event.start).format(),
-      end: moment(event.end).format(),
-=======
       start: formatDate(event.start),
       end: formatDate(event.end),
->>>>>>> 6a99da08fb0a318c6c293f4eeea947b93bb64c92
       user_id: event.extendedProps.user_id,
       room_id: event.extendedProps.room_id,
       room_name: event.extendedProps.room_name,
