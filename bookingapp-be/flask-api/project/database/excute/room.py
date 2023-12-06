@@ -4,7 +4,7 @@ from project import db
 from datetime import datetime
 from itertools import islice
 from sqlalchemy import or_
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Tuple
 
 
 class RoomExecutor:
@@ -102,9 +102,14 @@ class RoomExecutor:
         room.description = description
         room.deleted_at = None
         db.session.commit()
+        
     @staticmethod
     def search_rooms_in_db(page: int, per_page: int, search_name: Optional[str]) -> Tuple[List[Room], int, int]:
-        query = Room.query.filter(or_(Room.room_name.ilike(f"%{search_name}%")) if search_name else True)
+        query = Room.query.filter(
+            or_(Room.room_name.ilike(f"%{search_name}%")) if search_name else True,
+            Room.is_blocked.is_(False)
+        )
+        
         paginated_rooms = query.paginate(page=page, per_page=per_page, error_out=False).items
 
         total_items = len(query.all())
