@@ -81,3 +81,21 @@ class RoomService:
 
         except Exception as e:
             raise InternalServerError(e)
+    
+    @staticmethod
+    def open_room(room_id: int, data: Dict) -> Dict:
+        room_to_open = RoomExecutor.get_room_by_id(room_id)
+
+        if not room_to_open:
+            raise NotFound("Room not found")
+
+        if not room_to_open.is_blocked:
+            raise BadRequest("Room is already open")
+
+        description = data.get("description")
+
+        bookings_to_open = RoomExecutor.get_bookings_by_room_id(room_id)
+
+        RoomExecutor.open_room(room_to_open, bookings_to_open, description)
+
+        return {"message": "Room and associated bookings opened successfully"}
