@@ -217,3 +217,20 @@ class BookingService:
         except Exception as e:
             db.session.rollback()
             raise InternalServerError(e)
+
+    @staticmethod
+    def admin_view_booking_pending(page: int, per_page: int) -> List[Booking]:
+        bookings=BookingExecutor.admin_view_booking_pending(page, per_page)
+        list_bookings=BookingService.show_list_booking(bookings)  
+        total_items = bookings.total
+        total_pages = ceil(total_items / per_page)
+        per_page = per_page
+        current_page = page
+        result = {
+            'list_bookings': list_bookings,
+            'total_items': total_items,
+            'per_page': per_page,
+            'current_page': current_page,
+            'total_pages': total_pages
+        }
+        return result
