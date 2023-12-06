@@ -14,7 +14,7 @@ import {
   Alert,
   AutoComplete,
 } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import moment from "moment"; 
 import axios from 'axios';
 import { getCookie } from '../helper/CookiesHelper';
 import { url } from '../ultils/apiUrl';
@@ -29,6 +29,7 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
+import { formatDate } from '../../ultils/ultils';
 const { Title } = Typography;
 
 interface BookingData {
@@ -82,16 +83,16 @@ const CalendarBooking = () => {
   const [formAdd] = Form.useForm();
   const [formEdit] = Form.useForm();
   const [startDate, setStartDate] = useState<string>(
-    dayjs().startOf('week').format('YYYY-MM-DD')
+    moment().startOf('week').format('YYYY-MM-DD')
   );
   const [endDate, setEndDate] = useState<string>(
-    dayjs().endOf('week').format('YYYY-MM-DD')
+    moment().endOf('week').format('YYYY-MM-DD')
   );
   const roles: string[] = getCookie('roles');
   const id: number = parseInt(getCookie('user_id'));
   const checkAdmin: boolean = roles.includes('admin');
-  const [timeStartAdd, setTimeStartAdd] = useState<dayjs.Dayjs | null>(null);
-  const [timeEndAdd, setTimeEndAdd] = useState<dayjs.Dayjs | null>(null);
+  const [timeStartAdd, setTimeStartAdd] = useState<moment.Moment | null>(null);
+  const [timeEndAdd, setTimeEndAdd] = useState<moment.Moment | null>(null);
   const [updateModal, setUpdateModal] = useState<boolean>(false);
   const [success, setSuccess] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
@@ -200,8 +201,8 @@ const CalendarBooking = () => {
     const selectedData: BookingData = {
       title: event.title,
       booking_id: event.extendedProps.booking_id || null,
-      start: dayjs(event.start).format(),
-      end: dayjs(event.end).format(),
+      start: formatDate(event.start),
+      end: formatDate(event.end),
       user_id: event.extendedProps.user_id,
       room_id: event.extendedProps.room_id,
       room_name: event.extendedProps.room_name,
@@ -239,16 +240,16 @@ const CalendarBooking = () => {
   };
   const handleDateSelect = (arg: DateSelectArg) => {
     const { start, end } = arg;
-    const startTime = dayjs(start);
-    const endTime = dayjs(end);
+    const startTime = moment(start);
+    const endTime = moment(end);
     setTimeStartAdd(startTime);
     setTimeEndAdd(endTime);
   };
 
   const handleDatesSet = (arg: { start: Date; end: Date }) => {
     const { start, end } = arg;
-    const startDate = dayjs(start).format('YYYY-MM-DD');
-    const endDate = dayjs(end).format('YYYY-MM-DD');
+    const startDate = moment(start).format('YYYY-MM-DD');
+    const endDate = moment(end).format('YYYY-MM-DD');
     setStartDate(startDate);
     setEndDate(endDate);
 
