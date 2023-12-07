@@ -30,7 +30,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
 import { formatDate, timeEndWeek, timeStartWeek } from '../../ultils/ultils';
-import './BookingCalendar.css';
+import './Booking.css';
 const { Title } = Typography;
 
 interface BookingData {
