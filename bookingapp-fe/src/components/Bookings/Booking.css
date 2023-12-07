@@ -33,3 +33,17 @@
 .title-booked{
     font-size: 30px;
 }
+
+.listWeek {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+
+.listWeekCalendar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+

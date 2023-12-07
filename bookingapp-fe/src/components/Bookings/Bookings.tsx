@@ -35,23 +35,25 @@ const { Title } = Typography;
 interface BookingData {
   title: string;
   booking_id: number | null;
+  is_accepted: boolean;
   start: string;
   end: string;
-  user_id: number[];
+  user_ids: number[];
   room_id: number | null;
   room_name: string;
-  user_name: string[];
+  user_names: string[];
 }
 
 interface BookingDataApi {
   title: string;
   booking_id: number | null;
+  is_accepted: boolean;
   time_start: string;
   time_end: string;
-  user_id: number[];
+  user_ids: number[];
   room_id: number | null;
   room_name: string;
-  user_name: string[];
+  user_names: string[];
 }
 
 interface DataType {
@@ -211,22 +213,22 @@ const CalendarBooking = () => {
 
   const eventContent = (eventInfo: EventContentArg) => {
     const { event, view } = eventInfo;
-
+    let content;
     if (view.type === 'listWeek') {
       return (
-        <>
+        content = (
           <div
-            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
-          >
-            <Title level={2}>{event.title}</Title>
-          </div>
-        </>
+            className='listWeek'
+        >
+          <Title level={2}>{event.title}</Title>
+        </div>
+        )
       );
     } else {
       return (
         <>
           <div
-            style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+            className='listWeekCalendar'
           >
             <Title level={2}>{event.title}</Title>
           </div>
@@ -248,9 +250,56 @@ const CalendarBooking = () => {
     const endDate = moment(end).format('YYYY-MM-DD');
     setStartDate(startDate);
     setEndDate(endDate);
-
     fetchBookingData(startDate, endDate);
   };
+
+  const handleUpdate = async (values: BookingDataApi) => {
+    const formattedBookingData = {
+      ...values,
+      booking_id: values.booking_id
+        ? values.booking_id
+        : selectedBookingData?.booking_id,
+      user_ids: values.user_ids ? values.user_ids : selectedBookingData?.user_ids,
+      room_id: values.room_id ? values.room_id : selectedBookingData?.room_id,
+      time_start: moment(values.time_start).format('YYYY-MM-DD HH:mm:ss'),
+      time_end: moment(values.time_end).format('YYYY-MM-DD HH:mm:ss'),
+    };
+    try {
+      const response = await axios.put(
+        `${url}/v1/bookings/${formattedBookingData!.booking_id}`,
+        formattedBookingData,
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'ngrok-skip-browser-warning': true,
+          },
+        }
+      );
+      fetchBookingData(startDate, endDate);
+      handleSuccessShow(response);
+    } catch (error: any) {
+      handleErrorShow(error);
+      fetchBookingData(startDate, endDate);
+    }
+  };
+
+  const handleEventDrop = (eventInfo: EventClickArg) => {
+    const { event } = eventInfo;
+    const selectedData: BookingDataApi = {
+      title: event.title,
+      booking_id: event.extendedProps.booking_id || null,
+      is_accepted: event.extendedProps.is_accepted,
+      time_start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
+      time_end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+      user_ids: event.extendedProps.user_ids,
+      room_id: event.extendedProps.room_id,
+      room_name: event.extendedProps.room_name,
+      user_names: event.extendedProps.user_names,
+    };
+    handleUpdate(selectedData);
+  }; 
+
   return (
     <FullCalendar
       plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
@@ -269,6 +318,8 @@ const CalendarBooking = () => {
       selectMirror={true}
       select={handleDateSelect}
       datesSet={handleDatesSet}
+      editable={true}
+      eventDrop={handleEventDrop}
     />
   );
 };
