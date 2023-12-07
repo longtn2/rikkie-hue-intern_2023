@@ -30,7 +30,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
 import { formatDate, timeEndWeek, timeStartWeek } from '../../ultils/ultils';
-import './BookingCalendar.css';
+import "./Booking.css";
 import ReusableForm from './ResaubleForm';
 const { Title } = Typography;
 
@@ -145,30 +145,27 @@ const CalendarBooking = () => {
   const fetchBookingData = async (startDate: string, endDate: string) => {
     try {
       setLoading(true);
-      let response;
-      roles.includes('admin')
-        ? (response = await axios.get(`${url}/v1/bookings`, {
-            params: {
-              start_date: startDate,
-              end_date: endDate,
-            },
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'ngrok-skip-browser-warning': true,
-            },
-          }))
-        : (response = await axios.get(`${url}/v1/user/bookings`, {
-            params: {
-              start_date: startDate,
-              end_date: endDate,
-            },
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'ngrok-skip-browser-warning': true,
-            },
-          }));
+      const response = roles.includes("admin") ? await axios.get(`${url}/v1/bookings`, {
+        params: {
+          start_date: startDate,
+          end_date: endDate,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': true,
+        },
+      }) :  await axios.get(`${url}/v1/user/bookings`, {
+        params: {
+          start_date: startDate,
+          end_date: endDate,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': true,
+        },
+      })
 
       if (response.data.data) {
         const updatedData = response.data.data.map(
@@ -370,13 +367,7 @@ const CalendarBooking = () => {
       <div>
         <Title
           level={2}
-          style={{
-            display: 'flex',
-            width: '100%',
-            justifyContent: 'center',
-            borderBottom: '4px solid #D6E4EC',
-            marginBottom: '15px',
-            paddingBottom: '10px',
+          className = 'edit-modal'
           }}
         >
           Add Booking
@@ -385,12 +376,7 @@ const CalendarBooking = () => {
     }
     visible={updateModal}
     onCancel={closeShowAddModal}
-    footer={null}
-    bodyStyle={{
-      border: '1px solid #ccc',
-      borderRadius: '5px',
-      padding: '20px',
-    }}
+    footer={nu
     destroyOnClose={true}
     maskClosable={false}
     afterClose={closeShowAddModal}
