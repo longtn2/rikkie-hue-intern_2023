@@ -252,3 +252,16 @@ class BookingService:
             'total_pages': total_pages
         }
         return result
+    
+    @staticmethod
+    def user_decline_booking(booking_id: int):
+        user_id = get_jwt_identity()
+        booking_user = BookingExecutor.get_booking_user(booking_id, user_id)
+        try:
+            booking_user.is_attending = False
+            db.session.commit()
+            return BaseResponse.success('Invitation successfully declined')
+
+        except Exception as e:
+            db.session.rollback()
+            raise InternalServerError(e)
