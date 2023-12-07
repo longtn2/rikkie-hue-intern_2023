@@ -399,6 +399,54 @@ const CalendarBooking = () => {
     }
   };
 
+  const handleSearchRoom = async (values: number) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${url}/v1/bookings/search_room/${values}`,
+        {
+          params: {
+            start_date: startDate,
+            end_date: endDate,
+          },
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.data.data) {
+        const updatedData = response.data.data.map(
+          (booking: BookingDataApi) => {
+            const { time_end, time_start, is_accepted, ...rest } = booking;
+            return {
+              ...rest,
+              is_accepted: is_accepted,
+              start: time_start,
+              end: time_end,
+              backgroundColor: is_accepted ? '#009900' : '#ff9933',
+            };
+          }
+        );
+        setBookingData(updatedData);
+      }
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (values: number) => {
+    if (values) {
+      handleSearchRoom(values);
+    } else {
+      fetchBookingData(startDate, endDate);
+    }
+  };
+
   return (
 <>
   <SearchRoomBooking options={rooms ?? []} onSelect={handleSearch} />
