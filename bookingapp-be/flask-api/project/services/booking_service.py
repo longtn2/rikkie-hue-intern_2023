@@ -137,3 +137,18 @@ class BookingService:
 
         BookingExecutor.commit()
         return BaseResponse.success( 'Booking deleted successfully')
+    
+    @staticmethod
+    def user_confirm_booking(booking_id: int):
+        user_id = get_jwt_identity()
+        booking_user = BookingExecutor.get_booking_user(booking_id, user_id)
+        try:
+            booking_user.is_attending = True
+
+            db.session.commit()
+
+            return BaseResponse.success('Invitation successfully confirmed')
+
+        except Exception as e:
+            db.session.rollback()
+            raise InternalServerError(e)
