@@ -70,7 +70,8 @@ class BookingService:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
         else:
-            raise BadRequest("Both start_date and end_date are required for date range query.")
+            raise BadRequest(
+                "Both start_date and end_date are required for date range query.")
 
         bookings = BookingExecutor.get_bookings_in_date_range_user(start_date, end_date, user_id)
         list_bookings = BookingService.show_list_booking(bookings)
@@ -157,3 +158,30 @@ class BookingService:
 
         BookingExecutor.commit()
         return BaseResponse.success( 'Booking deleted successfully')
+    
+    @staticmethod
+    def book_room_belong_to_user(data:  Dict) :
+        room_id = data.get('room_id')
+        title = data.get('title')
+        time_start= data.get('time_start')
+        time_end= data.get('time_end')
+        user_ids = data.get('user_ids', [])
+
+        errors = []
+        validate_title = Booking.validate_title(title)
+        if validate_title:
+            errors.append(validate_title)
+
+        validate_time = Booking.validate_time(time_start, time_end)
+        if validate_time:
+            errors.append(validate_time)
+        if errors:
+            return BaseResponse.error_validate(errors)
+
+        existing_booking: Optional[Booking] = BookingExecutor.check_room_availability(room_id, time_start, time_end)
+
+        if existing_booking:
+            raise Conflict('Room is already booked for this time')
+        else:
+            new_booking = BookingExecutor.create_booking_belong_to_user(room_id, title, time_start, time_end, user_ids)
+        return BaseResponse.success( 'Booking created successfully')
