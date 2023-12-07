@@ -201,3 +201,19 @@ class BookingService:
         else:
             new_booking = BookingExecutor.create_booking_belong_to_user(room_id, title, time_start, time_end, user_ids)
         return BaseResponse.success( 'Booking created successfully')
+    
+    @staticmethod
+    def reject_booking(booking_id: int):
+        booking = BookingExecutor.get_booking(booking_id)
+        try:
+            booking.is_accepted = False
+            booking.is_deleted = True
+            booking.deleted_at = datetime.now()
+
+            db.session.commit()
+
+            return BaseResponse.success('Booking rejected successfully')
+
+        except Exception as e:
+            db.session.rollback()
+            raise InternalServerError(e)
