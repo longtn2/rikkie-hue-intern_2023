@@ -206,8 +206,8 @@ def admin_view_booking_pending() -> dict:
         per_page = int(request.args.get('per_page', 10))
         result = BookingService.admin_view_booking_pending(page, per_page)
         return BaseResponse.success(result)
-    except Exception as e:
-        raise InternalServerError('Internal Server Error') from e
+    except NotFound as e:
+        raise BaseResponse.error(e)
     
 @booking_blueprint.route("/user/view_booked", methods=["GET"])
 @jwt_required()
@@ -230,8 +230,6 @@ def detail_booking(booking_id: int) -> dict:
         return BaseResponse.success(result)
     except NotFound as e:
         return BaseResponse.error(e)
-    except Exception as e:
-        raise InternalServerError(e) 
         
 @booking_blueprint.route("/bookings/search_room/<int:room_id>", methods=["GET"])
 @jwt_required()
@@ -240,6 +238,21 @@ def Search_booking_room(room_id: int):
     try:
         response_data: dict = BookingService.search_booking_room(room_id)
         return BaseResponse.success(response_data)
+    except BadRequest as e:
+        return BaseResponse.error(e)
+    except NotFound as e:
+        raise BaseResponse.error(e)
+    
+@booking_blueprint.route("/user/view_list_invite", methods=["GET"])
+@jwt_required()
+@has_permission("view")
+def view_list_invite() -> dict:
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 10))
+        response_data: dict = BookingService.view_list_invite(page, per_page)
+        return BaseResponse.success(response_data)
+
     except BadRequest as e:
         return BaseResponse.error(e)
     except NotFound as e:
