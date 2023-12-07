@@ -139,5 +139,15 @@ class BookingExecutor:
             Booking.is_accepted == True,
             Booking.booking_id == booking_id
         ).first()
-        
         return booking_user
+    
+    @staticmethod
+    def search_booking_room(start_date: str, end_date: str, room_id: int) -> List[Booking]:
+        bookings = Booking.query.filter(
+            Booking.is_deleted == False,
+            Booking.deleted_at == None,
+            Booking.time_start >= start_date,
+            Booking.time_start <= end_date,
+            Booking.room_id == room_id
+        ).all()
+        return bookings

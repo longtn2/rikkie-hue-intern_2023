@@ -13,12 +13,14 @@ from project import db
 
 
 class BookingService:
+    
     @staticmethod
     def show_list_booking(bookings: List[Booking]):
         list_bookings = []
         for booking in bookings:
             user_ids = [booking_user.user.user_id for booking_user in booking.booking_user]
             user_names = [booking_user.user.user_name for booking_user in booking.booking_user]
+            booking_users = [booking_user.serialize() for booking_user in booking.booking_user]
             user_created= User.query.filter_by(user_id=booking.creator_id).first()
             creator_name=user_created.user_name if user_created else None
             room = Room.query.filter_by(room_id=booking.room_id).first()
@@ -36,7 +38,8 @@ class BookingService:
                 "creator_id": booking.creator_id,
                 "creator_name": creator_name,
                 "is_accepted":booking.is_accepted,
-                "is_deleted":booking.is_deleted
+                "is_deleted":booking.is_deleted,
+                "booking_users":booking_users
             }
             list_bookings.append(booking_info) 
         return list_bookings
@@ -308,3 +311,19 @@ class BookingService:
             "is_deleted": booking.is_deleted
         }
         return  booking_info
+    
+    @staticmethod
+    def search_booking_room(room_id: int ) -> List[Booking]:
+
+        start_date_str = request.args.get('start_date', None)
+        end_date_str = request.args.get('end_date', None)
+
+        if start_date_str and end_date_str:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
+        else:
+            raise BadRequest("Both start_date and end_date are required for date range query.")
+       
+        bookings = BookingExecutor.search_booking_room(start_date, end_date, room_id)
+        list_bookings = BookingService.show_list_booking(bookings)
+        return list_bookings

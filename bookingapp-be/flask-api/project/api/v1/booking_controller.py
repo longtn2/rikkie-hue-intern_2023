@@ -232,3 +232,15 @@ def detail_booking(booking_id: int) -> dict:
         return BaseResponse.error(e)
     except Exception as e:
         raise InternalServerError(e) 
+        
+@booking_blueprint.route("/bookings/search_room/<int:room_id>", methods=["GET"])
+@jwt_required()
+@has_permission("search")
+def Search_booking_room(room_id: int):
+    try:
+        response_data: dict = BookingService.search_booking_room(room_id)
+        return BaseResponse.success(response_data)
+    except BadRequest as e:
+        return BaseResponse.error(e)
+    except NotFound as e:
+        return BaseResponse.error(e)
