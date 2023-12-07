@@ -215,7 +215,6 @@ const CalendarBooking = () => {
     const { event, view } = eventInfo;
     let content;
     if (view.type === 'listWeek') {
-      return (
         content = (
           <div
             className='listWeek'
@@ -223,9 +222,7 @@ const CalendarBooking = () => {
           <Title level={2}>{event.title}</Title>
         </div>
         )
-      );
     } else {
-      return (
         <>
           <div
             className='listWeekCalendar'
@@ -233,8 +230,8 @@ const CalendarBooking = () => {
             <Title level={2}>{event.title}</Title>
           </div>
         </>
-      );
     }
+    return content;
   };
   const handleDateSelect = (arg: DateSelectArg) => {
     const { start, end } = arg;
