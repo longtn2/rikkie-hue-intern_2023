@@ -18,8 +18,6 @@ import { handleErrorShow, handleSuccessShow } from '../../ultils/ultilsApi';
 import ReusableForm from './ResaubleForm';
 import { getCookie } from '../../helper/Cookie';
 import {
-  timeEndWeek,
-  timeStartWeek,
   formatMonth,
   formatDate,
 } from '../../ultils/ultils';
@@ -28,13 +26,13 @@ import FooterBooking from './FooterBooking';
 import FormEditBooking from './FormEditBooking';
 import ListBooking from './ListBooking';
 import {
-  HEADER,
   BookingDataCalendar,
   BookingDataApi,
   DataType,
   Room,
 } from '../../constant/constant';
 import ActionBooking from './ActionBooking';
+import { getHeaders } from '../../helper/Header';
 import ModalConfirm from './ModalConfirm';
 const { Title } = Typography;
 
@@ -47,8 +45,12 @@ const CalendarBooking = () => {
   const [modalShow, setModalShow] = useState<Boolean>(false);
   const [isEditing, setIsEditing] = useState<Boolean>(false);
   const [isDeleted, setIsDeleted] = useState<Boolean>(false);
-  const [startDate, setStartDate] = useState<string>(timeStartWeek);
-  const [endDate, setEndDate] = useState<string>(timeEndWeek);
+  const [startDate, setStartDate] = useState<string>(
+    moment().startOf('week').format('YYYY-MM-DD')
+  );
+  const [endDate, setEndDate] = useState<string>(
+    moment().endOf('week').format('YYYY-MM-DD')
+  );
   const roles: string[] = getCookie('roles');
   const checkAdmin: boolean = roles.includes('admin');
   const [timeStartAdd, setTimeStartAdd] = useState<moment.Moment | null>(null);
@@ -61,7 +63,7 @@ const CalendarBooking = () => {
       setLoading(true);
       const response = await axios.get(`${url}/v1/rooms`, {
         withCredentials: true,
-        headers: HEADER,
+        headers: await getHeaders(),
       });
       if (response?.data?.data) {
         setRooms(response.data.data.rooms);
@@ -76,7 +78,7 @@ const CalendarBooking = () => {
   const fetchUser = async () => {
     try {
       const response = await axios.get(`${url}/v1/users`, {
-        headers: HEADER,
+        headers: await getHeaders(),
       });
       if (response?.data?.data) {
         setUsers(response.data.data.users);
@@ -99,7 +101,7 @@ const CalendarBooking = () => {
           start_date: startDate,
           end_date: endDate,
         },
-        headers: HEADER,
+        headers: await getHeaders(),
       });
 
       if (response?.data?.data) {
@@ -118,7 +120,7 @@ const CalendarBooking = () => {
         setBookingData(updatedData);
       }
     } catch (error: any) {
-      handleErrorShow(error);
+      // handleErrorShow(error);
     } finally {
       setLoading(false);
     }
@@ -155,34 +157,21 @@ const CalendarBooking = () => {
   };
   const eventContent = (eventInfo: EventContentArg) => {
     const { event, view } = eventInfo;
-    const content = () => {
-      if (view.type === 'listWeek' || view.type === 'timeGridWeek') {
+    const content =
+      view.type === 'timeGridWeek' ? (
+        <div>{event.title}</div>
+      ) : (
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
             width: '100%',
           }}
         >
           <Title level={2}>{event.title}</Title>
-        </div>;
-      } else {
-        <div
-          style={{
-            backgroundColor: event.backgroundColor,
-            color: 'black',
-            width: '100%',
-            paddingLeft: '10px',
-            fontSize: '18px',
-          }}
-        >
-          {event.title}
-        </div>;
-      }
-    };
+        </div>
+      );
+
     return content;
   };
-
   const handleDateSelect = (arg: DateSelectArg) => {
     const { start, end } = arg;
     const startTime = moment(start);
@@ -219,7 +208,7 @@ const CalendarBooking = () => {
         : `${url}/v1/user/bookings`;
       const response = await axios.post(urlCallApi, formattedBookingData, {
         withCredentials: true,
-        headers: HEADER,
+        headers: await getHeaders(),
       });
       if (response?.data?.data) {
         visibleModal('add', false);
@@ -262,7 +251,7 @@ const CalendarBooking = () => {
         formattedBookingData,
         {
           withCredentials: true,
-          headers: HEADER,
+          headers: await getHeaders(),
         }
       );
       if (response?.data?.data) {
@@ -281,7 +270,7 @@ const CalendarBooking = () => {
       const response = await axios.delete(
         `${url}/v1/bookings/${selectedBookingData?.booking_id}`,
         {
-          headers: HEADER,
+          headers: await getHeaders(),
         }
       );
       if (response?.data?.data) {
@@ -323,7 +312,7 @@ const CalendarBooking = () => {
             end_date: endDate,
           },
           withCredentials: true,
-          headers: HEADER,
+          headers: await getHeaders(),
         }
       );
 
@@ -357,140 +346,148 @@ const CalendarBooking = () => {
     }
   };
 
-  return (
-    <>
-      <div className='search'>
-        <Autocomplete options={rooms ?? []} onSelect={handleSearch} />
-      </div>
+  const handleCancel = (action: string) => {
+    visibleModal(action, false);
+  }
 
-      <div>
-        <div className='action'>
-          <Spin
-            size='large'
-            tip='Loading...'
-            spinning={loading}
-            className='loading'
-          />
+    const handleOpen = (action: string) => {
+      visibleModal(action, true);
+    };
+
+    return (
+      <>
+        <div className='search'>
+          <Autocomplete options={rooms ?? []} onSelect={handleSearch} />
         </div>
-        <div className='full-calendar'>
-          <FullCalendar
-            plugins={[
-              dayGridPlugin,
-              timeGridPlugin,
-              listPlugin,
-              interactionPlugin,
-            ]}
-            initialView='timeGridWeek'
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,listWeek',
-            }}
-            events={bookingData}
-            eventClick={handleEventClick}
-            eventContent={eventContent}
-            fixedWeekCount={true}
-            showNonCurrentDates={false}
-            selectable={true}
-            selectMirror={true}
-            select={handleDateSelect}
-            datesSet={handleDatesSet}
-            editable={roles.includes('admin') ? true : false}
-            eventDrop={handleEventDrop}
-            eventResize={handleEventDrop}
-          />
+
+        <div>
+          <div className='action'>
+            <Spin
+              size='large'
+              tip='Loading...'
+              spinning={loading}
+              className='loading'
+            />
+          </div>
+          <div className='full-calendar'>
+            <FullCalendar
+              plugins={[
+                dayGridPlugin,
+                timeGridPlugin,
+                listPlugin,
+                interactionPlugin,
+              ]}
+              initialView='timeGridWeek'
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listWeek',
+              }}
+              events={bookingData}
+              eventClick={handleEventClick}
+              eventContent={eventContent}
+              fixedWeekCount={true}
+              showNonCurrentDates={false}
+              selectable={true}
+              selectMirror={true}
+              select={handleDateSelect}
+              datesSet={handleDatesSet}
+              editable={roles.includes('admin') ? true : false}
+              eventDrop={handleEventDrop}
+              eventResize={handleEventDrop}
+            />
+          </div>
         </div>
-      </div>
 
-      <ModalConfirm
-        title={selectedBookingData?.title}
-        visible={modalShow ? true : false}
-        onCancel={handleCloseShow}
-        footer={
-          checkAdmin ? (
-            <div>
-              <Space className='space'>
-                <ActionBooking
-                  is_accepted={selectedBookingData?.is_accepted ?? false}
-                  visible={visibleModal}
-                />
-              </Space>
-            </div>
-          ) : null
-        }
-      >
-        {selectedBookingData && (
-          <ListBooking selectedBookingData={selectedBookingData} />
-        )}
-      </ModalConfirm>
-
-      <ModalConfirm
-        title='Add Booking'
-        visible={updateModal}
-        onCancel={() => visibleModal('add', false)}
-        footer={null}
-      >
-        <ReusableForm
-          onSubmit={handleAddBooking}
-          timeStart={timeStartAdd}
-          timeEnd={timeEndAdd}
-          rooms={rooms ?? []}
-          users={users ?? []}
-        />
-      </ModalConfirm>
-
-      <ModalConfirm
-        title={
-          <>
-            <Typography.Title level={2} className='title-modal'>
-              Update Booking
-            </Typography.Title>
-            <div className='modal-container-title'>
-              <div className='modal-title-div'>
-                Title:
-                <Typography.Title level={5}>
-                  {selectedBookingData?.title}
-                </Typography.Title>
+        <ModalConfirm
+          title={selectedBookingData?.title}
+          visible={modalShow ? true : false}
+          onCancel={handleCloseShow}
+          footer={
+            checkAdmin ? (
+              <div>
+                <Space className='space'>
+                  <ActionBooking
+                    is_accepted={selectedBookingData?.is_accepted ?? false}
+                    visible={visibleModal}
+                  />
+                </Space>
               </div>
-            </div>
-            <div className='modal-container-title'>
-              <div className='modal-title-div'>
-                Room Name:
-                <Typography.Title level={5}>
-                  {selectedBookingData?.room_name}
-                </Typography.Title>
-              </div>
-            </div>
-          </>
-        }
-        visible={isEditing ? true : false}
-        onCancel={() => visibleModal('add', false)}
-        footer={null}
-      >
-        <FormEditBooking
-          users={users ?? []}
+            ) : null
+          }
+        >
+          {selectedBookingData && (
+            <ListBooking selectedBookingData={selectedBookingData} />
+          )}
+        </ModalConfirm>
+
+        <ModalConfirm
+          title='Add Booking'
+          visible={updateModal}
           onCancel={() => visibleModal('add', false)}
-          initialValues={selectedBookingData}
-          onFinish={handleUpdate}
-        />
-      </ModalConfirm>
-
-      <ModalConfirm
-        title='Delete Booking'
-        visible={isDeleted ? true : false}
-        onCancel={() => visibleModal('delete', false)}
-        footer={
-          <FooterBooking
-            onDelete={handleDeleteBooking}
-            onCancel={() => visibleModal('delete', false)}
-            id={selectedBookingData?.booking_id!}
+          footer={null}
+        >
+          <ReusableForm
+            onSubmit={handleAddBooking}
+            onCancel={() => setIsEditing(false)}
+            timeStart={timeStartAdd}
+            timeEnd={timeEndAdd}
+            rooms={rooms ?? []}
+            users={users ?? []}
           />
-        }
-      >
-        <p>Are you sure you want to delete this booking?</p>
-      </ModalConfirm>
-    </>
-  );
-};
+        </ModalConfirm>
 
+        <ModalConfirm
+          title={
+            <>
+              <Typography.Title level={2} className='title-modal'>
+                Update Booking
+              </Typography.Title>
+              <div className='modal-container-title'>
+                <div className='modal-title-div'>
+                  Title:
+                  <Typography.Title level={5}>
+                    {selectedBookingData?.title}
+                  </Typography.Title>
+                </div>
+              </div>
+              <div className='modal-container-title'>
+                <div className='modal-title-div'>
+                  Room Name:
+                  <Typography.Title level={5}>
+                    {selectedBookingData?.room_name}
+                  </Typography.Title>
+                </div>
+              </div>
+            </>
+          }
+          visible={isEditing ? true : false}
+          onCancel={() => visibleModal('edit', false)}
+          footer={null}
+        >
+          <FormEditBooking
+            users={users ?? []}
+            onCancel={() => setIsEditing(false)}
+            initialValues={selectedBookingData}
+            onFinish={handleUpdate}
+          />
+        </ModalConfirm>
+
+        <ModalConfirm
+          title='Delete Booking'
+          visible={isDeleted ? true : false}
+          onCancel={() => visibleModal('delete', false)}
+          footer={
+            <FooterBooking
+              onDelete={handleDeleteBooking}
+              onCancel={() => visibleModal('delete', false)}
+              id={selectedBookingData?.booking_id!}
+            />
+          }
+        >
+          <p>Are you sure you want to delete this booking?</p>
+        </ModalConfirm>
+      </>
+    );
+  };
 export default CalendarBooking;

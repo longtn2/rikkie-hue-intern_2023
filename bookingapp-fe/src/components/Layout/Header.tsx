@@ -6,15 +6,33 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { getCookie } from "../../helper/Cookie";
 import ChangePassword from "../InfoUser/ChangePassword";
+import { url } from "../../ultils/urlApi";
 import "./Layout.css";
+import axios from "axios";
+import { HEADER } from "../../constant/constant";
+import { handleErrorShow } from "../../ultils/ultilsApi";
+import { getHeaders } from "../../helper/Header";
 
 const HeaderComponent = () => {
   const role = getCookie("roles");
   const name = getCookie("name");
   const navigator = useNavigate();
   const [isopen, setIsOpen] = useState(false);
+
+  const fetchLogout =  async () => {
+    try{
+      await axios.post(`${url}/v1/logout`,{},{
+        withCredentials: true,
+        headers: await getHeaders(),
+      })
+    } catch(error : any ) {
+      handleErrorShow(error);
+    }
+  }
+
   const handleLogout = () => {
     const cookies = Cookies.get();
+    fetchLogout();
     for (const cookie in cookies) {
       Cookies.remove(cookie);
     }

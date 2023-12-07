@@ -20,6 +20,7 @@ import { HEADER } from '../../constant/constant';
 import './Room.css';
 import FormAddRoom from './FormAddRoom';
 import FormEditRoom from './FormEditRoom';
+import { getHeaders } from '../../helper/Header';
 interface Room {
   room_id: number;
   room_name: string;
@@ -49,7 +50,7 @@ const Rooms: React.FC = () => {
           per_page: perPage,
         },
         withCredentials: true,
-        headers: HEADER,
+        headers: await getHeaders(),
       });
       if (response?.data?.data) {
         setRooms(response.data.data.rooms);
@@ -103,7 +104,7 @@ const Rooms: React.FC = () => {
           description,
         },
         {
-          headers: HEADER,
+          headers: await getHeaders(),
         }
       );
       if (response?.data?.data) {
@@ -136,7 +137,7 @@ const Rooms: React.FC = () => {
           `${url}/v1/rooms/${selectedRoom.room_id}`,
           { room_name: values.room_name, description: values.description },
           {
-            headers: HEADER,
+            headers: await getHeaders(),
           }
         );
         if (response?.data?.data) {
@@ -163,7 +164,7 @@ const Rooms: React.FC = () => {
           params: {
             name: value,
           },
-          headers: HEADER,
+          headers: await getHeaders(),
         });
         if (response?.data?.data) {
           handleSuccessShow(response);

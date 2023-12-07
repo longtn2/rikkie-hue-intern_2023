@@ -1,4 +1,4 @@
-import { Modal, Button, Typography } from 'antd';
+import { Modal, Typography } from 'antd';
 import { ReactNode } from 'react';
 
 interface ModalConfirmProps {

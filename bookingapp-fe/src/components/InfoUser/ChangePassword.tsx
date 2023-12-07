@@ -3,7 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { url } from "../../ultils/urlApi";
 import { token } from "../../constant/constant";
-import "./ChangePassword.css"
+// import "./ChangePassword.css"
 import { handleError, handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 
 interface ChangePasswordProps {

@@ -9,6 +9,7 @@ import { url } from '../../ultils/urlApi';
 import CustomModal from './CustomModal';
 import RoomModalContent from './ModalContent';
 import { HEADER } from '../../constant/constant';
+import { getHeaders } from '../../helper/Header';
 const { Title, Text } = Typography;
 interface RoomManager {
   room_id: number;
@@ -44,7 +45,7 @@ const RoomDetails = () => {
       setLoading(true);
       const response = await axios.get(`${url}/v1/rooms/${roomId}`, {
         withCredentials: true,
-        headers: HEADER,
+        headers: await getHeaders(),
       });
       if (response?.data?.data) {
         setRoom(response.data.data);
@@ -82,7 +83,7 @@ const RoomDetails = () => {
           description: values.description,
         },
         {
-          headers: HEADER,
+          headers: await getHeaders(),
         }
       );
       if (response?.data?.data) {
@@ -106,7 +107,7 @@ const RoomDetails = () => {
           description: values.description,
         },
         {
-          headers: HEADER,
+          headers: await getHeaders(),
         }
       );
       if(response?.data?.data){
