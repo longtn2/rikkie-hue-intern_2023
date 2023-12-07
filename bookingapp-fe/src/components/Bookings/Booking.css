@@ -34,7 +34,6 @@
     font-size: 30px;
 }
 
-<<<<<<< HEAD
 .listWeek {
     display: flex;
     flex-direction: column;
@@ -47,7 +46,7 @@
     width: 100%;
 }
 
-=======
+
 .edit-modal {
     display: flex;
     width: 100%;
@@ -61,4 +60,4 @@
     border-radius:  5px;
     padding: 20px;
 }
->>>>>>> eea598f (fix comment)
+

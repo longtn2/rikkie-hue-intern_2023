@@ -413,7 +413,7 @@ const CalendarBooking = () => {
     }
     visible={updateModal}
     onCancel={closeShowAddModal}
-    footer={nu
+    footer={null}
     destroyOnClose={true}
     maskClosable={false}
     afterClose={closeShowAddModal}
