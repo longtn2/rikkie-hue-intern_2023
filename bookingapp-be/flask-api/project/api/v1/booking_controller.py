@@ -85,6 +85,22 @@ def delete_booking(booking_id: int) -> Dict:
     except IntegrityError:
         db.session.rollback()
         return BaseResponse.error(e)
+    
+@booking_blueprint.route("/bookings/<int:booking_id>/accept", methods=["PUT"])
+@jwt_required()
+@has_permission("update")
+def accept_booking_endpoint(booking_id: int):
+    try:
+        response_data = BookingService.accept_booking(booking_id)
+        return response_data
+    
+    except BadRequest as e:
+        return BaseResponse.error(e)
+
+    except Conflict as e:
+        return BaseResponse.error(e)
+
+    except NotFound as e:
 
 @booking_blueprint.route("/user/bookings", methods=["GET"])
 @jwt_required()
