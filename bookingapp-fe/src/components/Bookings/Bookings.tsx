@@ -289,8 +289,8 @@ const CalendarBooking = () => {
         : selectedBookingData?.booking_id,
       user_ids: values.user_ids ? values.user_ids : selectedBookingData?.user_ids,
       room_id: values.room_id ? values.room_id : selectedBookingData?.room_id,
-      time_start: moment(values.time_start).format('YYYY-MM-DD HH:mm:ss'),
-      time_end: moment(values.time_end).format('YYYY-MM-DD HH:mm:ss'),
+      time_start: formatDate(values.time_start),
+      time_end: formatDate(values.time_end),
     };
     try {
       const response = await axios.put(
