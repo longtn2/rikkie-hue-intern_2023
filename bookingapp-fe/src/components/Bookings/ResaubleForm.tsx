@@ -110,9 +110,7 @@ const ReusableForm: React.FC<TypeSubmit> = ({
         <Button
           htmlType='button'
           onClick={() => form.resetFields()}
-          style={{
-            marginRight: '30px',
-          }}
+          className = 'button'
         >
           Cancel
         </Button>

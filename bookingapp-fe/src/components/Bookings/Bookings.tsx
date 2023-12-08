@@ -146,18 +146,10 @@ const CalendarBooking = () => {
 
   const fetchBookingData = async (startDate: string, endDate: string) => {
     try {
-      setLoading(true);
-      const response = roles.includes("admin") ? await axios.get(`${url}/v1/bookings`, {
-        params: {
-          start_date: startDate,
-          end_date: endDate,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': true,
-        },
-      }) :  await axios.get(`${url}/v1/user/bookings`, {
+      const urlCallApi = roles.includes('admin')
+        ? `${url}/v1/bookings`
+        : `${url}/v1/user/bookings`;
+      const response = await axios.get(urlCallApi, {
         params: {
           start_date: startDate,
           end_date: endDate,
@@ -343,30 +335,16 @@ const CalendarBooking = () => {
         time_start: formatDate(values.time_start),
         time_end: formatDate(values.time_end),
       };
-      let response;
-      roles.includes('admin')
-        ? (response = await axios.post(
-            `${url}/v1/bookings`,
-            formattedBookingData,
-            {
-              withCredentials: true,
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'ngrok-skip-browser-warning': true,
-              },
-            }
-          ))
-        : (response = await axios.post(
-            `${url}/v1/user/bookings`,
-            formattedBookingData,
-            {
-              withCredentials: true,
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'ngrok-skip-browser-warning': true,
-              },
-            }
-          ));
+      const urlCallApi: string = roles.includes('admin')
+        ? `${url}/v1/bookings`
+        : `${url}/v1/user/bookings`;
+      const response = await axios.post(urlCallApi, formattedBookingData, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'ngrok-skip-browser-warning': true,
+        },
+      });
       closeShowAddModal();
       fetchBookingData(startDate, endDate);
       handleSuccessShow(response);
