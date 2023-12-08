@@ -3,11 +3,12 @@ from typing import List, Optional, Union
 from project import db
 from flask_jwt_extended import get_jwt_identity
 
+
 class BookingExecutor:
     @staticmethod
     def get_booking(booking_id: int) -> Optional[Booking]:
         return Booking.query.get(booking_id)
-    
+
     @staticmethod
     def get_bookings_in_date_range(start_date, end_date) -> List[Booking]:
         return Booking.query.filter(
@@ -22,7 +23,7 @@ class BookingExecutor:
             Booking.time_end >= time_start,
             Booking.time_start <= time_end
         ).first()
-        
+
     @staticmethod
     def create_booking(room_id: int, title: str, time_start: str, time_end: str, user_ids: List[int]) -> Booking:
         try:
@@ -41,7 +42,7 @@ class BookingExecutor:
         except Exception as e:
             db.session.rollback()
             raise e
-        
+
     @staticmethod
     def check_room_availability_update(room_id: int, time_start: str, time_end: str, booking_id: int) -> Optional[Booking]:
         return Booking.query.filter(
@@ -50,7 +51,7 @@ class BookingExecutor:
             Booking.time_start <= time_end,
             Booking.booking_id != booking_id
         ).first()
-        
+
     @staticmethod
     def update_booking(booking: Booking, room_id: int, title: str, time_start: str, time_end: str, user_ids: List[int]) -> None:
         try:
@@ -70,25 +71,25 @@ class BookingExecutor:
         except Exception as e:
             db.session.rollback()
             raise e
-        
+
     @staticmethod
     def is_room_blocked(room_id: int) -> Union[bool, None]:
         return Room.query.filter_by(room_id=room_id).value(Room.is_blocked)
 
     @staticmethod
     def get_bookings_in_date_range_user(start_date, end_date, user_id) -> List[Booking]:
-        return Booking.query.join(BookingUser,Booking.booking_id==BookingUser.booking_id).filter(
+        return Booking.query.join(BookingUser, Booking.booking_id == BookingUser.booking_id).filter(
             Booking.is_deleted == False,
             Booking.time_end.between(start_date, end_date),
             BookingUser.user_id == user_id
         ).all()
-    
+
     @staticmethod
     def create_booking_belong_to_user(room_id: int, title: str, time_start: str, time_end: str, user_ids: List[int]) -> Booking:
         user_id = get_jwt_identity()
         try:
             new_booking = Booking(
-                room_id=room_id, title=title, time_start=time_start, time_end=time_end, is_accepted=False, is_deleted=False, creator_id = user_id)
+                room_id=room_id, title=title, time_start=time_start, time_end=time_end, is_accepted=False, is_deleted=False, creator_id=user_id)
             db.session.add(new_booking)
             db.session.commit()
 
@@ -102,3 +103,13 @@ class BookingExecutor:
         except Exception as e:
             db.session.rollback()
             raise e
+
+    @staticmethod
+    def admin_view_booking_pending(page: int, per_page: int) -> List[Booking]:
+        bookings = (Booking.query.filter(
+            Booking.is_accepted == False, 
+            Booking.is_deleted == False,
+            Booking.deleted_at == None
+            ).paginate( page=page, per_page=per_page, error_out=False)
+        )
+        return bookings
