@@ -34,6 +34,7 @@ import "./Booking.css";
 import ReusableForm from './ResaubleForm';
 import './Booking.css';
 import SearchRoomBooking from './SearchRoomBooking';
+import { headers } from '../../constant/constant';
 const { Title } = Typography;
 
 interface BookingData {
@@ -115,9 +116,7 @@ const CalendarBooking = () => {
       setLoading(true);
       const response = await axios.get(`${url}/v1/rooms`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': true,
+          headers
         },
       });
       setRooms(response.data.data.rooms);
@@ -133,9 +132,7 @@ const CalendarBooking = () => {
       setLoading(true);
       const response = await axios.get(`${url}/v1/users`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': true,
+          headers
         },
       });
       setUsers(response.data.data.users);
@@ -219,8 +216,7 @@ const CalendarBooking = () => {
         {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${token}`,
-            'ngrok-skip-browser-warning': true,
+            headers
           },
         }
       );
@@ -291,8 +287,7 @@ const CalendarBooking = () => {
         {
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${token}`,
-            'ngrok-skip-browser-warning': true,
+            headers
           },
         }
       );
@@ -343,8 +338,7 @@ const CalendarBooking = () => {
       const response = await axios.post(urlCallApi, formattedBookingData, {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${token}`,
-          'ngrok-skip-browser-warning': true,
+          headers
         },
       });
       closeShowAddModal();
@@ -406,54 +400,54 @@ const CalendarBooking = () => {
   };
 
   return (
-    <>
-    <SearchRoomBooking options={rooms ?? []} onSelect={handleSearch} />
-      <div>
-        <div className='action'>
-          <Spin
-            size='large'
-            tip='Loading...'
-            spinning={loading}
-            style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              fontSize: '24px',
-              color: '#ff0000',
-            }}
-          />
-        </div>
-        <div className='full-calendar'>
-          <FullCalendar
-            plugins={[
-              dayGridPlugin,
-              timeGridPlugin,
-              listPlugin,
-              interactionPlugin,
-            ]}
-            initialView='timeGridWeek'
-            headerToolbar={{
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,timeGridWeek,listWeek',
-            }}
-            events={bookingData}
-            eventClick={handleEventClick}
-            eventContent={eventContent}
-            fixedWeekCount={true}
-            showNonCurrentDates={false}
-            selectable={true}
-            selectMirror={true}
-            select={handleDateSelect}
-            datesSet={handleDatesSet}
-            editable={roles.includes('admin') ? true : false}
-            eventDrop={handleEventDrop}
-            eventResize={handleEventDrop}
-          />
-        </div>
-      </div>
-    </>
+<>
+  <SearchRoomBooking options={rooms ?? []} onSelect={handleSearch} />
+  <div>
+    <div className='action'>
+      <Spin
+        size='large'
+        tip='Loading...'
+        spinning={loading}
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: '24px',
+          color: '#ff0000',
+        }}
+      />
+    </div>
+    <div className='full-calendar'>
+      <FullCalendar
+        plugins={[
+          dayGridPlugin,
+          timeGridPlugin,
+          listPlugin,
+          interactionPlugin,
+        ]}
+        initialView='timeGridWeek'
+        headerToolbar={{
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek',
+        }}
+        events={bookingData}
+        eventClick={handleEventClick}
+        eventContent={eventContent}
+        fixedWeekCount={true}
+        showNonCurrentDates={false}
+        selectable={true}
+        selectMirror={true}
+        select={handleDateSelect}
+        datesSet={handleDatesSet}
+        editable={roles.includes('admin')}
+        eventDrop={handleEventDrop}
+        eventResize={handleEventDrop}
+      />
+    </div>
+  </div>
+</>
   );
 };
 
