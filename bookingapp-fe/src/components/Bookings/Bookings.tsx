@@ -30,7 +30,8 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
 import { formatDate, timeEndWeek, timeStartWeek } from '../../ultils/ultils';
-import './Booking.css';
+import "./Booking.css";
+import ReusableForm from './ResaubleForm';
 const { Title } = Typography;
 
 interface BookingData {
@@ -145,31 +146,20 @@ const CalendarBooking = () => {
 
   const fetchBookingData = async (startDate: string, endDate: string) => {
     try {
-      setLoading(true);
-      let response;
-      roles.includes('admin')
-        ? (response = await axios.get(`${url}/v1/bookings`, {
-            params: {
-              start_date: startDate,
-              end_date: endDate,
-            },
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'ngrok-skip-browser-warning': true,
-            },
-          }))
-        : (response = await axios.get(`${url}/v1/user/bookings`, {
-            params: {
-              start_date: startDate,
-              end_date: endDate,
-            },
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-              'ngrok-skip-browser-warning': true,
-            },
-          }));
+      const urlCallApi = roles.includes('admin')
+        ? `${url}/v1/bookings`
+        : `${url}/v1/user/bookings`;
+      const response = await axios.get(urlCallApi, {
+        params: {
+          start_date: startDate,
+          end_date: endDate,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': true,
+        },
+      })
 
       if (response.data.data) {
         const updatedData = response.data.data.map(
@@ -327,6 +317,43 @@ const CalendarBooking = () => {
     };
     handleUpdate(selectedData);
   }; 
+  };
+
+  const showAddModal = () => {
+    setUpdateModal(true);
+  };
+
+  const closeShowAddModal = () => {
+    setUpdateModal(false);
+  };
+
+  const handleAddBooking = async (values: BookingDataApi) => {
+    try {
+      setLoading(true);
+      const formattedBookingData = {
+        ...values,
+        time_start: formatDate(values.time_start),
+        time_end: formatDate(values.time_end),
+      };
+      const urlCallApi: string = roles.includes('admin')
+        ? `${url}/v1/bookings`
+        : `${url}/v1/user/bookings`;
+      const response = await axios.post(urlCallApi, formattedBookingData, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'ngrok-skip-browser-warning': true,
+        },
+      });
+      closeShowAddModal();
+      fetchBookingData(startDate, endDate);
+      handleSuccessShow(response);
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <FullCalendar
@@ -349,6 +376,29 @@ const CalendarBooking = () => {
       editable={true}
       eventDrop={handleEventDrop}
     />
+
+    <Modal
+    title={
+      <div>
+        <Title
+          level={2}
+          className = 'edit-modal'
+          }}
+        >
+          Add Booking
+        </Title>
+      </div>
+    }
+    visible={updateModal}
+    onCancel={closeShowAddModal}
+    footer={null}
+    destroyOnClose={true}
+    maskClosable={false}
+    afterClose={closeShowAddModal}
+  >
+    <ReusableForm onSubmit={handleAddBooking} timeStart={timeStartAdd} timeEnd={timeEndAdd} rooms={rooms ?? []} users={users ?? []} />
+  </Modal>
+
   );
 };
 
