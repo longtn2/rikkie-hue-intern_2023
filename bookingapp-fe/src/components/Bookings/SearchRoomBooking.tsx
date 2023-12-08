@@ -14,7 +14,7 @@ interface AutocompleteProps {
   onSelect: (roomId: number) => void;
 }
 
-const Autocomplete: React.FC<AutocompleteProps> = ({ options, onSelect }) => {
+const SearchRoomBooking: React.FC<AutocompleteProps> = ({ options, onSelect }) => {
   const [searchResults, setSearchResults] = useState<Room[]>([]);
   const [searchValue, setSearchValue] = useState('');
 
@@ -60,4 +60,4 @@ const Autocomplete: React.FC<AutocompleteProps> = ({ options, onSelect }) => {
   );
 };
 
-export default Autocomplete;
+export default SearchRoomBooking;
