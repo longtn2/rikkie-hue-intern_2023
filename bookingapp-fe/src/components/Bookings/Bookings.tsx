@@ -417,7 +417,7 @@ const CalendarBooking = () => {
         }
       );
 
-      if (response.data.data) {
+      if (response?.data.data) {
         const updatedData = response.data.data.map(
           (booking: BookingDataApi) => {
             const { time_end, time_start, is_accepted, ...rest } = booking;
@@ -448,54 +448,54 @@ const CalendarBooking = () => {
   };
 
   return (
-<>
-  <SearchRoomBooking options={rooms ?? []} onSelect={handleSearch} />
-  <div>
-    <div className='action'>
-      <Spin
-        size='large'
-        tip='Loading...'
-        spinning={loading}
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          fontSize: '24px',
-          color: '#ff0000',
-        }}
-      />
-    </div>
-    <div className='full-calendar'>
-      <FullCalendar
-        plugins={[
-          dayGridPlugin,
-          timeGridPlugin,
-          listPlugin,
-          interactionPlugin,
-        ]}
-        initialView='timeGridWeek'
-        headerToolbar={{
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,listWeek',
-        }}
-        events={bookingData}
-        eventClick={handleEventClick}
-        eventContent={eventContent}
-        fixedWeekCount={true}
-        showNonCurrentDates={false}
-        selectable={true}
-        selectMirror={true}
-        select={handleDateSelect}
-        datesSet={handleDatesSet}
-        editable={roles.includes('admin')}
-        eventDrop={handleEventDrop}
-        eventResize={handleEventDrop}
-      />
-    </div>
-  </div>
-</>
+    <>
+      <SearchRoomBooking options={rooms ?? []} onSelect={handleSearch} />
+      <div>
+        <div className='action'>
+          <Spin
+            size='large'
+            tip='Loading...'
+            spinning={loading}
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: '24px',
+              color: '#ff0000',
+            }}
+          />
+        </div>
+        <div className='full-calendar'>
+          <FullCalendar
+            plugins={[
+              dayGridPlugin,
+              timeGridPlugin,
+              listPlugin,
+              interactionPlugin,
+            ]}
+            initialView='timeGridWeek'
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,listWeek',
+            }}
+            events={bookingData}
+            eventClick={handleEventClick}
+            eventContent={eventContent}
+            fixedWeekCount={true}
+            showNonCurrentDates={false}
+            selectable={true}
+            selectMirror={true}
+            select={handleDateSelect}
+            datesSet={handleDatesSet}
+            editable={roles.includes('admin')}
+            eventDrop={handleEventDrop}
+            eventResize={handleEventDrop}
+          />
+        </div>
+      </div>
+    </>
   );
 };
 
