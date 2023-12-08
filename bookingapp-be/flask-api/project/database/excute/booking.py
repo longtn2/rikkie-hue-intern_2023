@@ -2,6 +2,7 @@ from project.models import Booking, BookingUser, Room
 from typing import List, Optional, Union
 from project import db
 from flask_jwt_extended import get_jwt_identity
+from werkzeug.exceptions import UnprocessableEntity 
 
 
 class BookingExecutor:
@@ -20,24 +21,28 @@ class BookingExecutor:
     def check_room_availability(room_id: int, time_start: str, time_end: str) -> Optional[Booking]:
         return Booking.query.filter(
             Booking.room_id == room_id,
-            Booking.time_end >= time_start,
-            Booking.time_start <= time_end
+            Booking.is_deleted == False,
+            Booking.time_end > time_start,
+            Booking.time_start < time_end
         ).first()
 
     @staticmethod
     def create_booking(room_id: int, title: str, time_start: str, time_end: str, user_ids: List[int]) -> Booking:
+        user_id = get_jwt_identity()
         try:
             new_booking = Booking(
-                room_id=room_id, title=title, time_start=time_start, time_end=time_end, is_accepted=True, is_deleted=False)
+                room_id=room_id, title=title, time_start=time_start, time_end=time_end, is_accepted=True, is_deleted=False, creator_id=user_id)
             db.session.add(new_booking)
             db.session.commit()
 
-            for user_id in user_ids:
-                user_booking = BookingUser(
-                    user_id=user_id, booking_id=new_booking.booking_id, is_attending=False)
-                db.session.add(user_booking)
-            db.session.commit()
+            user_bookings = [
+                BookingUser(user_id=id, booking_id=new_booking.booking_id,
+                            is_attending=True if id == user_id else None)
+                for id in user_ids
+            ]
 
+            db.session.add_all(user_bookings)
+            db.session.commit()
             return new_booking
         except Exception as e:
             db.session.rollback()
@@ -47,8 +52,9 @@ class BookingExecutor:
     def check_room_availability_update(room_id: int, time_start: str, time_end: str, booking_id: int) -> Optional[Booking]:
         return Booking.query.filter(
             Booking.room_id == room_id,
-            Booking.time_end >= time_start,
-            Booking.time_start <= time_end,
+            Booking.is_deleted == False,
+            Booking.time_end > time_start,
+            Booking.time_start < time_end,
             Booking.booking_id != booking_id
         ).first()
 
@@ -93,16 +99,18 @@ class BookingExecutor:
             db.session.add(new_booking)
             db.session.commit()
 
-            for user_id in user_ids:
-                user_booking = BookingUser(
-                    user_id=user_id, booking_id=new_booking.booking_id, is_attending=False)
-                db.session.add(user_booking)
-            db.session.commit()
+            user_bookings = [
+                BookingUser(user_id=id, booking_id=new_booking.booking_id,
+                            is_attending=True if id == user_id else None)
+                for id in user_ids
+            ]
 
+            db.session.add_all(user_bookings)
+            db.session.commit()
             return new_booking
         except Exception as e:
             db.session.rollback()
-            raise e
+            raise UnprocessableEntity(str(e))
 
     @staticmethod
     def admin_view_booking_pending(page: int, per_page: int) -> List[Booking]:
