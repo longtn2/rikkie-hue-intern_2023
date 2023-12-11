@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-import UnauthorizedPage from './UnauthorizedPage';
+import UnauthorizedPage from "./Unauthorized";
 import getCookie from './Cookie'
 
 
