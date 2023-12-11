@@ -4,37 +4,46 @@ import axios from "axios";
 import { DataType, HEADER, roles } from "../../constant/constant";
 import { url } from "../../ultils/urlApi";
 import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
+import "./UserManager.css";
 interface FormEditProps {
   onModalEditUser: (status: boolean) => void;
   data: DataType | undefined;
   onEditUser: (editUser: DataType) => void;
 }
-const FormEdit: React.FC<FormEditProps> = ({ onModalEditUser, data, onEditUser }) => {
+const FormEdit: React.FC<FormEditProps> = ({
+  onModalEditUser,
+  data,
+  onEditUser,
+}) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
-  let apiurl: string = ''
+  let apiurl: string = "";
 
   const handleUpdate = async (value: any) => {
     if (data) {
       try {
-        setLoading(true)
-        { roles.includes('admin') ? apiurl = "/v1/users/" + data.user_id : apiurl = "/v1/users/profile" }
+        setLoading(true);
+        {
+          roles.includes("admin")
+            ? (apiurl = "/v1/users/" + data.user_id)
+            : (apiurl = "/v1/users/profile");
+        }
         await axios
           .put(url + apiurl, value, {
-            headers: HEADER
+            headers: HEADER,
           })
           .then((response: any) => {
-            onEditUser(value)
-            handleSuccessShow(response)
-            onModalEditUser(false)
-          })
+            onEditUser(value);
+            handleSuccessShow(response);
+            onModalEditUser(false);
+          });
       } catch (error: any) {
-        handleErrorShow(error)
+        handleErrorShow(error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    };
-  }
+    }
+  };
   return (
     <div>
       <div style={{ padding: 20 }}>
@@ -84,7 +93,7 @@ const FormEdit: React.FC<FormEditProps> = ({ onModalEditUser, data, onEditUser }
               },
               {
                 max: 10,
-                message: "Phone number has at most 10 numbers"
+                message: "Phone number has at most 10 numbers",
               },
               { whitespace: true },
               {
@@ -96,14 +105,14 @@ const FormEdit: React.FC<FormEditProps> = ({ onModalEditUser, data, onEditUser }
           >
             <Input />
           </Form.Item>
-          {roles.includes('admin') ? (
+          {roles.includes("admin") ? (
             <Form.Item
               name="role_id"
               label="Role"
               rules={[{ required: true, message: "Please select role!" }]}
               hasFeedback
             >
-              <Checkbox.Group  >
+              <Checkbox.Group>
                 <Row>
                   <Col span={12}>
                     <Checkbox value={1} style={{ lineHeight: "32px" }}>
@@ -119,15 +128,18 @@ const FormEdit: React.FC<FormEditProps> = ({ onModalEditUser, data, onEditUser }
               </Checkbox.Group>
             </Form.Item>
           ) : null}
-          <Button style={{ width: 200 }} type="primary" htmlType="submit" loading={loading}>
+          <Button
+            className="btn-modal"
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+          >
             Update
           </Button>
         </Form>
-
       </div>
     </div>
   );
 };
 
 export default FormEdit;
-

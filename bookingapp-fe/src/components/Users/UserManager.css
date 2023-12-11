@@ -1,0 +1,14 @@
+.search {
+  margin-bottom: 20px;
+  justify-content: space-between;
+  column-gap: 20px;
+  width: 100%;
+}
+.search .ant-space-item:first-child {
+  width: 100%;
+}
+.btn-modal {
+  display: flex;
+  width: 200px;
+  justify-content: center;
+}

@@ -143,7 +143,12 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
             </Row>
           </Checkbox.Group>
         </Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
+        <Button
+          className="btn-modal"
+          type="primary"
+          htmlType="submit"
+          loading={loading}
+        >
           Submit
         </Button>
       </Form>
@@ -152,4 +157,3 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
 };
 
 export default FormAdd;
-

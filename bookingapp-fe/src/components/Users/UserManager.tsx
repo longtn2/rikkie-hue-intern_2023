@@ -185,7 +185,7 @@ const UsersManager = () => {
     setIsModalOpen(true);
   };
   const handleAddUser = (user: DataType) => {
-    const users = {...user, role_name: ['']}
+    const users = { ...user, role_name: [""] };
     const listUserSet = listUsers.concat(users);
     setListUsers(listUserSet);
   };
@@ -206,18 +206,10 @@ const UsersManager = () => {
 
   return (
     <>
-    <div className="header-component">
+      <div className="header-component">
         <h1 className="component-name">User Manager</h1>
       </div>
-      <Space
-        style={{
-          marginBottom: 20,
-          justifyContent: "space-between",
-          columnGap: 20,
-          width: "100%",
-        }}
-        className="search"
-      >
+      <Space className="search">
         <Search
           placeholder="Search..."
           enterButton={<SearchOutlined />}
@@ -283,5 +275,3 @@ const UsersManager = () => {
 };
 
 export default UsersManager;
-
-
