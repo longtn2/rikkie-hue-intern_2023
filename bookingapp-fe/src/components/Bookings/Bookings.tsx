@@ -154,9 +154,7 @@ const CalendarBooking = () => {
           end_date: endDate,
         },
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': true,
+          headers
         },
       })
 
@@ -410,8 +408,7 @@ const CalendarBooking = () => {
           },
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            headers
           },
         }
       );
@@ -458,8 +455,7 @@ const CalendarBooking = () => {
           },
           withCredentials: true,
           headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            headers
           },
         }
       );
@@ -503,14 +499,7 @@ const CalendarBooking = () => {
             size='large'
             tip='Loading...'
             spinning={loading}
-            style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              fontSize: '24px',
-              color: '#ff0000',
-            }}
+            className='loading'
           />
         </div>
         <div className='full-calendar'>
