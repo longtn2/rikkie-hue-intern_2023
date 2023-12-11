@@ -34,7 +34,7 @@ import "./Booking.css";
 import ReusableForm from './ResaubleForm';
 import './Booking.css';
 import SearchRoomBooking from './SearchRoomBooking';
-import { headers } from '../../constant/constant';
+import { HEADER } from '../../constant/constant';
 const { Title } = Typography;
 
 interface BookingData {
@@ -115,9 +115,7 @@ const CalendarBooking = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${url}/v1/rooms`, {
-        headers: {
-          headers
-        },
+        headers: HEADER
       });
       setRooms(response.data.data.rooms);
     } catch (error: any) {
@@ -131,9 +129,7 @@ const CalendarBooking = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${url}/v1/users`, {
-        headers: {
-          headers
-        },
+        headers: HEADER,
       });
       setUsers(response.data.data.users);
     } catch (error: any) {
@@ -153,9 +149,7 @@ const CalendarBooking = () => {
           start_date: startDate,
           end_date: endDate,
         },
-        headers: {
-          headers
-        },
+        headers: HEADER,
       })
 
       if (response.data.data) {
@@ -213,9 +207,7 @@ const CalendarBooking = () => {
         formattedBookingData,
         {
           withCredentials: true,
-          headers: {
-            headers
-          },
+          headers: HEADER,
         }
       );
       fetchBookingData(startDate, endDate);
@@ -284,9 +276,7 @@ const CalendarBooking = () => {
         formattedBookingData,
         {
           withCredentials: true,
-          headers: {
-            headers
-          },
+          headers: HEADER,
         }
       );
       fetchBookingData(startDate, endDate);
@@ -335,9 +325,7 @@ const CalendarBooking = () => {
         : `${url}/v1/user/bookings`;
       const response = await axios.post(urlCallApi, formattedBookingData, {
         withCredentials: true,
-        headers: {
-          headers
-        },
+        headers: HEADER,
       });
       closeShowAddModal();
       fetchBookingData(startDate, endDate);
@@ -360,9 +348,7 @@ const CalendarBooking = () => {
             end_date: endDate,
           },
           withCredentials: true,
-          headers: {
-            headers
-          },
+          headers: HEADER,
         }
       );
 
