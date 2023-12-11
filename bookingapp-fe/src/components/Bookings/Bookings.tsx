@@ -152,7 +152,7 @@ const CalendarBooking = () => {
         headers: HEADER,
       })
 
-      if (response.data.data) {
+      if (response?.data?.data) {
         const updatedData = response.data.data.map(
           (booking: BookingDataApi) => {
             const { time_end, time_start, ...rest } = booking;
@@ -352,7 +352,7 @@ const CalendarBooking = () => {
         }
       );
 
-      if (response?.data.data) {
+      if (response?.data?.data) {
         const updatedData = response.data.data.map(
           (booking: BookingDataApi) => {
             const { time_end, time_start, is_accepted, ...rest } = booking;
