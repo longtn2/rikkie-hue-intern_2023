@@ -1,5 +1,6 @@
 import { Tag } from "antd";
 import getCookie from "../Route/Cookie";
+import React from "react";
 
 export const TYPE_USER = { ADMIN: "admin" };
 export interface DataType {

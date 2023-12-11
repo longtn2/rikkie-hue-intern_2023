@@ -16,13 +16,6 @@ import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 import FormEdit from "./FormEdit";
 
 const UsersManager = () => {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  const token = getCookie("token");
->>>>>>> e8031da (WIBA-506 update add new user)
-=======
->>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
   const [listUsers, setListUsers] = useState<DataType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
@@ -192,21 +185,10 @@ const UsersManager = () => {
     setIsModalOpen(true);
   };
   const handleAddUser = (user: DataType) => {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    const listUserSet = listUsers.concat(user);
+    const users = {...user, role_name: ['']}
+    const listUserSet = listUsers.concat(users);
     setListUsers(listUserSet);
   };
-=======
-    const listUserSet = listUsers.concat(user)
-    setListUsers(listUserSet)
-  }
->>>>>>> e8031da (WIBA-506 update add new user)
-=======
-    const listUserSet = listUsers.concat(user);
-    setListUsers(listUserSet);
-  };
->>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
   const handleModalAddUser = (status: boolean) => {
     setIsModalOpen(status);
   };
@@ -249,36 +231,13 @@ const UsersManager = () => {
         spinning={loading}
         size="large"
         tip="Loading..."
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          fontSize: "24px",
-          color: "#ff0000",
-        }}
+        className="spin-loading"
       >
         <Table
           columns={columns}
           dataSource={listUsers}
           pagination={pagination}
         />
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        <Modal
-          title="User Infomation"
-          destroyOnClose={true}
-          open={isModalOpen}
-          footer={[]}
-          onCancel={handleCancel}
-          style={{ width: "500px", textAlign: "center" }}
-        >
-          <FormAdd onModalAddUser={handleModalAddUser} onAddUser={handleAddUser}/>
-        </Modal>
->>>>>>> e8031da (WIBA-506 update add new user)
-=======
->>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
       </Spin>
 
       <Modal
@@ -287,7 +246,6 @@ const UsersManager = () => {
         open={isModalOpen}
         footer={[]}
         onCancel={handleCancel}
-        style={{ width: "500px", textAlign: "center" }}
       >
         <FormAdd
           onModalAddUser={handleModalAddUser}
@@ -297,11 +255,11 @@ const UsersManager = () => {
 
       <Modal
         title="Edit User Information"
+        className="small-modal"
         open={isModalEditOpen}
         destroyOnClose={true}
         footer={[]}
         onCancel={handleCancel}
-        style={{ width: "500px", textAlign: "center" }}
       >
         <FormEdit
           onModalEditUser={handleModalEditUser}
