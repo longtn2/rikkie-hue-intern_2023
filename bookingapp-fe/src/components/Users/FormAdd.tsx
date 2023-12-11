@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Button, Checkbox, Col, Form, Input, Row } from "antd";
 import React, { useState } from "react";
 import axios from "axios";
@@ -26,14 +27,27 @@ import {
   notification,
 } from "antd";
 import React from "react";
+=======
+import { Button, Checkbox, Col, Form, Input, Row } from "antd";
+import React, { useState } from "react";
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
 import axios from "axios";
-import { url } from "../ultils/urlApi";
-import getCookie from "../route/Cookie";
 
-const FormAdd = ({ onModalAddUser, onAddUser }) => {
+import { url } from "../../ultils/urlApi";
+import { DataType, HEADER } from "../../constant/constant";
+import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
+interface FormAddProps {
+  onModalAddUser: (status: boolean) => void;
+  onAddUser: (addUser: DataType) => void;
+}
+
+const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
   const [form] = Form.useForm();
+<<<<<<< HEAD
   const token = getCookie("token");
 >>>>>>> e8031da (WIBA-506 update add new user)
+=======
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
   const [loading, setLoading] = useState<boolean>(false);
   const handleSubmit = async (value: any) => {
     setLoading(true);
@@ -44,6 +58,7 @@ const FormAdd = ({ onModalAddUser, onAddUser }) => {
         })
         .then((response) => {
           onAddUser(value);
+<<<<<<< HEAD
 <<<<<<< HEAD
           handleSuccessShow(response);
           onModalAddUser(false);
@@ -56,10 +71,16 @@ const FormAdd = ({ onModalAddUser, onAddUser }) => {
           Modal.success({
             content: response.data.message,
           });
+=======
+          handleSuccessShow(response);
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
           onModalAddUser(false);
         });
     } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
       setLoading(false);
+<<<<<<< HEAD
       error.response.data.message === "Conflict"
         ? notification.error({
             message: error.response.data.errors,
@@ -73,6 +94,8 @@ const FormAdd = ({ onModalAddUser, onAddUser }) => {
             });
           });
 >>>>>>> e8031da (WIBA-506 update add new user)
+=======
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
     }
   };
   return (
@@ -188,6 +211,7 @@ const FormAdd = ({ onModalAddUser, onAddUser }) => {
           </Checkbox.Group>
         </Form.Item>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <Button type="primary" htmlType="submit" loading={loading}>
           Submit
         </Button>
@@ -198,6 +222,11 @@ const FormAdd = ({ onModalAddUser, onAddUser }) => {
           </Button>
         </Form.Item>
 >>>>>>> e8031da (WIBA-506 update add new user)
+=======
+        <Button type="primary" htmlType="submit" loading={loading}>
+          Submit
+        </Button>
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
       </Form>
     </div>
   );

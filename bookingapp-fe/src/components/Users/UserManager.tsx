@@ -17,9 +17,12 @@ import FormEdit from "./FormEdit";
 
 const UsersManager = () => {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   const token = getCookie("token");
 >>>>>>> e8031da (WIBA-506 update add new user)
+=======
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
   const [listUsers, setListUsers] = useState<DataType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
@@ -190,6 +193,7 @@ const UsersManager = () => {
   };
   const handleAddUser = (user: DataType) => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     const listUserSet = listUsers.concat(user);
     setListUsers(listUserSet);
   };
@@ -198,6 +202,11 @@ const UsersManager = () => {
     setListUsers(listUserSet)
   }
 >>>>>>> e8031da (WIBA-506 update add new user)
+=======
+    const listUserSet = listUsers.concat(user);
+    setListUsers(listUserSet);
+  };
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
   const handleModalAddUser = (status: boolean) => {
     setIsModalOpen(status);
   };
@@ -255,6 +264,7 @@ const UsersManager = () => {
           pagination={pagination}
         />
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         <Modal
           title="User Infomation"
@@ -267,6 +277,8 @@ const UsersManager = () => {
           <FormAdd onModalAddUser={handleModalAddUser} onAddUser={handleAddUser}/>
         </Modal>
 >>>>>>> e8031da (WIBA-506 update add new user)
+=======
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
       </Spin>
 
       <Modal

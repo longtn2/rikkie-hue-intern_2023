@@ -36,7 +36,11 @@ const FormEdit: React.FC<FormEditProps> = ({ onModalEditUser, data, onEditUser }
     };
   }
   return (
+<<<<<<< HEAD
     <div>
+=======
+    <>
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
       <div style={{ padding: 20 }}>
         <Form
           name="validateOnly"
@@ -125,7 +129,11 @@ const FormEdit: React.FC<FormEditProps> = ({ onModalEditUser, data, onEditUser }
         </Form>
 
       </div>
+<<<<<<< HEAD
     </div>
+=======
+    </>
+>>>>>>> 2b05bb3 (WIBA-506 user manager (add + edit + delete + search))
   );
 };
 
