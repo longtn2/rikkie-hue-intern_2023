@@ -153,7 +153,7 @@ const CalendarBooking = () => {
       })
 
       if (response?.data?.data) {
-        const updatedData = response.data.data.map(
+        const updatedData = response?.data?.data.map(
           (booking: BookingDataApi) => {
             const { time_end, time_start, ...rest } = booking;
             return {
@@ -353,7 +353,7 @@ const CalendarBooking = () => {
       );
 
       if (response?.data?.data) {
-        const updatedData = response.data.data.map(
+        const updatedData = response?.data?.data.map(
           (booking: BookingDataApi) => {
             const { time_end, time_start, is_accepted, ...rest } = booking;
             return {
