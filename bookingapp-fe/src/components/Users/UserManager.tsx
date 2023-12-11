@@ -1,32 +1,33 @@
-import { Tag, Space, Modal, Form, Button, Spin, notification } from "antd";
+import { Tag, Space, Modal, Button, Spin } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import getCookie from "../route/Cookie";
+
 import { url } from "../../ultils/urlApi";
 import FormAdd from "./FormAdd";
+import { DataType, HEADER, TYPE_USER } from "../../constant/constant";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import Search from "antd/es/input/Search";
+import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
+import FormEdit from "./FormEdit";
 
 const UsersManager = () => {
-  const token = getCookie("token");
   const [listUsers, setListUsers] = useState<DataType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalEditOpen, setIsModalEditOpen] = useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<DataType>();
   const [perPage, setPerPage] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
-
-  interface DataType {
-    user_id: number;
-    role_id: number[];
-    user_name: string;
-    role_name: string[];
-    phone_number: string;
-    email: string;
-    is_deleted: boolean;
-  }
   useEffect(() => {
     getData();
-  }, [currentPage, totalItems]);
+  }, [currentPage, perPage]);
   const getData = async () => {
     setLoading(true);
     try {
@@ -37,9 +38,7 @@ const UsersManager = () => {
             per_page: perPage,
           },
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: HEADER,
         })
         .then((response) => {
           setListUsers(response.data.data.users);
@@ -47,9 +46,60 @@ const UsersManager = () => {
           setPerPage(response.data.data.per_page);
         });
     } catch (error) {
-      console.error(error);
+      handleErrorShow(error);
     } finally {
       setLoading(false);
+    }
+  };
+  const handleSearch = async (value: string) => {
+    if (value.length === 0) {
+      getData();
+    } else {
+      try {
+        await axios
+          .get(url + "/v1/users/search", {
+            params: {
+              search: value,
+            },
+            headers: HEADER,
+          })
+          .then((response) => {
+            setListUsers(response.data.data.users);
+            setTotalItems(response.data.data.total_items);
+          });
+      } catch (error) {
+        handleErrorShow(error);
+      }
+    }
+  };
+  const handleEditUser = (editUser: DataType) => {
+    if (selectedUser) {
+      setListUsers((prevListUsers) =>
+        prevListUsers.map((user) =>
+          user.user_id === selectedUser.user_id
+            ? { ...user, ...editUser }
+            : user
+        )
+      );
+    }
+  };
+
+  const handleDelete = (_id: any) => {
+    if (selectedUser) {
+      try {
+        axios
+          .delete(url + "/v1/users/" + selectedUser.user_id, {
+            headers: HEADER,
+          })
+          .then((response) => {
+            setListUsers(response.data.users);
+            handleSuccessShow(response);
+            setIsModalDeleteOpen(false);
+            getData();
+          });
+      } catch (error) {
+        handleErrorShow(error);
+      }
     }
   };
 
@@ -112,36 +162,70 @@ const UsersManager = () => {
         </>
       ),
     },
-
     {
       align: "center",
       title: "Action",
       key: "action",
       render: (_text, user) => (
         <Space size="middle">
-          <EditOutlined />
-          <DeleteOutlined />
+          <EditOutlined onClick={() => handleSelectUser(user)} />
+          <DeleteOutlined onClick={() => handleToggleDelete(user)} />
         </Space>
       ),
     },
   ];
 
   const handleCancel = () => {
-    setIsModalOpen(false);
+    setIsModalDeleteOpen(false);
+    handleModalEditUser(false);
+    handleModalAddUser(false);
   };
+
   const showModal = () => {
     setIsModalOpen(true);
   };
   const handleAddUser = (user: DataType) => {
-    const listUserSet = listUsers.concat(user)
-    setListUsers(listUserSet)
-  }
+    const listUserSet = listUsers.concat(user);
+    setListUsers(listUserSet);
+  };
   const handleModalAddUser = (status: boolean) => {
     setIsModalOpen(status);
+  };
+  const handleModalEditUser = (status: boolean) => {
+    setIsModalEditOpen(status);
+  };
+  const handleToggleDelete = (user: DataType) => {
+    setSelectedUser(user);
+    setIsModalDeleteOpen(true);
+  };
+  const handleSelectUser = (user: DataType) => {
+    handleModalEditUser(true);
+    setSelectedUser(user);
   };
 
   return (
     <>
+    <div className="header-component">
+        <h1 className="component-name">User Manager</h1>
+      </div>
+      <Space
+        style={{
+          marginBottom: 20,
+          justifyContent: "space-between",
+          columnGap: 20,
+          width: "100%",
+        }}
+        className="search"
+      >
+        <Search
+          placeholder="Search..."
+          enterButton={<SearchOutlined />}
+          onSearch={handleSearch}
+        />
+        <Button type="primary" onClick={showModal}>
+          Add New User
+        </Button>
+      </Space>
       <Spin
         spinning={loading}
         size="large"
@@ -155,37 +239,55 @@ const UsersManager = () => {
           color: "#ff0000",
         }}
       >
-        <Space
-          style={{
-            marginBottom: 20,
-            justifyContent: "space-between",
-            columnGap: 20,
-            width: "100%",
-          }}
-          className="search"
-        >
-          <Button type="primary" onClick={showModal}>
-            Add New User
-          </Button>
-        </Space>
         <Table
           columns={columns}
-          dataSource={list_users}
+          dataSource={listUsers}
           pagination={pagination}
         />
-        <Modal
-          title="User Infomation"
-          destroyOnClose={true}
-          open={isModalOpen}
-          footer={[]}
-          onCancel={handleCancel}
-          style={{ width: "500px", textAlign: "center" }}
-        >
-          <FormAdd onModalAddUser={handleModalAddUser} onAddUser={handleAddUser}/>
-        </Modal>
       </Spin>
+
+      <Modal
+        title="User Infomation"
+        destroyOnClose={true}
+        open={isModalOpen}
+        footer={[]}
+        onCancel={handleCancel}
+        style={{ width: "500px", textAlign: "center" }}
+      >
+        <FormAdd
+          onModalAddUser={handleModalAddUser}
+          onAddUser={handleAddUser}
+        />
+      </Modal>
+
+      <Modal
+        title="Edit User Information"
+        open={isModalEditOpen}
+        destroyOnClose={true}
+        footer={[]}
+        onCancel={handleCancel}
+        style={{ width: "500px", textAlign: "center" }}
+      >
+        <FormEdit
+          onModalEditUser={handleModalEditUser}
+          data={selectedUser}
+          onEditUser={handleEditUser}
+        />
+      </Modal>
+
+      <Modal
+        title="Delete"
+        open={isModalDeleteOpen}
+        onOk={handleDelete}
+        onCancel={handleCancel}
+        okText="Confirm"
+        cancelText="Cancel"
+      >
+        <p>Confirm delete this user ??</p>
+      </Modal>
     </>
   );
 };
 
 export default UsersManager;
+

@@ -1,53 +1,34 @@
-import {
-  Button,
-  Checkbox,
-  Col,
-  Form,
-  Input,
-  Modal,
-  Row,
-  Spin,
-  notification,
-} from "antd";
-import React from "react";
+import { Button, Checkbox, Col, Form, Input, Row } from "antd";
+import React, { useState } from "react";
 import axios from "axios";
-import { url } from "../ultils/urlApi";
-import getCookie from "../route/Cookie";
 
-const FormAdd = ({ onModalAddUser, onAddUser }) => {
+import { url } from "../../ultils/urlApi";
+import { DataType, HEADER } from "../../constant/constant";
+import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
+interface FormAddProps {
+  onModalAddUser: (status: boolean) => void;
+  onAddUser: (addUser: DataType) => void;
+}
+
+const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
   const [form] = Form.useForm();
-  const token = getCookie("token");
   const [loading, setLoading] = useState<boolean>(false);
   const handleSubmit = async (value: any) => {
     setLoading(true);
     try {
       await axios
         .post(url + "/v1/users", value, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: HEADER,
         })
         .then((response) => {
           onAddUser(value);
-          Modal.success({
-            content: response.data.message,
-          });
+          handleSuccessShow(response);
           onModalAddUser(false);
         });
     } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
       setLoading(false);
-      error.response.data.message === "Conflict"
-        ? notification.error({
-            message: error.response.data.errors,
-            duration: 5,
-          })
-        : error.response.data.errors.map((error: any) => {
-            notification.error({
-              message: error.field,
-              description: error.error,
-              duration: 5,
-            });
-          });
     }
   };
   return (
@@ -94,6 +75,10 @@ const FormAdd = ({ onModalAddUser, onAddUser }) => {
               min: 10,
               message: "Phone number has at least 10 numbers",
             },
+            {
+              max: 10,
+              message: "Phone number has at most 10 numbers",
+            },
             { whitespace: true },
             {
               pattern: /^\d+$/,
@@ -110,10 +95,32 @@ const FormAdd = ({ onModalAddUser, onAddUser }) => {
           rules={[
             { required: true, message: "Please input password!" },
             { whitespace: true, message: "Please input password!" },
+            { min: 8, message: "Password has at least 8 letters" },
           ]}
           hasFeedback
         >
-          <Input placeholder="Password" type="password" required />
+          <Input.Password placeholder="Password" />
+          <Form.Item
+            label="Confirm password"
+            name="confirm_password"
+            dependencies={["password"]}
+            rules={[
+              { required: true, message: "Please input password!" },
+              { whitespace: true, message: "Please input password!" },
+              { min: 8, message: "Password has at least 8 numbers" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Not match with password!"));
+                },
+              }),
+            ]}
+            hasFeedback
+          >
+            <Input.Password placeholder="Confirm password" />
+          </Form.Item>
         </Form.Item>
         <Form.Item
           name="role_id"
@@ -136,11 +143,9 @@ const FormAdd = ({ onModalAddUser, onAddUser }) => {
             </Row>
           </Checkbox.Group>
         </Form.Item>
-        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit" disabled={loading}>
-            {loading ? <Spin spinning={loading} /> : "Submit"}
-          </Button>
-        </Form.Item>
+        <Button type="primary" htmlType="submit" loading={loading}>
+          Submit
+        </Button>
       </Form>
     </div>
   );
