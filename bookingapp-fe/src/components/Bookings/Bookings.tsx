@@ -32,6 +32,9 @@ import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
 import { formatDate, timeEndWeek, timeStartWeek } from '../../ultils/ultils';
 import "./Booking.css";
 import ReusableForm from './ResaubleForm';
+import './Booking.css';
+import SearchRoomBooking from './SearchRoomBooking';
+import { HEADER } from '../../constant/constant';
 const { Title } = Typography;
 
 interface BookingData {
@@ -112,11 +115,7 @@ const CalendarBooking = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${url}/v1/rooms`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': true,
-        },
+        headers: HEADER
       });
       setRooms(response.data.data.rooms);
     } catch (error: any) {
@@ -130,11 +129,7 @@ const CalendarBooking = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${url}/v1/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': true,
-        },
+        headers: HEADER,
       });
       setUsers(response.data.data.users);
     } catch (error: any) {
@@ -154,15 +149,11 @@ const CalendarBooking = () => {
           start_date: startDate,
           end_date: endDate,
         },
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': true,
-        },
+        headers: HEADER,
       })
 
-      if (response.data.data) {
-        const updatedData = response.data.data.map(
+      if (response?.data?.data) {
+        const updatedData = response?.data?.data.map(
           (booking: BookingDataApi) => {
             const { time_end, time_start, ...rest } = booking;
             return {
@@ -216,10 +207,7 @@ const CalendarBooking = () => {
         formattedBookingData,
         {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'ngrok-skip-browser-warning': true,
-          },
+          headers: HEADER,
         }
       );
       fetchBookingData(startDate, endDate);
@@ -288,10 +276,7 @@ const CalendarBooking = () => {
         formattedBookingData,
         {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'ngrok-skip-browser-warning': true,
-          },
+          headers: HEADER,
         }
       );
       fetchBookingData(startDate, endDate);
@@ -340,10 +325,7 @@ const CalendarBooking = () => {
         : `${url}/v1/user/bookings`;
       const response = await axios.post(urlCallApi, formattedBookingData, {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'ngrok-skip-browser-warning': true,
-        },
+        headers: HEADER,
       });
       closeShowAddModal();
       fetchBookingData(startDate, endDate);
@@ -355,50 +337,93 @@ const CalendarBooking = () => {
     }
   };
 
-  return (
-    <FullCalendar
-      plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-      initialView='timeGridWeek'
-      headerToolbar={{
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,listWeek',
-      }}
-      events={bookingData}
-      eventClick={handleEventClick}
-      eventContent={eventContent}
-      fixedWeekCount={true}
-      showNonCurrentDates={false}
-      selectable={true}
-      selectMirror={true}
-      select={handleDateSelect}
-      datesSet={handleDatesSet}
-      editable={true}
-      eventDrop={handleEventDrop}
-    />
+  const handleSearchRoom = async (values: number) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${url}/v1/bookings/search_room/${values}`,
+        {
+          params: {
+            start_date: startDate,
+            end_date: endDate,
+          },
+          withCredentials: true,
+          headers: HEADER,
+        }
+      );
 
-    <Modal
-    title={
-      <div>
-        <Title
-          level={2}
-          className = 'edit-modal'
-          }}
-        >
-          Add Booking
-        </Title>
-      </div>
+      if (response?.data?.data) {
+        const updatedData = response?.data?.data.map(
+          (booking: BookingDataApi) => {
+            const { time_end, time_start, is_accepted, ...rest } = booking;
+            return {
+              ...rest,
+              is_accepted: is_accepted,
+              start: time_start,
+              end: time_end,
+              backgroundColor: is_accepted ? '#009900' : '#ff9933',
+            };
+          }
+        );
+        setBookingData(updatedData);
+      }
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
     }
-    visible={updateModal}
-    onCancel={closeShowAddModal}
-    footer={null}
-    destroyOnClose={true}
-    maskClosable={false}
-    afterClose={closeShowAddModal}
-  >
-    <ReusableForm onSubmit={handleAddBooking} timeStart={timeStartAdd} timeEnd={timeEndAdd} rooms={rooms ?? []} users={users ?? []} />
-  </Modal>
+  };
 
+  const handleSearch = (values: number) => {
+    if (values) {
+      handleSearchRoom(values);
+    } else {
+      fetchBookingData(startDate, endDate);
+    }
+  };
+
+  return (
+    <>
+      <SearchRoomBooking options={rooms ?? []} onSelect={handleSearch} />
+      <div>
+        <div className='action'>
+          <Spin
+            size='large'
+            tip='Loading...'
+            spinning={loading}
+            className='loading'
+          />
+        </div>
+        <div className='full-calendar'>
+          <FullCalendar
+            plugins={[
+              dayGridPlugin,
+              timeGridPlugin,
+              listPlugin,
+              interactionPlugin,
+            ]}
+            initialView='timeGridWeek'
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,listWeek',
+            }}
+            events={bookingData}
+            eventClick={handleEventClick}
+            eventContent={eventContent}
+            fixedWeekCount={true}
+            showNonCurrentDates={false}
+            selectable={true}
+            selectMirror={true}
+            select={handleDateSelect}
+            datesSet={handleDatesSet}
+            editable={roles.includes('admin')}
+            eventDrop={handleEventDrop}
+            eventResize={handleEventDrop}
+          />
+        </div>
+      </div>
+    </>
   );
 };
 
