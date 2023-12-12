@@ -1,81 +1,44 @@
-import {
-  Button,
-  Checkbox,
-  Col,
-  Form,
-  Input,
-  Modal,
-  Row,
-  notification,
-} from "antd";
-import React from "react";
+import { Button, Checkbox, Col, Form, Input, Row } from "antd";
+import React, { useState } from "react";
 import axios from "axios";
-import { url } from "../ultils/urlApi";
-import getCookie from "../route/Cookie";
-import { useEffect, useState } from "react";
-import { DataType } from "../constant/constant";
+import "./UserManager.css";
 
-const FormAdd = ({ onModalAddUser }) => {
+import { url } from "../../ultils/urlApi";
+import { DataType, HEADER } from "../../constant/constant";
+import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
+interface FormAddProps {
+  onModalAddUser: (status: boolean) => void;
+  onAddUser: (addUser: DataType) => void;
+}
+
+const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
   const [form] = Form.useForm();
-  const token = getCookie("token");
-  const [list_users, setListUsers] = useState<DataType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const getData = async () => {
-    setLoading(true);
-    try {
-      await axios
-        .get(url + "/v1/users", {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          setListUsers(response.data.data.users);
-        });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    getData();
-  }, []);
-
   const handleSubmit = async (value: any) => {
     setLoading(true);
     try {
       await axios
         .post(url + "/v1/users", value, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: HEADER,
         })
         .then((response) => {
-          getData();
-          Modal.success({
-            content: response.data.message,
-          });
+          onAddUser(value);
+          handleSuccessShow(response);
           onModalAddUser(false);
-        })
-        .catch((error) => {
-          error.response.data.message === "Conflict"
-            ? notification.error({
-                message: error.response.data.errors,
-                duration: 5,
-              })
-            : error.response.data.errors.map((error: any) => {
-                notification.error({
-                  message: error.field,
-                  description: error.error,
-                  duration: 5,
-                });
-              });
         });
-    } catch (error) {}
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
+    }
   };
+  const validateConfirmPassword = (rule: any, value: any) => {
+    if (value && value !== form.getFieldValue("password")) {
+      return Promise.reject("Not match with password!");
+    }
+    return Promise.resolve();
+  };
+
   return (
     <div style={{ padding: 20 }}>
       <Form
@@ -86,7 +49,7 @@ const FormAdd = ({ onModalAddUser }) => {
         form={form}
         onFinish={handleSubmit}
         wrapperCol={{ flex: 1 }}
-        style={{ maxWidth: 600 }}
+        className="form-info"
       >
         <Form.Item
           label="User Name"
@@ -120,6 +83,10 @@ const FormAdd = ({ onModalAddUser }) => {
               min: 10,
               message: "Phone number has at least 10 numbers",
             },
+            {
+              max: 10,
+              message: "Phone number has at most 10 numbers",
+            },
             { whitespace: true },
             {
               pattern: /^\d+$/,
@@ -136,10 +103,25 @@ const FormAdd = ({ onModalAddUser }) => {
           rules={[
             { required: true, message: "Please input password!" },
             { whitespace: true, message: "Please input password!" },
+            { min: 8, message: "Password has at least 8 letters" },
           ]}
           hasFeedback
         >
-          <Input placeholder="Password" type="password" required />
+          <Input.Password placeholder="Password" />
+          <Form.Item
+            label="Confirm password"
+            name="confirm_password"
+            dependencies={["password"]}
+            rules={[
+              { required: true, message: "Please input password!" },
+              { whitespace: true, message: "Please input password!" },
+              { min: 8, message: "Password has at least 8 numbers" },
+              { validator: validateConfirmPassword },
+            ]}
+            hasFeedback
+          >
+            <Input.Password placeholder="Confirm password" />
+          </Form.Item>
         </Form.Item>
         <Form.Item
           name="role_id"
@@ -162,11 +144,14 @@ const FormAdd = ({ onModalAddUser }) => {
             </Row>
           </Checkbox.Group>
         </Form.Item>
-        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
+        <Button
+          className="btn-modal"
+          type="primary"
+          htmlType="submit"
+          loading={loading}
+        >
+          Submit
+        </Button>
       </Form>
     </div>
   );
