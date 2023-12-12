@@ -77,7 +77,7 @@ const FormLogin: React.FC = () => {
               prefix={<MailOutlined className='icon' />}
               placeholder='Email'
               allowClear
-              className='Input'
+              className='input'
               disabled={loading}
             />
           </Form.Item>
