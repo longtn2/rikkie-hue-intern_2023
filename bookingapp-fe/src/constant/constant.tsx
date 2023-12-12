@@ -1,3 +1,4 @@
+import { Tag } from "antd";
 import getCookie from "../Route/Cookie";
 
 export const TYPE_USER = { ADMIN: "admin" };
@@ -9,9 +10,11 @@ export interface DataType {
   phone_number: string;
   email: string;
   is_deleted: boolean;
+  is_attending: boolean
 }
 
 export interface BookingData {
+  booking_id: number
   room_name: string;
   title: string;
   user_name: string[];
@@ -19,8 +22,14 @@ export interface BookingData {
   time_end: string;
   is_eccept: boolean;
   is_deleted: boolean;
+  booking_users: [];
+  creator_name: string;
+  status: boolean | null;
+  user_ids: number[]
+
 }
 export const token = getCookie("token");
+export const roles = getCookie("roles")
 
 export const statuTag = (item: BookingData) => {
   if (item.is_deleted) {
@@ -43,3 +52,8 @@ export const statuTag = (item: BookingData) => {
     );
   }
 };
+export const HEADER =  {
+  Authorization: `Bearer ${token}`,
+  'ngrok-skip-browser-warning': true,
+}
+
