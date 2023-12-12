@@ -4,7 +4,6 @@ export const setCookie = (key: string, value: any) => {
   Cookies.set(key, JSON.stringify(value));
 };
 
-
 export const getCookie = (str: string) => {
   switch (str) {
     case 'roles':
@@ -14,8 +13,7 @@ export const getCookie = (str: string) => {
     case 'name':
       return Cookies.get('name');
     default:
-      console.log('Not Found');
-      break;
+      throw new Error('Not Found Options');
   }
 };
 

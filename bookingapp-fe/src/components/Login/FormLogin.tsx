@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Spin, Typography, Modal } from 'antd';
+import { Button, Form, Input, Typography } from 'antd';
 import axios from 'axios';
-import confirm from './Confirm';
+import { handleErrorShow } from '../../ultils/ultilsApi';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import { url } from '../../ultils/urlApi';
-import { setCookie } from '../../helper/Cookie';
+import './Form.css';
 
 const { Title, Text } = Typography;
 
@@ -15,43 +15,33 @@ const FormLogin: React.FC = () => {
   const [form] = Form.useForm();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const handleClose = () => {
-    Modal.destroyAll();
-    Navigate('/login');
-  };
-
-  const handleError = (errorMessage: string) => {
-    Modal.destroyAll();
-    confirm(errorMessage, false, handleClose);
-  };
 
   const onFinish = async (values: any) => {
-    try{
-      setLoading(true);
-      await axios
-        .post(url + '/v1/login', values, {
-          withCredentials: true,
-        })
-        .then(res => {
-          const token: string = res.data.data[0].token;
-          const roles: string[] = res.data.data[1].role_name;
-          const name: string = res.data.data[2].user_name;
-          setCookie('roles', JSON.stringify(roles));
-          setCookie('token', token);
-          setCookie('name', name);
-          if (roles.includes('admin')) {
-            Navigate('/');
-          } else {
-            Navigate('/bookingmanagement');
-          }
-        })
-    }catch(error: any){
-        const errorMessage =
-        error.response?.data?.description || 'There is 1 error from the server';
-        handleError(errorMessage);
-    }finally{
-      setLoading(false);
-    }    
+    setLoading(true);
+    await axios
+      .post(url + '/v1/login', values, {
+        withCredentials: true,
+      })
+      .then(res => {
+        const token: string = res.data.data[0].token;
+        const roles: string[] = res.data.data[1].role_name;
+        const name: string = res.data.data[2].user_name;
+        const id: number = res.data.data[3].user_id;
+        Cookies.set('roles', JSON.stringify(roles));
+        Cookies.set('token', token);
+        Cookies.set('name', name);
+        Cookies.set('id', id.toString());
+        if (roles.includes('admin')) {
+          Navigate('/');
+        } else {
+          Navigate('/calendarmeeting');
+        }
+      })
+      .catch(error => {
+        handleErrorShow(error);
+      });
+
+    setLoading(false);
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -64,16 +54,8 @@ const FormLogin: React.FC = () => {
   };
   return (
     <>
-      <div
-        style={{
-          maxWidth: '400px',
-          margin: '0 auto',
-          marginTop: '100px',
-          padding: '0.5rem',
-          borderRadius: '0.5rem',
-        }}
-      >
-        <div style={{ textAlign: 'center', margin: '10px', padding: '10px' }}>
+      <div className='container'>
+        <div className='title'>
           <Title level={2}>Booking Login</Title>
           <Text underline strong>
             {' '}
@@ -89,17 +71,13 @@ const FormLogin: React.FC = () => {
             ]}
             validateStatus={errors.email ? 'error' : ''}
             help={errors.email}
+            className='form-item'
           >
             <Input
-              prefix={<MailOutlined style={{ marginRight: '10px' }} />}
+              prefix={<MailOutlined className='icon' />}
               placeholder='Email'
               allowClear
-              style={{
-                padding: '16px',
-                fontSize: '16px',
-                outline: 'none',
-                border: 'none',
-              }}
+              className='Input'
               disabled={loading}
             />
           </Form.Item>
@@ -114,28 +92,16 @@ const FormLogin: React.FC = () => {
               prefix={<LockOutlined style={{ marginRight: '10px' }} />}
               placeholder='Password'
               allowClear
-              style={{
-                padding: '16px',
-                fontSize: '16px',
-                outline: 'none',
-                border: 'none',
-              }}
               disabled={loading}
             />
           </Form.Item>
 
-          <Form.Item style={{ fontSize: '50px' }}>
+          <Form.Item className='Input'>
             <Button
               type='primary'
               htmlType='submit'
               block
-              style={{
-                padding: '20px',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontSize: '18px',
-              }}
+              className='btn'
               loading={loading}
             >
               Login
