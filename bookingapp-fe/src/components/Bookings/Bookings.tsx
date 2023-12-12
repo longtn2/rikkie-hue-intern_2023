@@ -1,23 +1,9 @@
 import { useEffect, useState } from 'react';
-import {
-  Modal,
-  Button,
-  Form,
-  Input,
-  Spin,
-  DatePicker,
-  List,
-  Typography,
-  Space,
-  Select,
-  Popover,
-  Alert,
-  AutoComplete,
-} from 'antd';
+import { Modal, Button, Typography, Space, Popover, Spin } from 'antd';
 import moment from 'moment';
 import axios from 'axios';
-import { getCookie } from '../helper/CookiesHelper';
-import { url } from '../ultils/apiUrl';
+import './Booking.css';
+import { url } from '../../ultils/urlApi';
 import {
   DateSelectArg,
   EventClickArg,
@@ -28,96 +14,57 @@ import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
-import { handleErrorShow, handleSuccessShow } from '../ultils/apiUltils';
-import { formatDate, timeEndWeek, timeStartWeek } from '../../ultils/ultils';
-import "./Booking.css";
+import { handleErrorShow, handleSuccessShow } from '../../ultils/ultilsApi';
 import ReusableForm from './ResaubleForm';
-import './Booking.css';
-import SearchRoomBooking from './SearchRoomBooking';
-import { HEADER } from '../../constant/constant';
+import { getCookie } from '../../helper/Cookie';
+import {
+  timeEndWeek,
+  timeStartWeek,
+  formatMonth,
+  formatDate,
+} from '../../ultils/ultils';
+import Autocomplete from './SearchRoomBooking';
+import FooterBooking from './FooterBooking';
+import FormEditBooking from './FormEditBooking';
+import ListBooking from './ListBooking';
+import { HEADER } from './constant/constant';
+import {
+  BookingDataCalendar,
+  BookingDataApi,
+  DataType,
+  Room,
+} from '../../constant/constant';
 const { Title } = Typography;
-
-interface BookingData {
-  title: string;
-  booking_id: number | null;
-  is_accepted: boolean;
-  start: string;
-  end: string;
-  user_ids: number[];
-  room_id: number | null;
-  room_name: string;
-  user_names: string[];
-}
-
-interface BookingDataApi {
-  title: string;
-  booking_id: number | null;
-  is_accepted: boolean;
-  time_start: string;
-  time_end: string;
-  user_ids: number[];
-  room_id: number | null;
-  room_name: string;
-  user_names: string[];
-}
-
-interface DataType {
-  user_id: number;
-  role_id: number[];
-  user_name: string;
-  role_name: string[];
-  phone_number: string;
-  email: string;
-}
-
-interface Room {
-  room_id: number;
-  room_name: string;
-  description: string | null;
-  is_blocked: boolean;
-}
 
 const CalendarBooking = () => {
   const [rooms, setRooms] = useState<Room[]>();
   const [users, setUsers] = useState<DataType[]>();
-  const [bookingData, setBookingData] = useState<BookingData[]>([]);
+  const [bookingData, setBookingData] = useState<BookingDataCalendar[]>([]);
   const token: string = getCookie('token');
   const [selectedBookingData, setSelectedBookingData] =
-    useState<BookingData | null>(null);
+    useState<BookingDataCalendar | null>(null);
   const [modalShow, setModalShow] = useState<Boolean>(false);
   const [isEditing, setIsEditing] = useState<Boolean>(false);
   const [isDeleted, setIsDeleted] = useState<Boolean>(false);
-  const [formAdd] = Form.useForm();
-  const [formEdit] = Form.useForm();
   const [startDate, setStartDate] = useState<string>(timeStartWeek);
   const [endDate, setEndDate] = useState<string>(timeEndWeek);
   const roles: string[] = getCookie('roles');
-  const id: number = parseInt(getCookie('user_id'));
   const checkAdmin: boolean = roles.includes('admin');
   const [timeStartAdd, setTimeStartAdd] = useState<moment.Moment | null>(null);
   const [timeEndAdd, setTimeEndAdd] = useState<moment.Moment | null>(null);
   const [updateModal, setUpdateModal] = useState<boolean>(false);
-  const [success, setSuccess] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState('');
-  const [isError, setIsError] = useState(false);
-  const [successAdd, setSuccessAdd] = useState('');
-  const [isSuccessAdd, setIsSuccessAdd] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchBookingData(startDate, endDate);
-    fetchRooms();
-    fetchUser();
-  }, [startDate, endDate]);
 
   const fetchRooms = async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${url}/v1/rooms`, {
-        headers: HEADER
+        withCredentials: true,
+        headers: HEADER,
       });
-      setRooms(response.data.data.rooms);
+      if (response?.data?.data) {
+        setRooms(response.data.data.rooms);
+      }
     } catch (error: any) {
       handleErrorShow(error);
     } finally {
@@ -127,11 +74,12 @@ const CalendarBooking = () => {
 
   const fetchUser = async () => {
     try {
-      setLoading(true);
       const response = await axios.get(`${url}/v1/users`, {
         headers: HEADER,
       });
-      setUsers(response.data.data.users);
+      if (response?.data?.data) {
+        setUsers(response.data.data.users);
+      }
     } catch (error: any) {
       handleErrorShow(error);
     } finally {
@@ -141,6 +89,7 @@ const CalendarBooking = () => {
 
   const fetchBookingData = async (startDate: string, endDate: string) => {
     try {
+      setLoading(true);
       const urlCallApi = roles.includes('admin')
         ? `${url}/v1/bookings`
         : `${url}/v1/user/bookings`;
@@ -150,16 +99,18 @@ const CalendarBooking = () => {
           end_date: endDate,
         },
         headers: HEADER,
-      })
+      });
 
       if (response?.data?.data) {
-        const updatedData = response?.data?.data.map(
+        const updatedData = response.data.data.map(
           (booking: BookingDataApi) => {
-            const { time_end, time_start, ...rest } = booking;
+            const { time_end, time_start, is_accepted, ...rest } = booking;
             return {
               ...rest,
+              is_accepted: is_accepted,
               start: time_start,
               end: time_end,
+              backgroundColor: is_accepted ? '#009900' : '#ff9933',
             };
           }
         );
@@ -172,73 +123,66 @@ const CalendarBooking = () => {
     }
   };
 
+  useEffect(() => {
+    fetchBookingData(startDate, endDate);
+    fetchRooms();
+    fetchUser();
+  }, [startDate, endDate]);
   const handleEventClick = (eventInfo: EventClickArg) => {
     const { event } = eventInfo;
-    const selectedData: BookingData = {
+    const selectedData: BookingDataCalendar = {
       title: event.title,
       booking_id: event.extendedProps.booking_id || null,
-      start: formatDate(event.start),
-      end: formatDate(event.end),
-      user_id: event.extendedProps.user_id,
+      backgroundColor: event.backgroundColor,
+      is_accepted: event.extendedProps.is_accepted,
+      start: moment(event.start).format(),
+      end: moment(event.end).format(),
+      user_ids: event.extendedProps.user_ids,
       room_id: event.extendedProps.room_id,
       room_name: event.extendedProps.room_name,
-      user_name: event.extendedProps.user_name,
+      user_names: event.extendedProps.user_names,
+      creator_name: event.extendedProps.creator_name,
+      creator_id: event.extendedProps.creator_id,
     };
-
     setSelectedBookingData(selectedData);
     setModalShow(true);
   };
 
-  const handleUpdate = async (values: BookingDataApi) => {
-    const formattedBookingData = {
-      ...values,
-      booking_id: values.booking_id
-        ? values.booking_id
-        : selectedBookingData?.booking_id,
-      user_id: values.user_id,
-      room_id: selectedBookingData?.room_id,
-      time_start: formatDate(values.time_start),
-      time_end: formatDate(values.time_end),
-    };
-    try {
-      setLoading(true);
-      const response = await axios.put(
-        `${url}/v1/bookings/${formattedBookingData!.booking_id}`,
-        formattedBookingData,
-        {
-          withCredentials: true,
-          headers: HEADER,
-        }
-      );
-      fetchBookingData(startDate, endDate);
-      handleSuccessShow(response);
-    } catch (error: any) {
-      handleErrorShow(error);
-      fetchBookingData(startDate, endDate);
-    } finally {
-      setLoading(false);
-    }
+  const handleCloseShow = () => {
+    setSelectedBookingData(null);
+    setModalShow(false);
   };
-
   const eventContent = (eventInfo: EventContentArg) => {
     const { event, view } = eventInfo;
     let content;
     if (view.type === 'listWeek') {
-        content = (
-          <div
-            className='listWeek'
+      content = (
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+          }}
         >
           <Title level={2}>{event.title}</Title>
         </div>
-        )
-    } else {
-        <>
-          <div
-            className='listWeekCalendar'
-          >
-            <Title level={2}>{event.title}</Title>
-          </div>
-        </>
+      );
+    } else if (view.type === 'dayGridMonth') {
+      content = (
+        <div
+          style={{
+            backgroundColor: event.backgroundColor,
+            color: 'black',
+            width: '100%',
+            paddingLeft: '10px',
+            fontSize: '18px',
+          }}
+        >
+          {event.title}
+        </div>
+      );
+    } else if (view.type === 'timeGridWeek') {
+      content = <div>{event.title}</div>;
     }
     return content;
   };
@@ -248,60 +192,7 @@ const CalendarBooking = () => {
     const endTime = moment(end);
     setTimeStartAdd(startTime);
     setTimeEndAdd(endTime);
-  };
-
-  const handleDatesSet = (arg: { start: Date; end: Date }) => {
-    const { start, end } = arg;
-    const startDate = formatDate(start);
-    const endDate = formatDate(end);
-    setStartDate(startDate);
-    setEndDate(endDate);
-    fetchBookingData(startDate, endDate);
-  };
-
-  const handleUpdate = async (values: BookingDataApi) => {
-    const formattedBookingData = {
-      ...values,
-      booking_id: values.booking_id
-        ? values.booking_id
-        : selectedBookingData?.booking_id,
-      user_ids: values.user_ids ? values.user_ids : selectedBookingData?.user_ids,
-      room_id: values.room_id ? values.room_id : selectedBookingData?.room_id,
-      time_start: formatDate(values.time_start),
-      time_end: formatDate(values.time_end),
-    };
-    try {
-      const response = await axios.put(
-        `${url}/v1/bookings/${formattedBookingData!.booking_id}`,
-        formattedBookingData,
-        {
-          withCredentials: true,
-          headers: HEADER,
-        }
-      );
-      fetchBookingData(startDate, endDate);
-      handleSuccessShow(response);
-    } catch (error: any) {
-      handleErrorShow(error);
-      fetchBookingData(startDate, endDate);
-    }
-  };
-
-  const handleEventDrop = (eventInfo: EventClickArg) => {
-    const { event } = eventInfo;
-    const selectedData: BookingDataApi = {
-      title: event.title,
-      booking_id: event.extendedProps.booking_id || null,
-      is_accepted: event.extendedProps.is_accepted,
-      time_start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-      time_end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
-      user_ids: event.extendedProps.user_ids,
-      room_id: event.extendedProps.room_id,
-      room_name: event.extendedProps.room_name,
-      user_names: event.extendedProps.user_names,
-    };
-    handleUpdate(selectedData);
-  }; 
+    showAddModal();
   };
 
   const showAddModal = () => {
@@ -317,8 +208,8 @@ const CalendarBooking = () => {
       setLoading(true);
       const formattedBookingData = {
         ...values,
-        time_start: formatDate(values.time_start),
-        time_end: formatDate(values.time_end),
+        time_start: formatMonth(values.time_start),
+        time_end: formatMonth(values.time_end),
       };
       const urlCallApi: string = roles.includes('admin')
         ? `${url}/v1/bookings`
@@ -327,14 +218,110 @@ const CalendarBooking = () => {
         withCredentials: true,
         headers: HEADER,
       });
-      closeShowAddModal();
-      fetchBookingData(startDate, endDate);
-      handleSuccessShow(response);
+      if (response?.data?.data) {
+        closeShowAddModal();
+        fetchBookingData(startDate, endDate);
+        handleSuccessShow(response);
+      }
     } catch (error: any) {
       handleErrorShow(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDatesSet = (arg: { start: Date; end: Date }) => {
+    const { start, end } = arg;
+    const startDate = formatDate(start);
+    const endDate = formatDate(end);
+    setStartDate(startDate);
+    setEndDate(endDate);
+
+    fetchBookingData(startDate, endDate);
+  };
+
+  const handleEditModal = () => {
+    setIsEditing(true);
+    console.log('Du lieu khi click vao: ', selectedBookingData);
+  };
+  const handleDeleteModal = () => {
+    setIsDeleted(true);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditing(false);
+  };
+  const handleDeleteModalClose = () => {
+    setIsDeleted(false);
+  };
+
+  const handleUpdate = async (values: BookingDataApi) => {
+    const formattedBookingData = {
+      ...values,
+      booking_id: values.booking_id
+        ? values.booking_id
+        : selectedBookingData?.booking_id,
+      user_ids: values.user_ids
+        ? values.user_ids
+        : selectedBookingData?.user_ids,
+      room_id: values.room_id ? values.room_id : selectedBookingData?.room_id,
+      time_start: formatMonth(values.time_start),
+      time_end: formatMonth(values.time_end),
+    };
+    try {
+      const response = await axios.put(
+        `${url}/v1/bookings/${formattedBookingData!.booking_id}`,
+        formattedBookingData,
+        {
+          withCredentials: true,
+          headers: HEADER,
+        }
+      );
+      if (response?.data?.data) {
+        fetchBookingData(startDate, endDate);
+        handleEditModalClose();
+        handleSuccessShow(response);
+      }
+    } catch (error: any) {
+      handleErrorShow(error);
+      fetchBookingData(startDate, endDate);
+    }
+  };
+
+  const handleDeleteBooking = async (id: number) => {
+    try {
+      const response = await axios.delete(
+        `${url}/v1/bookings/${selectedBookingData?.booking_id}`,
+        {
+          headers: HEADER,
+        }
+      );
+      if (response?.data?.data) {
+        fetchBookingData(startDate, endDate);
+        handleSuccessShow(response);
+        handleDeleteModalClose();
+      }
+    } catch (error: any) {
+      handleErrorShow(error);
+    }
+  };
+
+  const handleEventDrop = (eventInfo: EventClickArg) => {
+    const { event } = eventInfo;
+    const selectedData: BookingDataApi = {
+      title: event.title,
+      booking_id: event.extendedProps.booking_id || null,
+      is_accepted: event.extendedProps.is_accepted,
+      time_start: formatMonth(event.start),
+      time_end: formatMonth(event.end),
+      user_ids: event.extendedProps.user_ids,
+      room_id: event.extendedProps.room_id,
+      room_name: event.extendedProps.room_name,
+      user_names: event.extendedProps.user_names,
+      creator_name: event.extendedProps.creator_name,
+      creator_id: event.extendedProps.creator_id,
+    };
+    handleUpdate(selectedData);
   };
 
   const handleSearchRoom = async (values: number) => {
@@ -353,7 +340,7 @@ const CalendarBooking = () => {
       );
 
       if (response?.data?.data) {
-        const updatedData = response?.data?.data.map(
+        const updatedData = response.data.data.map(
           (booking: BookingDataApi) => {
             const { time_end, time_start, is_accepted, ...rest } = booking;
             return {
@@ -384,7 +371,10 @@ const CalendarBooking = () => {
 
   return (
     <>
-      <SearchRoomBooking options={rooms ?? []} onSelect={handleSearch} />
+      <div className='search'>
+        <Autocomplete options={rooms ?? []} onSelect={handleSearch} />
+      </div>
+
       <div>
         <div className='action'>
           <Spin
@@ -417,12 +407,149 @@ const CalendarBooking = () => {
             selectMirror={true}
             select={handleDateSelect}
             datesSet={handleDatesSet}
-            editable={roles.includes('admin')}
+            editable={roles.includes('admin') ? true : false}
             eventDrop={handleEventDrop}
             eventResize={handleEventDrop}
           />
         </div>
       </div>
+
+      <Modal
+        title={
+          <div className='title-modal'>
+            <Typography.Title level={2} className='container-show-list-title'>
+              {selectedBookingData?.title}
+            </Typography.Title>
+          </div>
+        }
+        visible={modalShow ? true : false}
+        onCancel={handleCloseShow}
+        bodyStyle={{
+          border: '1px solid #d6e4ec',
+          borderRadius: '5px',
+          boxShadow: '2px 2px 4px 0px rgba(0, 0, 0, 0.3)',
+          padding: '20px',
+        }}
+        footer={
+          checkAdmin ? (
+            <div>
+              <Space className='space'>
+                {selectedBookingData?.is_accepted ? (
+                  <>
+                    <Popover content='Edit'>
+                      <Button onClick={handleEditModal}>Edit</Button>
+                    </Popover>
+                    <Popover content='Delete'>
+                      <Button danger onClick={handleDeleteModal}>
+                        Delete
+                      </Button>
+                    </Popover>
+                  </>
+                ) : (
+                  <>
+                    <Popover content='Accepted'>
+                      <Button type='primary'>Accepted</Button>
+                    </Popover>
+                    <Popover content='Rejected'>
+                      <Button danger>Rejected</Button>
+                    </Popover>
+                  </>
+                )}
+              </Space>
+            </div>
+          ) : null
+        }
+        maskClosable={false}
+        afterClose={handleCloseShow}
+      >
+        {selectedBookingData && (
+          <ListBooking selectedBookingData={selectedBookingData} />
+        )}
+      </Modal>
+
+      <Modal
+        title={
+          <div>
+            <Title level={2} className='title-modal'>
+              Add Booking
+            </Title>
+          </div>
+        }
+        visible={updateModal}
+        onCancel={closeShowAddModal}
+        footer={null}
+        bodyStyle={{
+          border: '1px solid #ccc',
+          borderRadius: '5px',
+          boxShadow: '2px 2px 4px 0px rgba(0, 0, 0, 0.3)',
+          padding: '20px',
+        }}
+        destroyOnClose={true}
+        maskClosable={false}
+        afterClose={closeShowAddModal}
+      >
+        <ReusableForm
+          onSubmit={handleAddBooking}
+          timeStart={timeStartAdd}
+          timeEnd={timeEndAdd}
+          rooms={rooms ?? []}
+          users={users ?? []}
+        />
+      </Modal>
+
+      <Modal
+        title={
+          <div>
+            <Title level={2} className='title-modal'>
+              Update Booking
+            </Title>
+            <div className='modal-container-title'>
+              <div className='modal-title-div'>
+                Title:
+                <Title level={5}>{selectedBookingData?.title}</Title>
+              </div>
+            </div>
+            <div className='modal-container-title'>
+              <div className='modal-title-div'>
+                Room Name:
+                <Title level={5}>{selectedBookingData?.room_name}</Title>
+              </div>
+            </div>
+          </div>
+        }
+        visible={isEditing ? true : false}
+        onCancel={handleEditModalClose}
+        footer={null}
+      >
+        <FormEditBooking
+          users={users ?? []}
+          onCancel={handleEditModalClose}
+          initialValues={selectedBookingData}
+          onFinish={handleUpdate}
+        />
+      </Modal>
+
+      <Modal
+        title={
+          <>
+            <h1>Delete Booking</h1>
+          </>
+        }
+        visible={isDeleted ? true : false}
+        onCancel={handleDeleteModalClose}
+        footer={[
+          <FooterBooking
+            onDelete={handleDeleteBooking}
+            onCancel={handleDeleteModalClose}
+            id={selectedBookingData?.booking_id!}
+          />,
+        ]}
+        destroyOnClose={true}
+        maskClosable={false}
+        afterClose={handleDeleteModalClose}
+      >
+        <p>Are you sure you want to delete this booking?</p>
+      </Modal>
     </>
   );
 };
