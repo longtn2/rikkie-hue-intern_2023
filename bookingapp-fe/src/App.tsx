@@ -1,17 +1,16 @@
 import './App.css';
-import FormLogin from './components/Form';
+import FormLogin from './components/Login/FormLogin';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './Route/ProtectedRoute';
 import PrivateRoute from './Route/PrivateRoute';
 import CalendarBooking from './components/Bookings/Bookings';
-import UsersManager from './components/UserMananger/UserManager';
-import Dashboard from './components/dashboard/dashboard';
-import RoomDetails from './components/room/RoomDetails';
+import UsersManager from './components/Users/UserManager';
+import RoomDetails from './components/Rooms/RoomDetails';
 import LayoutApp from './components/Layout/Layout';
-import InfoUser from './InfoAccount/InfoUser';
-import ListBookingOfUser from './components/Booking/ListBookingOfUser';
-import WaitingBookingList from './components/Booking/WaitingBookingList';
-import InvitationList from './components/Booking/InvitationList';
+import InfoUser from './components/InfoAccount/InfoUser';
+import ListBookingOfUser from './components/Bookings/ListBookingOfUser';
+import InvitationList from './components/Bookings/InvitationList';
+import Rooms from './components/Rooms/Rooms';
 
 function App() {
   return (
@@ -28,8 +27,6 @@ function App() {
               <Route path='/roomManager' element={<Rooms />} />
               <Route path='/roomManager/:id' element={<RoomDetails />} />
               <Route path='/usermanager' element={<UsersManager />} />
-              <Route path='/bookingmanager' element={<WaitingBookingList/>}/>
-              <Route path='/' element={<Dashboard />} />
             </Route>
           </Route>
         </Route>

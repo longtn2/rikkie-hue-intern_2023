@@ -13,6 +13,7 @@ export interface DataType {
 }
 
 export interface BookingData {
+  booking_id: number
   room_name: string;
   title: string;
   user_name: string[];
@@ -20,6 +21,10 @@ export interface BookingData {
   time_end: string;
   is_eccept: boolean;
   is_deleted: boolean;
+  booking_users: [];
+  creator_name: string;
+  status: boolean | null;
+  user_ids: number[]
 }
 export const token = getCookie('token');
 
@@ -79,3 +84,8 @@ export const statuTag = (item: BookingData) => {
     );
   }
 };
+
+export const HEADER =  {
+  Authorization: `Bearer ${token}`,
+  'ngrok-skip-browser-warning': true,
+}
