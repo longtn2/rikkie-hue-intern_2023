@@ -1,11 +1,10 @@
 import { Button, Form, Input, Modal } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { url } from "../ultils/urlApi";
-import { handleError, handleSuccess } from "../ultils/ultilsApi";
-import { showPopup } from "../ultils/Popup";
-import { token } from "../constant/constant";
+import { url } from "../../ultils/urlApi";
+import { token } from "../../constant/constant";
 import "./ChangePassword.css"
+import { handleError, handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 
 interface ChangePasswordProps {
   onChange: (status: boolean) => void;
@@ -23,14 +22,11 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onChange }) => {
           },
         })
         .then((response: any) => {
-          const { message } = handleSuccess(response);
-          showPopup(true, message);
+          handleSuccessShow(response)
           onChange(false);
         });
     } catch (error: any) {
-      const { message, errors }: any = handleError(error);
-      const messageErrors = message + " " + errors;
-      showPopup(false, messageErrors);
+     handleErrorShow(error)
     } finally {
       setLoading(false);
     }
