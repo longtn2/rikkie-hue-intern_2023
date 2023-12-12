@@ -27,7 +27,7 @@ import Autocomplete from './SearchRoomBooking';
 import FooterBooking from './FooterBooking';
 import FormEditBooking from './FormEditBooking';
 import ListBooking from './ListBooking';
-import { HEADER } from './constant/constant';
+import { HEADER } from '../../constant/constant';
 import {
   BookingDataCalendar,
   BookingDataApi,
