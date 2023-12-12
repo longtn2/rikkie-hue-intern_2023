@@ -1,45 +1,41 @@
-import { Button, Descriptions, Image, Modal } from "antd";
+import { Button, Descriptions, Image, Modal, Spin } from "antd";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import FormEdit from "../UserManager/FormEdit";
-import { DataType } from "../constant/constant";
-import getCookie from "../route/Cookie";
-import { url } from "../ultils/urlApi";
-import { handleError } from "../ultils/ultilsApi";
-import { showPopup } from "../ultils/Popup";
+import { useEffect, useState } from "react";
+import { DataType, HEADER } from "../../constant/constant";
+import { url } from "../../ultils/urlApi";
+import { handleErrorShow } from "../../ultils/ultilsApi";
+
 import avatar from "../../../public/avatar.png";
-import "./InfoAccount.css"
+import "./InfoAccount.css";
+import getCookie from "../../Route/Cookie";
+import FormEdit from "../Users/FormEdit";
 
 const InfoUser = () => {
   const [infoUser, setInfoUser] = useState<DataType>();
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const id = getCookie("id");
-  const token = getCookie("token");
+  useEffect(() => {
+    getData();
+  }, []);
   const getData = async () => {
     try {
       setLoading(true);
       await axios
         .get(url + "/v1/users/" + id, {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: HEADER,
         })
         .then((response) => {
           setInfoUser(response.data.data);
         });
     } catch (error: any) {
-      const { message, errors }: any = handleError(error);
-      const messageErrors = message + " " + errors;
-      showPopup(false, messageErrors);
+      handleErrorShow(error);
     } finally {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    getData();
-  }, []);
+
   const handleEditUser = (editUser: DataType) => {
     if (editUser) {
       setInfoUser((prevUser: any) => ({
@@ -64,45 +60,50 @@ const InfoUser = () => {
   return (
     <>
       <h1 className="component-name">Account information</h1>
-      <div  className="show-info">
-        <Descriptions className="info-detail" layout="horizontal" column={1}>
-          <Descriptions.Item
-            contentStyle={customContentStyle}
-            labelStyle={customLabelStyle}
-            label="User Name"
-          >
-            {infoUser?.user_name}
-          </Descriptions.Item>
-          <Descriptions.Item
-            contentStyle={customContentStyle}
-            labelStyle={customLabelStyle}
-            label="Email"
-          >
-            {infoUser?.email}
-          </Descriptions.Item>
-          <Descriptions.Item
-            contentStyle={customContentStyle}
-            labelStyle={customLabelStyle}
-            label="Phone number"
-          >
-            {infoUser?.phone_number}
-          </Descriptions.Item>
-          <Descriptions.Item>
-            <div
-             className= "btn-edit-info"
+      <div className="show-info">
+        <Spin
+          spinning={loading}
+          size="large"
+          tip="Loading..."
+          className="loading"
+        >
+          <Descriptions className="info-detail" layout="horizontal" column={1}>
+            <Descriptions.Item
+              contentStyle={customContentStyle}
+              labelStyle={customLabelStyle}
+              label="User Name"
             >
-              <Button
-                style={{ marginTop: 20 }}
-                type="primary"
-                htmlType="submit"
-                onClick={() => handleModalEditUser(false)}
-              >
-                Edit
-              </Button>
-            </div>
-          </Descriptions.Item>
-        </Descriptions>
-        <Image width={200} src={avatar} />
+              {infoUser?.user_name}
+            </Descriptions.Item>
+            <Descriptions.Item
+              contentStyle={customContentStyle}
+              labelStyle={customLabelStyle}
+              label="Email"
+            >
+              {infoUser?.email}
+            </Descriptions.Item>
+            <Descriptions.Item
+              contentStyle={customContentStyle}
+              labelStyle={customLabelStyle}
+              label="Phone number"
+            >
+              {infoUser?.phone_number}
+            </Descriptions.Item>
+            <Descriptions.Item>
+              <div className="btn-edit-info">
+                <Button
+                  style={{ marginTop: 20 }}
+                  type="primary"
+                  htmlType="submit"
+                  onClick={() => handleModalEditUser(false)}
+                >
+                  Edit
+                </Button>
+              </div>
+            </Descriptions.Item>
+          </Descriptions>
+          <Image width={200} src={avatar} />
+        </Spin>
       </div>
       <Modal
         title="Edit User Information"

@@ -7,6 +7,7 @@
 }
 .item-booked .ant-card-body {
   padding: 15px;
+<<<<<<< HEAD
 }
 .status-tag {
   font-size: 17px;
@@ -19,6 +20,24 @@
   font-size: 25px;
 }
 .info-booked {
+=======
+}
+.status-tag {
+  font-size: 17px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+.title-booked {
+  font-size: 25px;
+}
+
+.item-booked-title {
+  font-size: 25px;
+}
+.item-booked-info {
+>>>>>>> 33d942fee9f5c9bb131300a3a55d7d08124c3a38
   display: flex;
   justify-content: center;
 }
@@ -51,6 +70,10 @@
   justify-content: center;
   border-bottom: 15px;
   padding-bottom: 1opx;
+<<<<<<< HEAD
+=======
+  padding-bottom: 10px;
+>>>>>>> 33d942fee9f5c9bb131300a3a55d7d08124c3a38
 }
 
 .edit-modal-content {
@@ -70,6 +93,7 @@
   transform: translate(-50%, -50%);
   font-size: 24px;
   color: #ff0000;
+<<<<<<< HEAD
 }
 
 .search {
@@ -158,4 +182,25 @@
 
 .btn-right {
   margin-right: 10px;
+=======
+>>>>>>> 33d942fee9f5c9bb131300a3a55d7d08124c3a38
 }
+
+.btn-action:first-child {
+  background-color: "#ff9999";
+}
+
+.button-action:first-child {
+  background-color: "#ff9999";
+}
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: #ff0000;
+}
+
+
+
