@@ -96,7 +96,7 @@ const FormLogin: React.FC = () => {
             />
           </Form.Item>
 
-          <Form.Item className='Input'>
+          <Form.Item className='input'>
             <Button
               type='primary'
               htmlType='submit'
