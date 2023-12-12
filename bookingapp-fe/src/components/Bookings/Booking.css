@@ -37,6 +37,49 @@
   font-size: 30px;
 }
 
+.item-booking-wait{
+    height: 200px;
+    border: 1px black solid;
+    justify-content: center;
+    width: 100%;
+
+}
+.item-booking-wait .ant-card-body{
+    padding: 15px;
+}
+.info-booking-wait{
+    display: flex;
+    justify-content: center;
+}
+.detail-booking-wait{
+    width: 900px;
+}
+.group-btn-action{
+    display: flex;
+    align-items: center;
+}
+.btn-action{
+    display: flex;
+    width: 100px;
+    margin-left: 30px;
+    justify-content: center;
+    color: white;
+
+}
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> 066d471 (WIBA-534 ui waiting booking list)
+.title-booking-wait{
+    font-size: 27px;
+    justify-content: center;
+    display: flex;
+}
+.list-user{
+    margin-top: 10px;
+}
+
 .listWeek {
   display: flex;
   flex-direction: column;
@@ -81,17 +124,14 @@
   background-color: "#ff9999";
 }
 
-.button-action:first-child {
-  background-color: "#ff9999";
+.btn--view{
+  background-color: #ff9999;
 }
-.loading {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
-  color: #ff0000;
+.btn--accept{
+  background-color: #009900;
 }
-
+.btn--reject{
+  background-color: #ff0000;
+}
 
 

@@ -1,13 +1,22 @@
 import axios from "axios";
+<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
-import { url } from "../ultils/urlApi";
-import { BookingData, statuTag, token } from "../constant/constant";
-import { Card, Descriptions, List } from "antd";
+=======
+import { useEffect, useState } from "react";
+>>>>>>> 066d471 (WIBA-534 ui waiting booking list)
+import { url } from "../../ultils/urlApi";
+import { BookingData, statuTag, token } from "../../constant/constant";
+import { Card, Descriptions, List, Spin } from "antd";
 import "./Booking.css";
-import { handleError } from "../ultils/ultilsApi";
-import { showPopup } from "../ultils/Popup";
-import { formatDate, formatTime } from "../ultils/ultils";
+<<<<<<< HEAD
+import { handleErrorShow } from "../../ultils/ultilsApi";
+import { formatDate, formatTime } from "../../ultils/ultils";
+=======
+import { handleError } from "../../ultils/ultilsApi";
+import { showPopup } from "../../ultils/Popup";
+import { formatDate, formatTime } from "../../ultils/ultils";
 
+>>>>>>> 066d471 (WIBA-534 ui waiting booking list)
 const ListBookingOfUser = () => {
   const [listBooking, setListBooking] = useState<BookingData[]>([]);
   const [perPage, setPerPage] = useState(1);
@@ -37,9 +46,7 @@ const ListBookingOfUser = () => {
           setPerPage(response?.data?.data?.per_page);
         });
     } catch (error: any) {
-      const { message, errors }: any = handleError(error);
-      const messageErrors = message + " " + errors;
-      showPopup(false, messageErrors);
+      handleErrorShow(error)
     } finally {
       setLoading(false);
     }
@@ -74,6 +81,12 @@ const ListBookingOfUser = () => {
   return (
     <div>
       <h1 className="component-name">List of scheduled meetings</h1>
+      <Spin
+        spinning={loading}
+        size="large"
+        tip="Loading..."
+        className="loading"
+      >
       <List
         dataSource={listBooking}
         pagination={pagination}
@@ -133,6 +146,7 @@ const ListBookingOfUser = () => {
           </List.Item>
         )}
       />
+      </Spin>
     </div>
   );
 };

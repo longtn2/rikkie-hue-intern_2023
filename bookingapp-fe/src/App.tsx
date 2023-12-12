@@ -1,24 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import FormLogin from './components/Login/FormLogin';
+import ProtectedRoute from './Route/ProtectedRoute';
+import LayoutApp from './components/Layout/Layout';
+import ListBookingOfUser from './components/Bookings/ListBookingOfUser';
+import InvitationList from './components/Bookings/InvitationList';
+import PrivateRoute from './Route/PrivateRoute';
+import Rooms from './components/Rooms/Rooms';
+import UsersManager from './components/Users/UserManager';
+import WaitingBookingList from './components/Bookings/WaitingBookingList';
+;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='App'>
+      <Routes>
+        <Route path='/login' element={<FormLogin />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path='/' element={<LayoutApp />}>
+            <Route path='/bookingroom' element={<ListBookingOfUser/>}/>
+            <Route path='/invitations' element = {<InvitationList/>}/>
+            <Route element={<PrivateRoute />}>
+              <Route path='/roomManager' element={<Rooms />} />
+              <Route path='/usermanager' element={<UsersManager />} />
+              <Route path='/bookingmanager' element={<WaitingBookingList/>}/>
+            </Route>
+          </Route>
+        </Route>
+      </Routes>
     </div>
   );
 }
