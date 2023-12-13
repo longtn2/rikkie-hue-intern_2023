@@ -53,63 +53,62 @@ const FormLogin: React.FC = () => {
     );
   };
   return (
-    <>
-      <div className='container'>
-        <div className='title'>
-          <Title level={2}>Booking Login</Title>
-          <Text underline strong>
-            {' '}
-            Welcome to RikkeiSoft{' '}
-          </Text>
-        </div>
-        <Form form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
-          <Form.Item
-            name='email'
-            rules={[
-              { required: true, message: 'Email is required' },
-              { type: 'email', message: 'Invalid email format' },
-            ]}
-            validateStatus={errors.email ? 'error' : ''}
-            help={errors.email}
-            className='form-item'
-          >
-            <Input
-              prefix={<MailOutlined className='icon' />}
-              placeholder='Email'
-              allowClear
-              className='input'
-              disabled={loading}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name='password'
-            rules={[{ required: true, message: 'Password is required' }]}
-            validateStatus={errors.password ? 'error' : ''}
-            help={errors.password}
-          >
-            <Input.Password
-              prefix={<LockOutlined style={{ marginRight: '10px' }} />}
-              placeholder='Password'
-              allowClear
-              disabled={loading}
-            />
-          </Form.Item>
-
-          <Form.Item className='input'>
-            <Button
-              type='primary'
-              htmlType='submit'
-              block
-              className='btn'
-              loading={loading}
-            >
-              Login
-            </Button>
-          </Form.Item>
-        </Form>
+    <div className='container'>
+      <div className='title'>
+        <Title level={2}>Booking Login</Title>
+        <Text underline strong>
+          {' '}
+          Welcome to RikkeiSoft{' '}
+        </Text>
       </div>
-    </>
+      <Form form={form} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+        <Form.Item
+          name='email'
+          rules={[
+            { required: true, message: 'Email is required' },
+            { type: 'email', message: 'Invalid email format' },
+          ]}
+          validateStatus={errors.email ? 'error' : ''}
+          help={errors.email}
+          className='form-item'
+        >
+          <Input
+            prefix={<MailOutlined className='icon icon-mail' />}
+            placeholder='Email'
+            allowClear
+            className='input'
+            disabled={loading}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name='password'
+          rules={[{ required: true, message: 'Password is required' }]}
+          validateStatus={errors.password ? 'error' : ''}
+          help={errors.password}
+          className='form-item'
+        >
+          <Input.Password
+            prefix={<LockOutlined className='icon icon-look-outlined' />}
+            placeholder='Password'
+            allowClear
+            disabled={loading}
+          />
+        </Form.Item>
+
+        <Form.Item className='form-item'>
+          <Button
+            type='primary'
+            htmlType='submit'
+            block
+            className='btn'
+            loading={loading}
+          >
+            Login
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
