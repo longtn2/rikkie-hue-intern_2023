@@ -10,10 +10,11 @@ export interface DataType {
   phone_number: string;
   email: string;
   is_deleted: boolean;
+  is_attending: boolean;
 }
 
 export interface BookingData {
-  booking_id: number
+  booking_id: number;
   room_name: string;
   title: string;
   user_name: string[];
@@ -24,10 +25,8 @@ export interface BookingData {
   booking_users: [];
   creator_name: string;
   status: boolean | null;
-  user_ids: number[]
+  user_ids: number[];
 }
-export const token = getCookie('token');
-
 export interface BookingDataCalendar {
   title: string;
   booking_id: number | null;
@@ -63,6 +62,9 @@ export interface Room {
   is_blocked: boolean;
 }
 
+export const token = getCookie('token');
+export const roles = getCookie('roles');
+
 export const statuTag = (item: BookingData) => {
   if (item.is_deleted) {
     return (
@@ -84,8 +86,7 @@ export const statuTag = (item: BookingData) => {
     );
   }
 };
-
-export const HEADER =  {
+export const HEADER = {
   Authorization: `Bearer ${token}`,
   'ngrok-skip-browser-warning': true,
-}
+};
