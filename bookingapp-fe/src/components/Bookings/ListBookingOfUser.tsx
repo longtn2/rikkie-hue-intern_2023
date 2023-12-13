@@ -1,11 +1,12 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { url } from "../../ultils/urlApi";
 import { BookingData, statuTag, token } from "../../constant/constant";
 import { Card, Descriptions, List, Spin } from "antd";
 import "./Booking.css";
 import { handleErrorShow } from "../../ultils/ultilsApi";
 import { formatDate, formatTime } from "../../ultils/ultils";
+
 const ListBookingOfUser = () => {
   const [listBooking, setListBooking] = useState<BookingData[]>([]);
   const [perPage, setPerPage] = useState(1);
