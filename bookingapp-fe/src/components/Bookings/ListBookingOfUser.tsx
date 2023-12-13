@@ -1,22 +1,12 @@
 import axios from "axios";
-<<<<<<< HEAD
-import React, { useEffect, useState } from "react";
-=======
 import { useEffect, useState } from "react";
->>>>>>> 066d471 (WIBA-534 ui waiting booking list)
 import { url } from "../../ultils/urlApi";
 import { BookingData, statuTag, token } from "../../constant/constant";
 import { Card, Descriptions, List, Spin } from "antd";
 import "./Booking.css";
-<<<<<<< HEAD
 import { handleErrorShow } from "../../ultils/ultilsApi";
 import { formatDate, formatTime } from "../../ultils/ultils";
-=======
-import { handleError } from "../../ultils/ultilsApi";
-import { showPopup } from "../../ultils/Popup";
-import { formatDate, formatTime } from "../../ultils/ultils";
 
->>>>>>> 066d471 (WIBA-534 ui waiting booking list)
 const ListBookingOfUser = () => {
   const [listBooking, setListBooking] = useState<BookingData[]>([]);
   const [perPage, setPerPage] = useState(1);
