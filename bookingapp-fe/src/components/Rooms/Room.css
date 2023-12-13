@@ -1,0 +1,78 @@
+.container {
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.search {
+  margin-bottom: 20;
+  justify-content: space-between;
+  column-gap: 20;
+  width: 100%;
+}
+
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: #ff0000;
+}
+
+.list {
+  width: 100%;
+  padding-left: 100px;
+}
+
+.listItem {
+  width: 100%;
+  height: 100%;
+  border: 2px solid #dadada;
+  border-radius: 1rem;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.edit {
+  margin-bottom: 10px;
+}
+
+.editClick {
+  text-align: center;
+}
+
+.input {
+  padding: 10px 20px;
+}
+
+.btn {
+  margin-right: 5px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.customBtn {
+  background-color: #ff0000;
+  color: white;
+}
+
+.card {
+  width: 100%;
+}
+
+.body-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.text {
+  margin-bottom: 8px;
+}
