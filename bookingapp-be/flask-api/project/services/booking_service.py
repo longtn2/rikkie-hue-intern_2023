@@ -102,7 +102,7 @@ class BookingService:
             raise Conflict('Room is already booked for this time')
         else:
             new_booking = BookingExecutor.create_booking(room_id, title, time_start, time_end, user_ids)
-        return BaseResponse.success( 'Booking created successfully')
+        return BaseResponse.success(message='Booking created successfully')
     
     @staticmethod
     def update_booking(booking_id: int, data: Dict) -> Union[Dict, None]:
@@ -136,7 +136,7 @@ class BookingService:
 
             BookingExecutor.update_booking(booking, room_id, title, time_start, time_end, user_ids,)
 
-            return BaseResponse.success( 'Booking updated successfully')
+            return BaseResponse.success(message='Booking updated successfully')
         
     @staticmethod
     def delete_booking_service(booking_id: int) -> Dict:
@@ -157,7 +157,7 @@ class BookingService:
         booking.deleted_at = datetime.now()
 
         BookingExecutor.commit()
-        return BaseResponse.success( 'Booking deleted successfully')
+        return BaseResponse.success(message='Booking deleted successfully')
     
     @staticmethod
     def accept_booking(booking_id: int):
@@ -169,7 +169,7 @@ class BookingService:
 
             db.session.commit()
 
-            return BaseResponse.success('Booking accepted successfully')
+            return BaseResponse.success(message='Booking accepted successfully')
 
         except Exception as e:
             db.session.rollback()
@@ -200,7 +200,7 @@ class BookingService:
             raise Conflict('Room is already booked for this time')
         else:
             new_booking = BookingExecutor.create_booking_belong_to_user(room_id, title, time_start, time_end, user_ids)
-        return BaseResponse.success( 'Booking created successfully')
+        return BaseResponse.success(message='Booking created successfully')
     
     @staticmethod
     def reject_booking(booking_id: int):
@@ -212,7 +212,7 @@ class BookingService:
 
             db.session.commit()
 
-            return BaseResponse.success('Booking rejected successfully')
+            return BaseResponse.success(message='Booking rejected successfully')
 
         except Exception as e:
             db.session.rollback()
