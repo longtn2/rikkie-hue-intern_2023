@@ -23,18 +23,20 @@ const FormLogin: React.FC = () => {
         withCredentials: true,
       })
       .then(res => {
-        const token: string = res.data.data[0].token;
-        const roles: string[] = res.data.data[1].role_name;
-        const name: string = res.data.data[2].user_name;
-        const id: number = res.data.data[3].user_id;
-        Cookies.set('roles', JSON.stringify(roles));
-        Cookies.set('token', token);
-        Cookies.set('name', name);
-        Cookies.set('id', id.toString());
-        if (roles.includes('admin')) {
-          Navigate('/');
-        } else {
-          Navigate('/calendarmeeting');
+        if (res) {
+          const token: string = res.data.data[0].token;
+          const roles: string[] = res.data.data[1].role_name;
+          const name: string = res.data.data[2].user_name;
+          const id: number = res.data.data[3].user_id;
+          Cookies.set('roles', JSON.stringify(roles));
+          Cookies.set('token', token);
+          Cookies.set('name', name);
+          Cookies.set('id', id.toString());
+          if (roles.includes('admin')) {
+            Navigate('/');
+          } else {
+            Navigate('/calendarmeeting');
+          }
         }
       })
       .catch(error => {
