@@ -32,7 +32,7 @@ import {
   BookingDataCalendar,
   BookingDataApi,
   DataType,
-  Room
+  Room,
 } from '../../constant/constant';
 import ActionBooking from './ActionBooking';
 const { Title } = Typography;
@@ -421,7 +421,10 @@ const CalendarBooking = () => {
           checkAdmin ? (
             <div>
               <Space className='space'>
-                  <ActionBooking is_accepted={selectedBookingData?.is_accepted ?? false} visible={visibleModal} />  
+                <ActionBooking
+                  is_accepted={selectedBookingData?.is_accepted ?? false}
+                  visible={visibleModal}
+                />
               </Space>
             </div>
           ) : null
