@@ -121,3 +121,15 @@ class BookingExecutor:
             .paginate(page=page, per_page=per_page, error_out=False)
         )
         return bookings
+    
+    @staticmethod
+    def get_booking_user(booking_id: int, user_id: int) -> Optional[Booking]:
+        booking_user = BookingUser.query.join(Booking).filter(
+            BookingUser.user_id == user_id,
+            BookingUser.booking_id == booking_id,
+            Booking.is_deleted == False,
+            Booking.is_accepted == True,
+            Booking.booking_id == booking_id
+        ).first()
+        
+        return booking_user
