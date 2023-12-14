@@ -90,3 +90,8 @@ export const HEADER = {
   Authorization: `Bearer ${token}`,
   'ngrok-skip-browser-warning': true,
 };
+
+export interface ActionBooking {
+  is_accepted : boolean;
+  visible: (action : string, visible : boolean) => void;
+}

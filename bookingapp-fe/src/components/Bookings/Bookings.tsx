@@ -27,20 +27,20 @@ import Autocomplete from './SearchRoomBooking';
 import FooterBooking from './FooterBooking';
 import FormEditBooking from './FormEditBooking';
 import ListBooking from './ListBooking';
-import { HEADER } from '../../constant/constant';
 import {
+  HEADER,
   BookingDataCalendar,
   BookingDataApi,
   DataType,
-  Room,
+  Room
 } from '../../constant/constant';
+import ActionBooking from './ActionBooking';
 const { Title } = Typography;
 
 const CalendarBooking = () => {
   const [rooms, setRooms] = useState<Room[]>();
   const [users, setUsers] = useState<DataType[]>();
   const [bookingData, setBookingData] = useState<BookingDataCalendar[]>([]);
-  const token: string = getCookie('token');
   const [selectedBookingData, setSelectedBookingData] =
     useState<BookingDataCalendar | null>(null);
   const [modalShow, setModalShow] = useState<Boolean>(false);
@@ -154,9 +154,8 @@ const CalendarBooking = () => {
   };
   const eventContent = (eventInfo: EventContentArg) => {
     const { event, view } = eventInfo;
-    let content;
-    if (view.type === 'listWeek') {
-      content = (
+    const content = () => {
+      if (view.type === 'listWeek' || view.type === 'timeGridWeek') {
         <div
           style={{
             display: 'flex',
@@ -165,10 +164,8 @@ const CalendarBooking = () => {
           }}
         >
           <Title level={2}>{event.title}</Title>
-        </div>
-      );
-    } else if (view.type === 'dayGridMonth') {
-      content = (
+        </div>;
+      } else {
         <div
           style={{
             backgroundColor: event.backgroundColor,
@@ -179,28 +176,33 @@ const CalendarBooking = () => {
           }}
         >
           {event.title}
-        </div>
-      );
-    } else if (view.type === 'timeGridWeek') {
-      content = <div>{event.title}</div>;
-    }
+        </div>;
+      }
+    };
     return content;
   };
+
   const handleDateSelect = (arg: DateSelectArg) => {
     const { start, end } = arg;
     const startTime = moment(start);
     const endTime = moment(end);
     setTimeStartAdd(startTime);
     setTimeEndAdd(endTime);
-    showAddModal();
+    visibleModal('add', true);
   };
 
-  const showAddModal = () => {
-    setUpdateModal(true);
-  };
-
-  const closeShowAddModal = () => {
-    setUpdateModal(false);
+  const visibleModal = (action: string, visible: boolean) => {
+    switch (action) {
+      case 'add':
+        setUpdateModal(visible);
+        break;
+      case 'edit':
+        setIsEditing(visible);
+        break;
+      case 'delete':
+        setIsDeleted(visible);
+        break;
+    }
   };
 
   const handleAddBooking = async (values: BookingDataApi) => {
@@ -219,7 +221,7 @@ const CalendarBooking = () => {
         headers: HEADER,
       });
       if (response?.data?.data) {
-        closeShowAddModal();
+        visibleModal('add', false);
         fetchBookingData(startDate, endDate);
         handleSuccessShow(response);
       }
@@ -240,21 +242,6 @@ const CalendarBooking = () => {
     fetchBookingData(startDate, endDate);
   };
 
-  const handleEditModal = () => {
-    setIsEditing(true);
-    console.log('Du lieu khi click vao: ', selectedBookingData);
-  };
-  const handleDeleteModal = () => {
-    setIsDeleted(true);
-  };
-
-  const handleEditModalClose = () => {
-    setIsEditing(false);
-  };
-  const handleDeleteModalClose = () => {
-    setIsDeleted(false);
-  };
-
   const handleUpdate = async (values: BookingDataApi) => {
     const formattedBookingData = {
       ...values,
@@ -270,7 +257,7 @@ const CalendarBooking = () => {
     };
     try {
       const response = await axios.put(
-        `${url}/v1/bookings/${formattedBookingData!.booking_id}`,
+        `${url}/v1/bookings/${formattedBookingData.booking_id}`,
         formattedBookingData,
         {
           withCredentials: true,
@@ -279,7 +266,7 @@ const CalendarBooking = () => {
       );
       if (response?.data?.data) {
         fetchBookingData(startDate, endDate);
-        handleEditModalClose();
+        visibleModal('edit', false);
         handleSuccessShow(response);
       }
     } catch (error: any) {
@@ -299,7 +286,7 @@ const CalendarBooking = () => {
       if (response?.data?.data) {
         fetchBookingData(startDate, endDate);
         handleSuccessShow(response);
-        handleDeleteModalClose();
+        visibleModal('delete', false);
       }
     } catch (error: any) {
       handleErrorShow(error);
@@ -434,27 +421,7 @@ const CalendarBooking = () => {
           checkAdmin ? (
             <div>
               <Space className='space'>
-                {selectedBookingData?.is_accepted ? (
-                  <>
-                    <Popover content='Edit'>
-                      <Button onClick={handleEditModal}>Edit</Button>
-                    </Popover>
-                    <Popover content='Delete'>
-                      <Button danger onClick={handleDeleteModal}>
-                        Delete
-                      </Button>
-                    </Popover>
-                  </>
-                ) : (
-                  <>
-                    <Popover content='Accepted'>
-                      <Button type='primary'>Accepted</Button>
-                    </Popover>
-                    <Popover content='Rejected'>
-                      <Button danger>Rejected</Button>
-                    </Popover>
-                  </>
-                )}
+                  <ActionBooking is_accepted={selectedBookingData?.is_accepted ?? false} visible={visibleModal} />  
               </Space>
             </div>
           ) : null
@@ -476,7 +443,7 @@ const CalendarBooking = () => {
           </div>
         }
         visible={updateModal}
-        onCancel={closeShowAddModal}
+        onCancel={() => visibleModal('add', false)}
         footer={null}
         bodyStyle={{
           border: '1px solid #ccc',
@@ -486,7 +453,7 @@ const CalendarBooking = () => {
         }}
         destroyOnClose={true}
         maskClosable={false}
-        afterClose={closeShowAddModal}
+        afterClose={() => visibleModal('add', false)}
       >
         <ReusableForm
           onSubmit={handleAddBooking}
@@ -518,35 +485,31 @@ const CalendarBooking = () => {
           </div>
         }
         visible={isEditing ? true : false}
-        onCancel={handleEditModalClose}
+        onCancel={() => visibleModal('add', false)}
         footer={null}
       >
         <FormEditBooking
           users={users ?? []}
-          onCancel={handleEditModalClose}
+          onCancel={() => visibleModal('add', false)}
           initialValues={selectedBookingData}
           onFinish={handleUpdate}
         />
       </Modal>
 
       <Modal
-        title={
-          <>
-            <h1>Delete Booking</h1>
-          </>
-        }
+        title={<h1>Delete Booking</h1>}
         visible={isDeleted ? true : false}
-        onCancel={handleDeleteModalClose}
+        onCancel={() => visibleModal('delete', false)}
         footer={[
           <FooterBooking
             onDelete={handleDeleteBooking}
-            onCancel={handleDeleteModalClose}
+            onCancel={() => visibleModal('delete', false)}
             id={selectedBookingData?.booking_id!}
           />,
         ]}
         destroyOnClose={true}
         maskClosable={false}
-        afterClose={handleDeleteModalClose}
+        afterClose={() => visibleModal('delete', false)}
       >
         <p>Are you sure you want to delete this booking?</p>
       </Modal>

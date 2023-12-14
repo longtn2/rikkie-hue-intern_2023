@@ -6,7 +6,7 @@ interface FooterBooking {
   id: number;
 }
 
-const FooterBooking: React.FC<FooterBooking> = ({ onDelete, onCancel, id }) => {
+const FooterBooking: React.FC<FooterBooking> = ({ onDelete, onCancel, id  }) => {
   return (
     <>
       <Button key='cancel' onClick={onCancel}>
