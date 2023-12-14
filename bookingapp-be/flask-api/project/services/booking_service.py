@@ -1,7 +1,7 @@
 from project.database.excute.booking import BookingExecutor
 from project.models import Room, Booking, BookingUser, User
 from project.api.common.base_response import BaseResponse
-from werkzeug.exceptions import BadRequest, InternalServerError, Conflict, NotFound
+from werkzeug.exceptions import BadRequest, InternalServerError, Conflict, NotFound, UnprocessableEntity
 from flask import request
 from datetime import datetime, timedelta
 from typing import List
@@ -252,3 +252,16 @@ class BookingService:
             'total_pages': total_pages
         }
         return result
+    
+    @staticmethod
+    def user_confirm_booking(booking_id: int):
+        user_id = get_jwt_identity()
+        booking_user = BookingExecutor.get_booking_user(booking_id, user_id)
+        try:
+            booking_user.is_attending = True
+            db.session.commit()
+            return BaseResponse.success('Invitation successfully confirmed')
+
+        except Exception as e:
+            db.session.rollback()
+            raise UnprocessableEntity(str(e))
