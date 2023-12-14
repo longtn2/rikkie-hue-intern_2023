@@ -23,7 +23,7 @@ const FormLogin: React.FC = () => {
         withCredentials: true,
       })
       .then(res => {
-        if (res) {
+        if (res?.data?.data) {
           const token: string = res.data.data[0].token;
           const roles: string[] = res.data.data[1].role_name;
           const name: string = res.data.data[2].user_name;
