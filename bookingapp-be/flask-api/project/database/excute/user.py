@@ -41,3 +41,38 @@ class UserExecutor:
             )
             permission_names = [rp[0] for rp in role_permissions]
         return permission_names
+    
+    @staticmethod
+    def get_list_users(page: int, per_page: int)-> List[User]:
+        users = User.query.filter_by(is_deleted=False).paginate(
+            page=page, per_page=per_page, error_out=False)
+        return users
+
+    @staticmethod
+    def add_user_role(user_id: int, role_id: int):
+        new_user_role = UserHasRole(
+                user_id=user_id, role_id=role_id)
+        db.session.add(new_user_role)
+        db.session.commit()
+
+    @staticmethod
+    def delete_user_role(user_id: int):
+        UserHasRole.query.filter_by(user_id=user_id).delete()
+
+    @staticmethod
+    def add_user(new_user: object):
+        db.session.add(new_user)
+        db.session.commit()
+
+    @staticmethod   
+    def check_existing_phone(phone_number: str, user_id=None):
+        existing_phone = User.query.filter_by(phone_number=phone_number)
+        if user_id is not None:
+            existing_phone = existing_phone.filter(User.user_id != user_id)
+        existing_phone = existing_phone.first()
+        return existing_phone
+    
+    @staticmethod
+    def check_existing_email(email: str):
+        existing_email = User.query.filter(User.email == email).first()
+        return existing_email
