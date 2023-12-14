@@ -254,6 +254,19 @@ class BookingService:
         return result
     
     @staticmethod
+    def user_decline_booking(booking_id: int):
+        user_id = get_jwt_identity()
+        booking_user = BookingExecutor.get_booking_user(booking_id, user_id)
+        try:
+            booking_user.is_attending = False
+            db.session.commit()
+            return BaseResponse.success('Invitation successfully declined')
+
+        except Exception as e:
+            db.session.rollback()
+            raise InternalServerError(e)
+
+    @staticmethod
     def user_confirm_booking(booking_id: int):
         user_id = get_jwt_identity()
         booking_user = BookingExecutor.get_booking_user(booking_id, user_id)
@@ -264,4 +277,4 @@ class BookingService:
 
         except Exception as e:
             db.session.rollback()
-            raise UnprocessableEntity(str(e))
+            raise UnprocessableEntity(str(e)
