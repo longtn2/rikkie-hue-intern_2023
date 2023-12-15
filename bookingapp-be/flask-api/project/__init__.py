@@ -7,6 +7,10 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from celery import Celery
+from pyfcm import FCMNotification
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import messaging
 from flask_apscheduler import APScheduler
 
 app=Flask(__name__)
@@ -23,11 +27,16 @@ app.config['MAIL_PASSWORD'] = BaseConfig.MAIL_PASSWORD
 app.config['MAIL_USE_TLS'] = BaseConfig.MAIL_USE_TLS
 app.config['MAIL_USE_SSL'] = BaseConfig.MAIL_USE_SSL
 app.config['MAIL_DEFAULT_SENDER'] = BaseConfig.MAIL_DEFAULT_SENDER
-
-mail = Mail(app)
+app.config['SCHEDULER_API_ENABLED'] = BaseConfig.SCHEDULER_API_ENABLED
 
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
+
+mail = Mail(app)
+
+cred = credentials.Certificate(BaseConfig.FIREBASE_ADMIN_SDK)
+firebase_admin.initialize_app(cred)
+push_service = FCMNotification(api_key=BaseConfig.FCM_SERVER_KEY)
 
 scheduler =  APScheduler()
 scheduler.init_app(app)
@@ -36,6 +45,7 @@ scheduler.start()
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
+
 with app.app_context():
     from project import models
     db.create_all()
