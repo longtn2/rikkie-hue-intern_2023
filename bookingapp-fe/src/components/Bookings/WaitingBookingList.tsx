@@ -7,6 +7,10 @@ import DetailBookingWait from "./DetailBookingWait";
 import { Button, Card, List, Modal, Spin } from "antd";
 import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 import InfoInvitation from "./InfoInvitation";
+import ConfirmAction from "./ConfirmAction";
+import BtnAccept from "./BtnAccept";
+import BtnReject from "./BtnReject";
+import BtnDetail from "./BtnDetail";
 
 const WaitingBookingList = () => {
   const [listBooking, setListBooking] = useState<BookingData[]>([]);
@@ -32,7 +36,7 @@ const WaitingBookingList = () => {
           withCredentials: true,
           headers: HEADER,
         })
-        .then((response) => {
+        .then((response: any) => {
           setListBooking(response?.data?.data?.list_bookings);
           setTotalItems(response?.data?.data?.total_items);
           setPerPage(response?.data?.data?.per_page);
@@ -42,141 +46,124 @@ const WaitingBookingList = () => {
     } finally {
       setLoading(false);
     }
-    const handelViewDetail = (status: boolean) => {
-      setIsModalDetail(status);
-    };
-    const handleModalAction = (status: boolean) => {
-      setIsModalAction(status);
-    };
-    const handleShowModalAction = (booking: BookingData, key: string) => {
-      setSelectBooking(booking);
-      if (key === "view") {
-        handelViewDetail(true);
-      } else {
-        handleModalAction(true);
-        Modal.confirm({
-          title: key,
-          content:
-            key === "accept" ? (
-              <p>Are you sure to accept this booking?</p>
-            ) : (
-              <p>Are you sure to reject this booking?</p>
-            ),
-          okText: key,
-          open: isModalAction,
-          onOk: () => handleAction(key),
-        });
-      }
-    };
-    const handleAction = async (key: string) => {
-      if (selectBooking) {
-        try {
-          setLoading(true);
-          await axios
-            .put(
-              `${url}/v1/bookings/${selectBooking.booking_id}/${key}`,
-              {},
-              {
-                headers: HEADER,
-              }
-            )
-            .then((response) => {
-              setListBooking(response?.data?.data?.list_bookings);
-              handleSuccessShow(response);
-              handleModalAction(false);
-              getData();
-            });
-        } catch (error: any) {
-          handleErrorShow(error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-    const handlePageChange = (page: number) => {
-      setCurrentPage(page);
-    };
-    const handlePageSizeChange = (pageSize: number) => {
-      const newPerPage = pageSize;
-      const newCurrentPage =
-        Math.ceil(((currentPage - 1) * perPage) / newPerPage) + 1;
-      setCurrentPage(newCurrentPage);
-    };
-    const pagination = {
-      current: currentPage,
-      pageSize: perPage,
-      total: totalItems,
-      onChange: handlePageChange,
-      onShowSizeChange: handlePageSizeChange,
-    };
-    return (
-      <div>
-        <div className="header-component">
-          <h1 className="component-name">List of waiting booking</h1>
-        </div>
-        <Spin
-          spinning={loading}
-          size="large"
-          tip="Loading..."
-          className="loading"
-        >
-          <List
-            dataSource={listBooking}
-            pagination={pagination}
-            renderItem={(item: BookingData) => (
-              <List.Item>
-                <Card
-                  className="item-booking-wait"
-                  key={item.title}
-                  title={<div className="title-booking-wait">{item.title}</div>}
-                >
-                  <div className="info-booking-wait">
-                    <InfoInvitation data={item} />
-                    <div className="container-btn">
-                      <Button
-                        className="btn-action btn--view"
-                        onClick={() => {
-                          handleShowModalAction(item, "view");
-                        }}
-                      >
-                        VIEW DETAIL
-                      </Button>
-                      <Button
-                        className="btn-action btn--accept"
-                        onClick={() => {
-                          handleShowModalAction(item, "accept");
-                        }}
-                      >
-                        ACCEPT
-                      </Button>
-                      <Button
-                        className="btn-action btn--reject"
-                        onClick={() => {
-                          handleShowModalAction(item, "reject");
-                        }}
-                      >
-                        REJECT
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              </List.Item>
-            )}
-          />
-        </Spin>
-        <Modal
-          open={isModalDetail}
-          onCancel={() => handelViewDetail(false)}
-          width={"80%"}
-          footer={[]}
-        >
-          <DetailBookingWait
-            onChange={handelViewDetail}
-            selectBooking={selectBooking}
-          />
-        </Modal>
-      </div>
-    );
   };
+  const handleAction = async (key: string) => {
+    if (selectBooking) {
+      try {
+        setLoading(true);
+        await axios
+          .put(
+            `${url}/v1/bookings/${selectBooking.booking_id}/${key}`,
+            {},
+            {
+              headers: HEADER,
+            }
+          )
+          .then((response: any) => {
+            setListBooking(response?.data?.data?.list_bookings);
+            handleSuccessShow(response);
+            handleModalAction(false);
+            handelViewDetail(false);
+            getData();
+          });
+      } catch (error: any) {
+        handleErrorShow(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+  const handelViewDetail = (status: boolean) => {
+    setIsModalDetail(status);
+  };
+  const handleModalAction = (status: boolean) => {
+    setIsModalAction(status);
+  };
+
+  const handleShowModalAction = (booking: BookingData, key: string) => {
+    setSelectBooking(booking);
+    if (key === "view") {
+      handelViewDetail(true);
+    } else {
+      handleModalAction(true);
+      const message: string = `Are you sure to ${key} this booking?`;
+      ConfirmAction(key, isModalAction, handleAction, message);
+    }
+  };
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+  const pagination = {
+    current: currentPage,
+    pageSize: perPage,
+    total: totalItems,
+    onChange: handlePageChange,
+    onShowSizeChange: PaginationSize,
+  };
+  return (
+    <div>
+      <div className="header-component">
+        <h1 className="component-name">List of waiting booking</h1>
+      </div>
+      <Spin
+        spinning={loading}
+        size="large"
+        tip="Loading..."
+        className="spin-loading"
+      >
+        <List
+          dataSource={listBooking}
+          pagination={pagination}
+          renderItem={(item: BookingData) => (
+            <List.Item>
+              <Card
+                className="item-booking-wait"
+                key={item.title}
+                title={<div className="title-booking-wait">{item.title}</div>}
+              >
+                <div className="info-booking-wait">
+                  <InfoInvitation data={item} />
+                  <div className="container-btn">
+                    <BtnDetail
+                      selectBooking={item}
+                      handleSelectAction={async () =>
+                        handleShowModalAction(item, "view")
+                      }
+                    />
+                    <BtnAccept
+                      selectBooking={item}
+                      handleSelectAction={async () =>
+                        handleShowModalAction(item, "accept")
+                      }
+                    />
+                    <BtnReject
+                      selectBooking={item}
+                      handleSelectAction={async () =>
+                        handleShowModalAction(item, "reject")
+                      }
+                    />
+                  </div>
+                </div>
+              </Card>
+            </List.Item>
+          )}
+        />
+      </Spin>
+      <Modal
+        open={isModalDetail}
+        onCancel={() => handelViewDetail(false)}
+        width={"80%"}
+        footer={[]}
+      >
+        <DetailBookingWait
+          selectBooking={selectBooking}
+          handleAction={async (booking, key) =>
+            handleShowModalAction(booking, key)
+          }
+        />
+      </Modal>
+    </div>
+  );
 };
+
 export default WaitingBookingList;

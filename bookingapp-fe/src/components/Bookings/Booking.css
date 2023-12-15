@@ -85,6 +85,36 @@
 .list-user {
   margin-top: 10px;
 }
+.item-booking-wait .ant-card-body{
+    padding: 15px;
+}
+.info-booking-wait{
+    display: flex;
+    justify-content: center;
+}
+.detail-booking-wait{
+    width: 900px;
+}
+.group-btn-action{
+    display: flex;
+    align-items: center;
+}
+.btn-action{
+    display: flex;
+    width: 100px;
+    margin-left: 30px;
+    justify-content: center;
+    color: white;
+
+}
+.title-booking-wait{
+    font-size: 27px;
+    justify-content: center;
+    display: flex;
+}
+.list-user{
+    margin-top: 10px;
+}
 
 .listWeek {
   display: flex;
