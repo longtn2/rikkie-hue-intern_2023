@@ -186,8 +186,19 @@ class BookingService:
             booking.deleted_at = None
             user_ids = [user.user_id for user in booking.booking_user]
             BookingService.send_email_accepting_the_scheduled(booking, user_ids)
-            db.session.commit()
 
+            if booking.creator_id:
+                user = UserExecutor.get_user(user_id=booking.creator_id)
+                if user and user.fcm_token:
+                    PushNotification.send_notification_reminder(
+                        fcm_token=user.fcm_token,
+                        message_title="Booking Accepted",
+                        message_body=f"The booking '{booking.title}' scheduled for {booking.time_start} - {booking.time_end} has been accepted."
+                    )
+            else:
+                raise NotFound('Creator not found')
+            
+            db.session.commit()
             return BaseResponse.success(message='Booking accepted successfully')
 
         except Exception as e:
@@ -256,6 +267,17 @@ class BookingService:
             booking.deleted_at = datetime.now()
             user_ids = [user.user_id for user in booking.booking_user]
             BookingService.send_email_rejecting_the_scheduled(booking, user_ids)
+            
+            if booking.creator_id:
+                user = UserExecutor.get_user(user_id=booking.creator_id)
+                if user and user.fcm_token:
+                    PushNotification.send_notification_reminder(
+                        fcm_token=user.fcm_token,
+                        message_title="Booking Rejected",
+                        message_body=f"The booking '{booking.title}' scheduled for {booking.time_start} - {booking.time_end} has been rejected."
+                    )
+            else:
+                raise NotFound('Creator not found')
 
             db.session.commit()
 
