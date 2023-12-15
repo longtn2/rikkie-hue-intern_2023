@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request
 from werkzeug.exceptions import BadRequest, Unauthorized
 from project import app
 from project.services.login_service import AuthService
-from flask_jwt_extended import jwt_required, unset_jwt_cookies
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from project.api.common.base_response import BaseResponse
 
 login_blueprint = Blueprint('login', __name__)
@@ -34,6 +34,6 @@ def login():
 @login_blueprint.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
-    response = jsonify(message='Logout successfully')
-    unset_jwt_cookies(response)
+    user_id=get_jwt_identity()
+    AuthService.logout_user(user_id)
     return BaseResponse.success(message="Logout successfully!")
