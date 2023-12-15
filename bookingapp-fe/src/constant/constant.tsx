@@ -1,7 +1,7 @@
-import { Tag } from "antd";
-import getCookie from "../Route/Cookie";
+import { Tag } from 'antd';
+import getCookie from '../Route/Cookie';
 
-export const TYPE_USER = { ADMIN: "admin" };
+export const TYPE_USER = { ADMIN: 'admin' };
 export interface DataType {
   user_id: number;
   role_id: number[];
@@ -10,11 +10,11 @@ export interface DataType {
   phone_number: string;
   email: string;
   is_deleted: boolean;
-  is_attending: boolean
+  is_attending: boolean;
 }
 
 export interface BookingData {
-  booking_id: number
+  booking_id: number;
   room_name: string;
   title: string;
   user_name: string[];
@@ -25,35 +25,73 @@ export interface BookingData {
   booking_users: [];
   creator_name: string;
   status: boolean | null;
-  user_ids: number[]
-
+  user_ids: number[];
 }
-export const token = getCookie("token");
-export const roles = getCookie("roles")
+export interface BookingDataCalendar {
+  title: string;
+  booking_id: number | null;
+  is_accepted: boolean;
+  start: string;
+  end: string;
+  user_ids: number[];
+  room_id: number | null;
+  room_name: string;
+  user_names: string[];
+  backgroundColor: string;
+  creator_name: string;
+  creator_id: string;
+}
+
+export interface BookingDataApi {
+  title: string;
+  booking_id: number | null;
+  is_accepted: boolean;
+  time_start: string;
+  time_end: string;
+  user_ids: number[];
+  room_id: number | null;
+  room_name: string;
+  user_names: string[];
+  creator_name: string;
+  creator_id: number;
+}
+export interface Room {
+  room_id: number;
+  room_name: string;
+  description: string | null;
+  is_blocked: boolean;
+}
+
+export const token = getCookie('token');
+export const roles = getCookie('roles');
 
 export const statuTag = (item: BookingData) => {
   if (item.is_deleted) {
     return (
-      <Tag className="status-tag" color="#ff0000">
+      <Tag className='status-tag' color='#ff0000'>
         Rejected
       </Tag>
     );
   } else if (item.is_eccept) {
     return (
-      <Tag className="status-tag" color="#009900">
+      <Tag className='status-tag' color='#009900'>
         Successed
       </Tag>
     );
   } else {
     return (
-      <Tag className="status-tag" color="#ff9933">
+      <Tag className='status-tag' color='#ff9933'>
         Pending
       </Tag>
     );
   }
 };
-export const HEADER =  {
+export const HEADER = {
   Authorization: `Bearer ${token}`,
   'ngrok-skip-browser-warning': true,
-}
+};
 
+export interface ActionBooking {
+  is_accepted : boolean;
+  visible: (action : string, visible : boolean) => void;
+}
