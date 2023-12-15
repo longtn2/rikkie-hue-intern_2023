@@ -5,12 +5,34 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
+from celery import Celery
+from flask_apscheduler import APScheduler
 
 app=Flask(__name__)
 CORS(app, supports_credentials=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = BaseConfig.SQLALCHEMY_DATABASE_URI
 app.config['JWT_SECRET_KEY'] = BaseConfig.JWT_SECRET_KEY
+app.config['CELERY_BROKER_URL'] =  BaseConfig.CELERY_BROKER_URL
+app.config['CELERY_RESULT_BACKEND'] = BaseConfig.CELERY_RESULT_BACKEND
+app.config['MAIL_SERVER'] = BaseConfig.MAIL_SERVER
+app.config['MAIL_PORT'] = BaseConfig.MAIL_PORT
+app.config['MAIL_USERNAME'] = BaseConfig.MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = BaseConfig.MAIL_PASSWORD
+app.config['MAIL_USE_TLS'] = BaseConfig.MAIL_USE_TLS
+app.config['MAIL_USE_SSL'] = BaseConfig.MAIL_USE_SSL
+app.config['MAIL_DEFAULT_SENDER'] = BaseConfig.MAIL_DEFAULT_SENDER
+
+mail = Mail(app)
+
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
+
+scheduler =  APScheduler()
+scheduler.init_app(app)
+scheduler.start()
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
