@@ -28,7 +28,7 @@ class BookingService:
             creator_name=user_created.user_name if user_created else None
             room = Room.query.filter_by(room_id=booking.room_id).first()
             room_name = room.room_name if room else None
-            
+
             booking_info = {
                 "booking_id": booking.booking_id,
                 "title": booking.title,
@@ -36,7 +36,7 @@ class BookingService:
                 "time_end": booking.time_end.strftime('%Y-%m-%d %H:%M:%S'),
                 "room_id": booking.room_id,
                 "room_name": room_name,
-                "user_ids": user_ids,  
+                "user_ids": user_ids,
                 "user_names": user_names,
                 "creator_id": booking.creator_id,
                 "creator_name": creator_name,
@@ -44,7 +44,7 @@ class BookingService:
                 "is_deleted":booking.is_deleted,
                 "booking_users":booking_users
             }
-            list_bookings.append(booking_info) 
+            list_bookings.append(booking_info)
         return list_bookings
 
     @staticmethod
@@ -74,21 +74,23 @@ class BookingService:
 
         if start_date_str and end_date_str:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-            end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
+            end_date = datetime.strptime(
+                end_date_str, '%Y-%m-%d') + timedelta(days=1)
         else:
             raise BadRequest(
                 "Both start_date and end_date are required for date range query.")
 
-        bookings = BookingExecutor.get_bookings_in_date_range_user(start_date, end_date, user_id)
+        bookings = BookingExecutor.get_bookings_in_date_range_user(
+            start_date, end_date, user_id)
         list_bookings = BookingService.show_list_booking(bookings)
         return list_bookings
-    
+
     @staticmethod
-    def book_room(data:  Dict) :
+    def book_room(data:  Dict):
         room_id = data.get('room_id')
         title = data.get('title')
-        time_start= data.get('time_start')
-        time_end= data.get('time_end')
+        time_start = data.get('time_start')
+        time_end = data.get('time_end')
         user_ids = data.get('user_ids', [])
 
         errors = []
@@ -102,7 +104,8 @@ class BookingService:
         if errors:
             return BaseResponse.error_validate(errors)
 
-        existing_booking: Optional[Booking] = BookingExecutor.check_room_availability(room_id, time_start, time_end)
+        existing_booking: Optional[Booking] = BookingExecutor.check_room_availability(
+            room_id, time_start, time_end)
 
         if existing_booking:
             raise Conflict('Room is already booked for this time')
@@ -124,38 +127,40 @@ class BookingService:
     
     @staticmethod
     def update_booking(booking_id: int, data: Dict) -> Union[Dict, None]:
-            room_id: int = data.get('room_id')
-            title: str = data.get('title')
-            time_start: str = data.get('time_start') 
-            time_end: str = data.get('time_end')
-            user_ids: List[int] = data.get('user_ids', [])
+        room_id: int = data.get('room_id')
+        title: str = data.get('title')
+        time_start: str = data.get('time_start')
+        time_end: str = data.get('time_end')
+        user_ids: List[int] = data.get('user_ids', [])
 
-            booking = BookingExecutor.get_booking(booking_id)
+        booking = BookingExecutor.get_booking(booking_id)
 
-            if not booking:
-                raise NotFound('Booking not found')
-            
-            errors = []
-            validate_title = Booking.validate_title(title)
-            if validate_title:
-                errors.append(validate_title)
+        if not booking:
+            raise NotFound('Booking not found')
 
-            validate_time = Booking.validate_time(time_start, time_end)
-            if validate_time:
-                errors.append(validate_time)
+        errors = []
+        validate_title = Booking.validate_title(title)
+        if validate_title:
+            errors.append(validate_title)
 
-            if errors:
-                return BaseResponse.error_validate(errors)
+        validate_time = Booking.validate_time(time_start, time_end)
+        if validate_time:
+            errors.append(validate_time)
 
-            existing_booking = BookingExecutor.check_room_availability_update(room_id, time_start, time_end, booking_id)
+        if errors:
+            return BaseResponse.error_validate(errors)
 
-            if existing_booking:
-                raise Conflict('Room is already booked for this time')
+        existing_booking = BookingExecutor.check_room_availability_update(
+            room_id, time_start, time_end, booking_id)
 
-            BookingExecutor.update_booking(booking, room_id, title, time_start, time_end, user_ids,)
+        if existing_booking:
+            raise Conflict('Room is already booked for this time')
 
-            return BaseResponse.success(message='Booking updated successfully')
-        
+        BookingExecutor.update_booking(
+            booking, room_id, title, time_start, time_end, user_ids,)
+
+        return BaseResponse.success('Booking updated successfully')
+
     @staticmethod
     def delete_booking_service(booking_id: int) -> Dict:
         booking = Booking.query.get(booking_id)
@@ -169,7 +174,8 @@ class BookingService:
         room_status = BookingExecutor.is_room_blocked(booking.room_id)
 
         if room_status:
-            raise BadRequest('Cannot delete the booking, the room is currently in use')
+            raise BadRequest(
+                'Cannot delete the booking, the room is currently in use')
 
         booking.is_deleted = True
         booking.deleted_at = datetime.now()
@@ -186,7 +192,7 @@ class BookingService:
             booking.deleted_at = None
             user_ids = [user.user_id for user in booking.booking_user]
             BookingService.send_email_accepting_the_scheduled(booking, user_ids)
-
+            db.session.commit()
             if booking.creator_id:
                 user = UserExecutor.get_user(user_id=booking.creator_id)
                 if user and user.fcm_token:
@@ -222,10 +228,14 @@ class BookingService:
             
     @staticmethod      
     def book_room_belong_to_user(data:  Dict) :
+            raise InternalServerError(e)
+
+    @staticmethod
+    def book_room_belong_to_user(data:  Dict):
         room_id = data.get('room_id')
         title = data.get('title')
-        time_start= data.get('time_start')
-        time_end= data.get('time_end')
+        time_start = data.get('time_start')
+        time_end = data.get('time_end')
         user_ids = data.get('user_ids', [])
 
         errors = []
@@ -239,7 +249,8 @@ class BookingService:
         if errors:
             return BaseResponse.error_validate(errors)
 
-        existing_booking: Optional[Booking] = BookingExecutor.check_room_availability(room_id, time_start, time_end)
+        existing_booking: Optional[Booking] = BookingExecutor.check_room_availability(
+            room_id, time_start, time_end)
 
         if existing_booking:
             raise Conflict('Room is already booked for this time')
@@ -300,6 +311,24 @@ class BookingService:
             if user_id == booking.creator_id:
                 EmailSender.send_email_rejecting_the_scheduled(user_email, title, time_start, time_end, room_name, attendees) 
 
+    @staticmethod
+    def view_list_invite(page: int, per_page: int) -> list[Booking]:
+        user_id = get_jwt_identity()
+        bookings = BookingExecutor.view_list_invite(page, per_page, user_id)
+        list_booking_invite = BookingService.show_list_booking(bookings)
+        total_items = bookings.total
+        total_pages = ceil(total_items / per_page)
+        per_page = per_page
+        current_page = page
+        result = {
+            'list_bookings': list_booking_invite,
+            'total_items': total_items,
+            'per_page': per_page,
+            'current_page': current_page,
+            'total_pages': total_pages
+        }
+        return result
+    
     @staticmethod
     def admin_view_booking_pending(page: int, per_page: int) -> List[Booking]:
         bookings=BookingExecutor.admin_view_booking_pending(page, per_page)
@@ -420,3 +449,4 @@ class BookingService:
         bookings = BookingExecutor.search_booking_room(start_date, end_date, room_id)
         list_bookings = BookingService.show_list_booking(bookings)
         return list_bookings
+
