@@ -92,6 +92,6 @@ export const HEADER = {
 };
 
 export interface ActionBooking {
-  is_accepted : boolean;
-  visible: (action : string, visible : boolean) => void;
+  is_accepted: boolean;
+  visible: (action: string, visible: boolean) => void;
 }

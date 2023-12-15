@@ -9,7 +9,7 @@ import PrivateRoute from './Route/PrivateRoute';
 import Rooms from './components/Rooms/Rooms';
 import UsersManager from './components/Users/UserManager';
 import WaitingBookingList from './components/Bookings/WaitingBookingList';
-;
+
 
 function App() {
   return (
