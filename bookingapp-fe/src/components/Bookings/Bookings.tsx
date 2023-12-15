@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Button, Typography, Space, Popover, Spin } from 'antd';
+import { Typography, Spin, Space } from 'antd';
 import moment from 'moment';
 import axios from 'axios';
 import './Booking.css';
@@ -35,6 +35,7 @@ import {
   Room,
 } from '../../constant/constant';
 import ActionBooking from './ActionBooking';
+import ModalConfirm from './ModalConfirm';
 const { Title } = Typography;
 
 const CalendarBooking = () => {
@@ -401,22 +402,10 @@ const CalendarBooking = () => {
         </div>
       </div>
 
-      <Modal
-        title={
-          <div className='title-modal'>
-            <Typography.Title level={2} className='container-show-list-title'>
-              {selectedBookingData?.title}
-            </Typography.Title>
-          </div>
-        }
+      <ModalConfirm
+        title={selectedBookingData?.title}
         visible={modalShow ? true : false}
         onCancel={handleCloseShow}
-        bodyStyle={{
-          border: '1px solid #d6e4ec',
-          borderRadius: '5px',
-          boxShadow: '2px 2px 4px 0px rgba(0, 0, 0, 0.3)',
-          padding: '20px',
-        }}
         footer={
           checkAdmin ? (
             <div>
@@ -429,34 +418,17 @@ const CalendarBooking = () => {
             </div>
           ) : null
         }
-        maskClosable={false}
-        afterClose={handleCloseShow}
       >
         {selectedBookingData && (
           <ListBooking selectedBookingData={selectedBookingData} />
         )}
-      </Modal>
+      </ModalConfirm>
 
-      <Modal
-        title={
-          <div>
-            <Title level={2} className='title-modal'>
-              Add Booking
-            </Title>
-          </div>
-        }
+      <ModalConfirm
+        title='Add Booking'
         visible={updateModal}
         onCancel={() => visibleModal('add', false)}
         footer={null}
-        bodyStyle={{
-          border: '1px solid #ccc',
-          borderRadius: '5px',
-          boxShadow: '2px 2px 4px 0px rgba(0, 0, 0, 0.3)',
-          padding: '20px',
-        }}
-        destroyOnClose={true}
-        maskClosable={false}
-        afterClose={() => visibleModal('add', false)}
       >
         <ReusableForm
           onSubmit={handleAddBooking}
@@ -465,27 +437,31 @@ const CalendarBooking = () => {
           rooms={rooms ?? []}
           users={users ?? []}
         />
-      </Modal>
+      </ModalConfirm>
 
-      <Modal
+      <ModalConfirm
         title={
-          <div>
-            <Title level={2} className='title-modal'>
+          <>
+            <Typography.Title level={2} className='title-modal'>
               Update Booking
-            </Title>
+            </Typography.Title>
             <div className='modal-container-title'>
               <div className='modal-title-div'>
                 Title:
-                <Title level={5}>{selectedBookingData?.title}</Title>
+                <Typography.Title level={5}>
+                  {selectedBookingData?.title}
+                </Typography.Title>
               </div>
             </div>
             <div className='modal-container-title'>
               <div className='modal-title-div'>
                 Room Name:
-                <Title level={5}>{selectedBookingData?.room_name}</Title>
+                <Typography.Title level={5}>
+                  {selectedBookingData?.room_name}
+                </Typography.Title>
               </div>
             </div>
-          </div>
+          </>
         }
         visible={isEditing ? true : false}
         onCancel={() => visibleModal('add', false)}
@@ -497,25 +473,22 @@ const CalendarBooking = () => {
           initialValues={selectedBookingData}
           onFinish={handleUpdate}
         />
-      </Modal>
+      </ModalConfirm>
 
-      <Modal
-        title={<h1>Delete Booking</h1>}
+      <ModalConfirm
+        title='Delete Booking'
         visible={isDeleted ? true : false}
         onCancel={() => visibleModal('delete', false)}
-        footer={[
+        footer={
           <FooterBooking
             onDelete={handleDeleteBooking}
             onCancel={() => visibleModal('delete', false)}
             id={selectedBookingData?.booking_id!}
-          />,
-        ]}
-        destroyOnClose={true}
-        maskClosable={false}
-        afterClose={() => visibleModal('delete', false)}
+          />
+        }
       >
         <p>Are you sure you want to delete this booking?</p>
-      </Modal>
+      </ModalConfirm>
     </>
   );
 };
