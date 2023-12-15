@@ -26,13 +26,13 @@ class PushNotification:
             time_cooming= curent_time+ timedelta(minutes=10)
             bookings=BookingExecutor.get_list_meeting_cooming(time_cooming)
             if bookings:
+                users = []
                 for booking in bookings:
-                    users = [booking_user.user for booking_user in booking.booking_user]
+                    users.extend([booking_user.user for booking_user in booking.booking_user])  
                     for user in users:
-                        EmailSender.send_mail_reminder(booking, user)
                         if user.fcm_token:
                             PushNotification.send_notification_reminder(
                                 fcm_token=user.fcm_token,
                                 message_title=booking.title,
-                                message_body="The meeting will take place in 10 minutes"
-                            )
+                                message_body="The meeting will take place in 10 minutes ")
+                        EmailSender.send_mail_reminder(booking, user) 

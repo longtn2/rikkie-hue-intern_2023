@@ -12,6 +12,7 @@ from typing import Union, Dict, Optional, List
 from math import ceil
 from flask_jwt_extended import get_jwt_identity
 from project import db
+from project.services.notification_service import PushNotification
 
 
 class BookingService:
@@ -233,6 +234,17 @@ class BookingService:
             raise Conflict('Room is already booked for this time')
         else:
             new_booking = BookingExecutor.create_booking_belong_to_user(room_id, title, time_start, time_end, user_ids)
+        admins=UserExecutor.get_list_user_by_role_name(role_name="admin")
+        if not admins:
+            raise NotFound('Admins not found')
+        creator=UserExecutor.get_user(user_id=new_booking.creator_id)
+        
+        for admin in admins:
+            if admin.fcm_token:
+                PushNotification.send_notification_reminder(
+                            fcm_token=admin.fcm_token,
+                            message_title="Meeting pending",
+                            message_body=f"There is a meeting schedule set by {creator.user_name}")
         return BaseResponse.success(message='Booking created successfully')
     
     @staticmethod
@@ -308,6 +320,13 @@ class BookingService:
         try:
             booking_user.is_attending = False
             db.session.commit()
+            booking = BookingExecutor.get_booking(booking_id)
+            creator=UserExecutor.get_user(user_id=booking.creator_id)
+            if creator.fcm_token:
+                PushNotification.send_notification_reminder(
+                            fcm_token=creator.fcm_token,
+                            message_title="Invitation confirme",
+                            message_body=f"{creator.user_name} decline participation in meeting schedule")
             return BaseResponse.success('Invitation successfully declined')
 
         except Exception as e:
@@ -321,6 +340,13 @@ class BookingService:
         try:
             booking_user.is_attending = True
             db.session.commit()
+            booking = BookingExecutor.get_booking(booking_id)
+            creator=UserExecutor.get_user(user_id=booking.creator_id)
+            if creator.fcm_token:
+                PushNotification.send_notification_reminder(
+                            fcm_token=creator.fcm_token,
+                            message_title="Invitation confirme",
+                            message_body=f"{creator.user_name} confirm participation in meeting schedule")
             return BaseResponse.success('Invitation successfully confirmed')
 
         except Exception as e:

@@ -32,3 +32,9 @@ class AuthService:
             {"user_id": user.user_id}
         ]
         return data
+
+    @staticmethod
+    def logout_user(user_id: int):
+        user = UserExecutor.get_user(user_id)
+        user.fcm_token=None
+        db.session.commit()
