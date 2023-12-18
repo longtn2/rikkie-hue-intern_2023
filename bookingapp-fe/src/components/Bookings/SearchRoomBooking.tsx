@@ -1,4 +1,4 @@
-import { Input ,AutoComplete, Button } from 'antd';
+import { Input, AutoComplete, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 
@@ -14,7 +14,10 @@ interface AutocompleteProps {
   onSelect: (roomId: number) => void;
 }
 
-const SearchRoomBooking: React.FC<AutocompleteProps> = ({ options, onSelect }) => {
+const SearchRoomBooking: React.FC<AutocompleteProps> = ({
+  options,
+  onSelect,
+}) => {
   const [searchResults, setSearchResults] = useState<Room[]>([]);
   const [searchValue, setSearchValue] = useState('');
 
@@ -27,7 +30,9 @@ const SearchRoomBooking: React.FC<AutocompleteProps> = ({ options, onSelect }) =
   };
 
   const handleSelect = (roomId: string) => {
-    const selectedRoom = options.find(room => room.room_id === parseInt(roomId));
+    const selectedRoom = options.find(
+      room => room.room_id === parseInt(roomId)
+    );
     if (selectedRoom) {
       const roomName = selectedRoom.room_name;
       onSelect(parseInt(roomId));
@@ -53,7 +58,7 @@ const SearchRoomBooking: React.FC<AutocompleteProps> = ({ options, onSelect }) =
       autoFocus
     >
       <Input.Search
-        enterButton={<Button  icon={<SearchOutlined />}  />}
+        enterButton={<Button icon={<SearchOutlined />} />}
         autoComplete='off'
       />
     </AutoComplete>

@@ -1,7 +1,10 @@
 import { Button, Popover } from 'antd';
-import { ActionBooking } from '../../constant/constant';
+import { ActionBookingType } from '../../constant/constant';
 
-const ActionBooking: React.FC<ActionBooking> = ({ is_accepted, visible }) => {
+const ActionBooking: React.FC<ActionBookingType> = ({
+  is_accepted,
+  visible,
+}) => {
   return is_accepted ? (
     <>
       <Popover content='Edit'>

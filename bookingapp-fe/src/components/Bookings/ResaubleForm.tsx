@@ -22,11 +22,13 @@ interface TypeSubmit {
   timeStart: moment.Moment | null;
   timeEnd: moment.Moment | null;
   rooms: Room[];
+  onCancel: () => void;
   users: DataType[] | null;
 }
 
 const ReusableForm: React.FC<TypeSubmit> = ({
   onSubmit,
+  onCancel,
   timeStart,
   timeEnd,
   rooms,
@@ -38,6 +40,11 @@ const ReusableForm: React.FC<TypeSubmit> = ({
     onSubmit(values);
     form.resetFields();
   };
+
+  const handleCancel = () => {
+    onCancel();
+    form.resetFields();
+  }
 
   return (
     <Form form={form} onFinish={handleSubmit} preserve={false}>
@@ -109,7 +116,7 @@ const ReusableForm: React.FC<TypeSubmit> = ({
       <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           htmlType='button'
-          onClick={() => form.resetFields()}
+          onClick={handleCancel}
           className = 'button'
         >
           Cancel

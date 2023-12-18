@@ -6,12 +6,12 @@ export const formatDate = (time: moment.MomentInput) => {
   return moment(time).format('DD/MM/YYYY');
 };
 
-export const timeStartWeek = () => {
-  return moment().startOf('week').format('YYYY-MM-DD');
+export const timeStartWeek = async () => {
+  return await moment().startOf('week').format('YYYY-MM-DD');
 };
 
-export const timeEndWeek = () => {
-  return moment().endOf('week').format('YYYY-MM-DD');
+export const timeEndWeek = async () => {
+  return await moment().endOf('week').format('YYYY-MM-DD');
 };
 export const formatMonth = (time: moment.MomentInput) => {
   return moment(time).format('YYYY-MM-DD HH:mm:ss');

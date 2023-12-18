@@ -9,8 +9,7 @@ const getCookie = (str: string) => {
     case 'name':
       return Cookies.get('name');
     default:
-      console.log('Not Found');
-      break;
+      throw new Error('Not Found Cookies');
   }
 };
 

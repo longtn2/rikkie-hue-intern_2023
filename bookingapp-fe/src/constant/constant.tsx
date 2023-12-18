@@ -86,12 +86,23 @@ export const statuTag = (item: BookingData) => {
     );
   }
 };
+
+export interface ActionBookingType {
+  is_accepted: boolean;
+  visible: (action: string, visible: boolean) => void;
+}
+
+export const firebaseConfig = {
+  apiKey: 'AIzaSyDeyU826NnvMNoFlXI-tN_qsBMbFkHwGf4',
+  authDomain: 'rikkei-intern-web-2023.firebaseapp.com',
+  projectId: 'rikkei-intern-web-2023',
+  storageBucket: 'rikkei-intern-web-2023.appspot.com',
+  messagingSenderId: '189121251757',
+  appId: '1:189121251757:web:f56e773f6eebe65601f924',
+  measurementId: 'G-9YR2Y5Q7HK',
+};
+
 export const HEADER = {
   Authorization: `Bearer ${token}`,
   'ngrok-skip-browser-warning': true,
 };
-
-export interface ActionBooking {
-  is_accepted : boolean;
-  visible: (action : string, visible : boolean) => void;
-}
