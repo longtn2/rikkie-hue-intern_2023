@@ -1,24 +1,24 @@
-import { DownOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, Menu, MenuProps, Modal, Space } from 'antd';
-import { Header } from 'antd/es/layout/layout';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
-import { getCookie } from '../../helper/Cookie';
-import ChangePassword from '../InfoUser/ChangePassword';
-import './Layout.css';
-import { handleErrorShow } from '../../ultils/ultilsApi';
-import { post } from '../../ultils/request';
+import { DownOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Button, Dropdown, Menu, MenuProps, Modal, Space } from "antd";
+import { Header } from "antd/es/layout/layout";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { getCookie } from "../../helper/Cookie";
+import ChangePassword from "../InfoUser/ChangePassword";
+import "./Layout.css";
+import { handleErrorShow } from "../../ultils/ultilsApi";
+import { post } from "../../ultils/request";
 
 const HeaderComponent = () => {
-  const role = getCookie('roles');
-  const name = getCookie('name');
+  const role = getCookie("roles");
+  const name = getCookie("name");
   const navigator = useNavigate();
   const [isopen, setIsOpen] = useState(false);
 
   const fetchLogout = async () => {
     try {
-      await post('/v1/logout', {});
+      await post("/v1/logout", {});
     } catch (error: any) {
       handleErrorShow(error);
     }
@@ -30,7 +30,7 @@ const HeaderComponent = () => {
     for (const cookie in cookies) {
       Cookies.remove(cookie);
     }
-    navigator('/login');
+    navigator("/login");
   };
   const handleChange = (status: boolean) => {
     setIsOpen(status);
@@ -39,56 +39,56 @@ const HeaderComponent = () => {
     handleChange(false);
   };
   const handleNavigate = (key: string) => {
-    if (key === 'logout') {
+    if (key === "logout") {
       handleLogout();
-    } else if (key === 'changepassword') {
+    } else if (key === "changepassword") {
       handleChange(true);
     } else {
       navigator(key);
     }
   };
-  const items: MenuProps['items'] = [
+  const items: MenuProps["items"] = [
     {
-      label: 'Infomaiton account',
+      label: "Infomaiton account",
       icon: <UserOutlined />,
-      key: 'informationaccount',
+      key: "informationaccount",
     },
     {
-      label: 'Change password',
+      label: "Change password",
       icon: <UserOutlined />,
-      key: 'changepassword',
+      key: "changepassword",
     },
     {
-      label: ' Logout',
+      label: " Logout",
       icon: <LogoutOutlined />,
-      key: 'logout',
+      key: "logout",
     },
   ];
   return (
     <>
-      <Header className='header-layout'>
+      <Header className="header-layout">
         <h1>BookingMeetingRoom</h1>
-        {!role.includes('admin') ? (
+        {!role.includes("admin") ? (
           <Menu
-            className='menu'
+            className="menu"
             onClick={({ key }) => {
               navigator(key);
             }}
-            theme='light'
-            mode='horizontal'
-            defaultSelectedKeys={['/']}
+            theme="light"
+            mode="horizontal"
+            defaultSelectedKeys={["/"]}
             items={[
               {
-                key: '/calendarmeeting',
-                label: 'Calendar',
+                key: "/calendarmeeting",
+                label: "Calendar",
               },
               {
-                key: '/bookingroom',
-                label: 'Booking room',
+                key: "/bookingroom",
+                label: "Booking room",
               },
               {
-                key: '/invitations',
-                label: 'Invitations',
+                key: "/invitations",
+                label: "Invitations",
               },
             ]}
           />
@@ -96,7 +96,7 @@ const HeaderComponent = () => {
           <></>
         )}
 
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: "flex" }}>
           <Dropdown
             overlay={
               <Menu
@@ -107,36 +107,30 @@ const HeaderComponent = () => {
                 items={items}
               />
             }
-            trigger={['click']}
+            trigger={["click"]}
             arrow
           >
-            <Button className='btn-account'>
-              <a
-                onClick={e => {
-                  e.preventDefault();
-                }}
-              >
-                <Space style={{ columnGap: 30 }}>
-                  <Avatar
-                    style={{ marginLeft: 0 }}
-                    src='https://xsgames.co/randomusers/avatar.php?g=pixel&key=1'
-                  />
-                  {name}
-                  <DownOutlined />
-                </Space>
-              </a>
+            <Button className="btn-account">
+              <Space style={{ columnGap: 30 }}>
+                <Avatar
+                  style={{ marginLeft: 0 }}
+                  src="https://xsgames.co/randomusers/avatar.php?g=pixel&key=1"
+                />
+                {name}
+                <DownOutlined />
+              </Space>
             </Button>
           </Dropdown>
         </div>
       </Header>
 
       <Modal
-        title='Change passwordpassword'
+        title="Change password"
         destroyOnClose={true}
         open={isopen}
         footer={[]}
         onCancel={handleCancel}
-        className='small-modal'
+        className="small-modal"
       >
         <ChangePassword onChange={handleChange} />
       </Modal>

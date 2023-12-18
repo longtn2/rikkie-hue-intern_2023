@@ -22,17 +22,22 @@ class PushNotification:
     @scheduler.task( trigger="cron", id="interval_1",minute="*")
     def scheduled_send():
         with app.app_context():
-            curent_time = datetime.now().replace(second=0, microsecond=0)
-            time_cooming= curent_time+ timedelta(minutes=10)
-            bookings=BookingExecutor.get_list_meeting_cooming(time_cooming)
+            current_time = datetime.now().replace(second=0, microsecond=0)
+            time_coming = current_time + timedelta(minutes=10)
+            bookings = BookingExecutor.get_list_meeting_cooming(time_coming)
+
             if bookings:
                 users = []
                 for booking in bookings:
-                    users.extend([booking_user.user for booking_user in booking.booking_user])  
-                    for user in users:
-                        if user.fcm_token:
-                            PushNotification.send_notification_reminder(
-                                fcm_token=user.fcm_token,
-                                message_title=booking.title,
-                                message_body="The meeting will take place in 10 minutes ")
-                        EmailSender.send_mail_reminder(booking, user) 
+                    booking_users = [booking_user.user for booking_user in booking.booking_user]
+                    users.extend([user for user in booking_users 
+                                if (attending := BookingExecutor.check_attending(
+                                    booking_id=booking.booking_id, 
+                                    user_id=user.user_id)) is None or attending])
+                for user in users:
+                    EmailSender.send_mail_reminder(booking, user)
+                    if user.fcm_token:
+                        PushNotification.send_notification_reminder(
+                            fcm_token = user.fcm_token,
+                            message_title = f"Reminder:{user.user_name} have {booking.title} Upcoming Meetings",
+                            message_body = "The meeting will take place in 10 minutes.")

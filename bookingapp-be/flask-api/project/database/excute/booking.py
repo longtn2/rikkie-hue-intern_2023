@@ -121,6 +121,7 @@ class BookingExecutor:
             Booking.deleted_at == None
             ).paginate( page=page, per_page=per_page, error_out=False)
         )
+        return bookings
     
     @staticmethod
     def user_view_list_booked(page: int, per_page: int, creator_id) -> List[Booking]:
@@ -151,6 +152,7 @@ class BookingExecutor:
             Booking.time_start <= end_date,
             Booking.room_id == room_id
         ).all()
+        return bookings
 
     @staticmethod    
     def view_list_invite(page: int, per_page: int, user_id: int) -> List[Booking]:
@@ -162,3 +164,20 @@ class BookingExecutor:
             BookingUser.user_id == user_id
         ).paginate(page=page, per_page=per_page, error_out=False)
         return bookings
+    
+    @staticmethod
+    def get_list_meeting_cooming(time_cooming: str):
+        bookings = Booking.query.filter(
+                Booking.is_deleted == False,
+                Booking.deleted_at == None,
+                Booking.time_start == (time_cooming)
+            ).all()
+        return bookings
+
+    @staticmethod 
+    def check_attending(booking_id: int, user_id: int):
+        booking_user = BookingUser.query.filter(
+            BookingUser.booking_id == booking_id,
+            BookingUser.user_id == user_id
+        ).first()
+        return booking_user.is_attending
