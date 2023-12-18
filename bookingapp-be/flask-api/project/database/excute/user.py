@@ -84,3 +84,22 @@ class UserExecutor:
     def check_existing_email(email: str):
         existing_email = User.query.filter(User.email == email).first()
         return existing_email
+    
+    @staticmethod
+    def get_list_user_by_role_name(role_name: str):
+        users = (User.query
+        .join(UserHasRole,User.user_id==UserHasRole.user_id)
+        .join(Role,UserHasRole.role_id==Role.role_id)
+        .filter(
+            Role.role_name==role_name, 
+            User.is_deleted==0).all()
+        )
+        return users
+    
+    @staticmethod
+    def search_list_user(page: int, per_page: int, search: str) : 
+        users = User.query.filter(User.is_deleted == False).filter(
+            (User.email.like(f'%{search}%')) |
+            (User.user_name.like(f'%{search}%'))
+        ).paginate(page=page, per_page=per_page, error_out=False)
+        return users
