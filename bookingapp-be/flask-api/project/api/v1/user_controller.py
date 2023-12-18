@@ -24,7 +24,7 @@ def view_list_user():
         result = UserService.get_list_users(page, per_page)
         return BaseResponse.success(result)
     except Exception as e:
-        raise InternalServerError() from e
+        raise NotFound() from e
 
 @user_blueprint.route('/users', methods=['POST'])
 @jwt_required()
@@ -72,7 +72,7 @@ def search_user_by_name_or_email():
         search = request.args.get('search')
         page = int(request.args.get('page', 1))
         per_page = int(request.args.get('per_page', 10))
-        response = UserService.search_list_user(page,per_page,search)
+        response = UserService.search_list_user(page, per_page, search)
         return response
     except NotFound as e:
         raise BaseResponse.error(e)

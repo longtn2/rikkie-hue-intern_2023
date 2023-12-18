@@ -5,6 +5,7 @@ from datetime import datetime
 from itertools import islice
 from sqlalchemy import or_
 from typing import Optional, Union, List, Tuple
+from werkzeug.exceptions import UnprocessableEntity, InternalServerError
 
 
 class RoomExecutor:
@@ -22,18 +23,18 @@ class RoomExecutor:
         return None
 
     @staticmethod
-    def get_room_by_name(room_name: str) -> Optional[Room]:
-        return Room.query.filter_by(room_name=room_name).first()
+    def get_room_by_name(room_name: str, room_id=None) -> Optional[Room]:
+        existing_room_name = Room.query.filter_by(room_name=room_name)
+        if room_id is not None:
+            existing_room_name = existing_room_name.filter(Room.room_id != room_id)
+        existing_room_name = existing_room_name.first()
+        return existing_room_name
 
     @staticmethod
-    def add_room(new_room: Union[Room, List[Room]]) -> None:
-        if isinstance(new_room, Room):
+    def add_room(new_room: object):
             db.session.add(new_room)
-        elif isinstance(new_room, list):
-            db.session.add_all(new_room)
-        else:
-            raise TypeError("Invalid type for new_room")
-    
+            db.session.commit()
+           
     @staticmethod
     def commit():
         db.session.commit()
@@ -104,7 +105,7 @@ class RoomExecutor:
         db.session.commit()
         
     @staticmethod
-    def search_rooms_in_db(page: int, per_page: int, search_name: Optional[str]) -> Tuple[List[Room], int, int]:
+    def filter_room_by_name(page: int, per_page: int, search_name: Optional[str]) -> Tuple[List[Room], int, int]:
         query = Room.query.filter(
             or_(Room.room_name.ilike(f"%{search_name}%")) if search_name else True,
             Room.is_blocked.is_(False)
