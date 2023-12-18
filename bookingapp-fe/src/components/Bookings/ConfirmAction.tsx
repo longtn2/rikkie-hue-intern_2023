@@ -1,5 +1,5 @@
-import { Modal } from "antd";
-import { BookingData } from "../../constant/constant";
+import { Modal } from 'antd';
+import { BookingData } from '../../constant/constant';
 
 const ConfirmAction = (
   key: string,

@@ -1,5 +1,6 @@
-import React from 'react';
-import { Form, Input, Button } from 'antd';
+import React, { useEffect } from 'react';
+import { Form, Input, Button, FormInstance, Row, Col } from 'antd';
+import CustomFormItem from './CustomFormItem';
 
 interface Room {
   room_id: number;
@@ -9,37 +10,64 @@ interface Room {
 }
 
 interface FormEdit {
-  initialValues: Room;
+  getInitialValues: () => Room | null;
   onFinish: (values: any) => void;
   onCancel: () => void;
+  form: FormInstance;
 }
 
 const FormEditRoom: React.FC<FormEdit> = ({
-  initialValues,
+  getInitialValues,
   onFinish,
   onCancel,
+  form,
 }) => {
-  const [form] = Form.useForm();
-
+  const initialValues: Room | null = getInitialValues();
+  useEffect(() => {
+    form.resetFields();
+    getInitialValues();
+  }, [initialValues]);
   const handleCancel = () => {
     onCancel();
     form.resetFields();
   };
 
+  const handelFinish = (values: any) => {
+    if (values) {
+      form.resetFields();
+      onFinish(values);
+    }
+  };
+
   return (
-    <Form form={form} initialValues={initialValues} onFinish={onFinish}>
-      <Form.Item name='room_name' label='Room Name: '>
-        <Input type='text' className='input' />
-      </Form.Item>
-      <Form.Item name='description' label='Description: '>
-        <Input type='text' className='input' />
-      </Form.Item>
-      <Form.Item>
-        <Button type='primary' htmlType='submit' className='btnClick'>
-          Save Changes
-        </Button>
-        <Button htmlType='button' onClick={handleCancel}>
+    <Form
+      form={form}
+      initialValues={{
+        room_name: initialValues?.room_name,
+        description: initialValues?.description,
+      }}
+      onFinish={handelFinish}
+      labelCol={{ span: 5 }}
+      labelAlign='left'
+      preserve={false}
+      wrapperCol={{ flex: 4 }}
+    >
+      <CustomFormItem
+        label='Room Name: '
+        name='room_name'
+        rules={[{ required: true, message: 'Room Name cannot required' }]}
+      />
+      <CustomFormItem
+        label='Description : '
+        name='description'
+        rules={[{ required: true, message: 'Description cannot required' }]}
+      />
+      <Form.Item className='action-btn'>
+        <Button htmlType='button' onClick={handleCancel} className='btn-right'>
           Cancel
+        </Button>
+        <Button type='primary' htmlType='submit'>
+          Update
         </Button>
       </Form.Item>
     </Form>
