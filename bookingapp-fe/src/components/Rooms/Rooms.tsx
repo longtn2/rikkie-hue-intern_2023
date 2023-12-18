@@ -16,7 +16,6 @@ import { url } from '../../ultils/urlApi';
 import { SearchOutlined } from '@ant-design/icons';
 import { EditOutlined } from '@ant-design/icons';
 import { handleErrorShow, handleSuccessShow } from '../../ultils/ultilsApi';
-import { HEADER } from '../../constant/constant';
 import './Room.css';
 import FormAddRoom from './FormAddRoom';
 import FormEditRoom from './FormEditRoom';
@@ -32,14 +31,23 @@ const { Search } = Input;
 
 const Rooms: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [form] = Form.useForm();
+  const [formAdd] = Form.useForm();
+  const [formEdit] = Form.useForm();
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(6);
+  const perPage = 6;
   const [totalRooms, setTotalRooms] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, [currentPage]);
+
+  useEffect(() => {
+    getInitalValues();
+  }, [selectedRoom]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -55,7 +63,6 @@ const Rooms: React.FC = () => {
       if (response?.data?.data) {
         setRooms(response.data.data.rooms);
         setTotalRooms(response.data.data.total_items);
-        setPerPage(response.data.data.per_page);
         setCurrentPage(response.data.data.current_page);
       }
     } catch (error: any) {
@@ -68,9 +75,6 @@ const Rooms: React.FC = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-  useEffect(() => {
-    fetchData();
-  }, [currentPage, totalRooms]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -107,7 +111,7 @@ const Rooms: React.FC = () => {
           headers: await getHeaders(),
         }
       );
-      if (response?.data?.data) {
+      if (response) {
         fetchData();
         handleSuccessShow(response);
       }
@@ -117,21 +121,21 @@ const Rooms: React.FC = () => {
     handleCancel();
   };
 
-  const handleEdit = (id: number, name: string) => {
+  const handleEdit = (id: number, name: string, description: string) => {
     setSelectedRoom({
       room_id: id,
       room_name: name,
-      description: '',
+      description: description,
       is_blocked: false,
     });
-    form.setFieldsValue({ room_name: name });
+    formEdit.setFieldsValue({ room_name: name, description: description });
     setShowEditModal(true);
   };
 
   const handleUpdate = async () => {
     try {
       setLoading(true);
-      const values = await form.validateFields();
+      const values = await formEdit.validateFields();
       if (selectedRoom) {
         const response = await axios.put(
           `${url}/v1/rooms/${selectedRoom.room_id}`,
@@ -140,7 +144,7 @@ const Rooms: React.FC = () => {
             headers: await getHeaders(),
           }
         );
-        if (response?.data?.data) {
+        if (response) {
           fetchData();
           setShowEditModal(false);
           handleSuccessShow(response);
@@ -170,7 +174,6 @@ const Rooms: React.FC = () => {
           handleSuccessShow(response);
           setRooms(response.data.data.rooms);
           setTotalRooms(response.data.data.total_items);
-          setPerPage(response.data.data.per_page);
           setCurrentPage(response.data.data.current_page);
         }
       } catch (error: any) {
@@ -179,20 +182,19 @@ const Rooms: React.FC = () => {
     }
   };
 
-  const handleSearchRoom = (values: string) => {
-    values ? handleSearch(values) : fetchData();
+  const getInitalValues = () => {
+    return selectedRoom || null;
   };
-
   return (
     <div className='container'>
       <Space className='search'>
         <Search
           placeholder='Search...'
           enterButton={<SearchOutlined />}
-          onSearch={handleSearchRoom}
+          onSearch={handleSearch}
         />
         <Button type='primary' onClick={handleShowAdd}>
-          Add New User
+          Add Rooms
         </Button>
       </Space>
       <div className='action'>
@@ -206,7 +208,15 @@ const Rooms: React.FC = () => {
           <List
             className='list'
             dataSource={rooms}
-            grid={{ gutter: 20, column: 3 }}
+            grid={{
+              gutter: [20, 20],
+              xs: 1,
+              sm: 2,
+              md: 3,
+              lg: 3,
+              xl: 3,
+              xxl: 3,
+            }}
             pagination={pagination}
             renderItem={room => (
               <List.Item className='listItem'>
@@ -220,7 +230,7 @@ const Rooms: React.FC = () => {
                     <p
                       style={{
                         color: room.is_blocked ? 'red' : 'black',
-                        fontSize: '20px',
+                        fontSize: '1.3rem',
                       }}
                     >
                       Trạng thái: {room.is_blocked ? 'Bận' : 'Rảnh'}
@@ -232,7 +242,11 @@ const Rooms: React.FC = () => {
                         <EditOutlined
                           className='btnClick'
                           onClick={() =>
-                            handleEdit(room.room_id, room.room_name)
+                            handleEdit(
+                              room.room_id,
+                              room.room_name,
+                              room.description || ''
+                            )
                           }
                         />
                       </Popover>
@@ -258,7 +272,8 @@ const Rooms: React.FC = () => {
         footer={null}
       >
         <FormEditRoom
-          initialValues={selectedRoom ? { ...selectedRoom } : ({} as Room)}
+          form={formAdd}
+          getInitialValues={getInitalValues}
           onFinish={handleUpdate}
           onCancel={handleCloseEditModal}
         />
@@ -270,7 +285,11 @@ const Rooms: React.FC = () => {
         onCancel={handleCancel}
         footer={null}
       >
-        <FormAddRoom onFinish={handleAddRoom} onCancel={handleCancel} />
+        <FormAddRoom
+          onFinish={handleAddRoom}
+          onCancel={handleCancel}
+          form={formAdd}
+        />
       </Modal>
     </div>
   );

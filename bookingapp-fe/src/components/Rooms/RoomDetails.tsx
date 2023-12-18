@@ -86,7 +86,7 @@ const RoomDetails = () => {
           headers: await getHeaders(),
         }
       );
-      if (response?.data?.data) {
+      if (response) {
         fetchRoomId(roomId);
         handleSuccessShow(response);
         handleModal(false, '', 'look');
@@ -110,10 +110,10 @@ const RoomDetails = () => {
           headers: await getHeaders(),
         }
       );
-      if(response?.data?.data){
+      if (response) {
         fetchRoomId(roomId);
-      handleSuccessShow(response);
-      handleModal(false, '', 'look');
+        handleSuccessShow(response);
+        handleModal(false, '', 'look');
       }
     } catch (error: any) {
       handleErrorShow(error);
@@ -157,7 +157,7 @@ const RoomDetails = () => {
             <div>
               <Text>Bạn có muốn mở lại phòng này không</Text>
               <Button
-                onClick={() => handleModal(true, room?.description, 'look')}
+                onClick={() => handleModal(true, room?.description, 'open')}
                 className='btnClick'
                 type='primary'
               >
@@ -174,7 +174,7 @@ const RoomDetails = () => {
             </div>
           }
           visible={open}
-          onOk={() => handleModal(true, room!.description, 'open')}
+          onOk={() => handleModal(true, room!.description, 'look')}
           okText='Look'
           onCancel={handleModalClose}
           cancelText='Cancel'

@@ -4,9 +4,9 @@
 }
 
 .search {
-  margin-bottom: 20;
+  margin-bottom: 20px;
   justify-content: space-between;
-  column-gap: 20;
+  column-gap: 20px;
   width: 100%;
   margin-bottom: 6%;
 }
@@ -16,7 +16,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 24px;
+  font-size: 4vw;
   color: #ff0000;
 }
 
@@ -35,7 +35,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 
 .listItem .room-card {
@@ -43,13 +43,10 @@
   color: #333333;
 }
 
-
-
 .room-action {
   border-bottom: 2px solid #dadada;
   border-radius: 1rem;
 }
-
 
 .edit {
   margin-bottom: 10px;
@@ -59,7 +56,7 @@
   text-align: center;
 }
 
-.Input {
+.input {
   padding: 10px 20px;
 }
 
@@ -90,4 +87,42 @@
 
 .text {
   margin-bottom: 8px;
+  font-size: 2rem;
+}
+
+.action-btn {
+  display: flex;
+  justify-content: flex-end;
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+.action-btn .button-left {
+  margin-right: 10%;
+}
+.room-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.room-form .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.room-form .ant-form-item-label {
+  display: flex;
+  align-items: center;
+}
+
+.room-form .ant-form-item-label > label {
+  margin-bottom: 0;
+}
+
+.room-form .ant-form-item-control {
+  flex-grow: 1;
+}
+
+.form-item-input {
+  margin-left: 1rem;
+  max-width: 250px;
 }

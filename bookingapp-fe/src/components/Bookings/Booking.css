@@ -85,35 +85,34 @@
 .list-user {
   margin-top: 10px;
 }
-.item-booking-wait .ant-card-body{
-    padding: 15px;
+.item-booking-wait .ant-card-body {
+  padding: 15px;
 }
-.info-booking-wait{
-    display: flex;
-    justify-content: center;
+.info-booking-wait {
+  display: flex;
+  justify-content: center;
 }
-.detail-booking-wait{
-    width: 900px;
+.detail-booking-wait {
+  width: 900px;
 }
-.group-btn-action{
-    display: flex;
-    align-items: center;
+.group-btn-action {
+  display: flex;
+  align-items: center;
 }
-.btn-action{
-    display: flex;
-    width: 100px;
-    margin-left: 30px;
-    justify-content: center;
-    color: white;
-
+.btn-action {
+  display: flex;
+  width: 100px;
+  margin-left: 30px;
+  justify-content: center;
+  color: white;
 }
-.title-booking-wait{
-    font-size: 27px;
-    justify-content: center;
-    display: flex;
+.title-booking-wait {
+  font-size: 27px;
+  justify-content: center;
+  display: flex;
 }
-.list-user{
-    margin-top: 10px;
+.list-user {
+  margin-top: 10px;
 }
 
 .listWeek {
@@ -256,4 +255,20 @@
 }
 .btn--reject {
   background-color: #ff0000;
+}
+
+.time-grid-week {
+  width: 100%;
+  font-size: 100%;
+  padding-left: 8%;
+}
+
+.full-calendar {
+  width: 100%;
+  height: 100%;
+  position: unset;
+  overflow: hidden;
+}
+.fc-event-main {
+  cursor: move;
 }

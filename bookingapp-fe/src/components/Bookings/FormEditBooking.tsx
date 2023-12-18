@@ -1,42 +1,78 @@
-import { Form, Select, DatePicker, Input, Button, Modal } from 'antd';
-import moment from 'moment';
+import { Form, Select, DatePicker, Input, Button, FormInstance } from 'antd';
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 import './Booking.css';
-import {
-  BookingDataCalendar,
-  BookingDataApi,
-  DataType,
-} from '../../constant/constant';
+import { BookingDataCalendar, BookingDataApi } from '../../constant/constant';
+
 interface FormEditBooking {
   onFinish: (values: BookingDataApi) => void;
-  initialValues: BookingDataCalendar | null;
+  getInitialValues: () => BookingDataCalendar | null;
   onCancel: () => void;
   users: DataType[] | null;
+  form: FormInstance;
+}
+
+interface DataType {
+  user_id: number;
+  role_id: number[];
+  user_name: string;
+  role_name: string[];
+  phone_number: string;
+  email: string;
 }
 
 const FormEditBooking: React.FC<FormEditBooking> = ({
   onFinish,
   onCancel,
-  initialValues,
+  getInitialValues,
   users,
+  form,
 }) => {
-  const [form] = Form.useForm();
+  const initialValues: BookingDataCalendar | null = getInitialValues();
+  const [timeStart, setTimeStart] = useState<dayjs.Dayjs | null>(
+    initialValues?.start ? dayjs(initialValues.start) : null
+  );
+  const [timeEnd, setTimeEnd] = useState<dayjs.Dayjs | null>(
+    initialValues?.end ? dayjs(initialValues.end) : null
+  );
+
+  useEffect(() => {
+    getInitialValues();
+    form.resetFields();
+    setTimeStart(initialValues?.start ? dayjs(initialValues.start) : null);
+    setTimeEnd(initialValues?.end ? dayjs(initialValues.end) : null);
+  }, [getInitialValues]);
 
   const handleCancel = () => {
     onCancel();
-    form.resetFields();
+  };
+
+  const handleFinish = (values: any) => {
+    const updatedValues = {
+      ...values,
+      time_start: timeStart ? timeStart.format('YYYY-MM-DD HH:mm') : null,
+      time_end: timeEnd ? timeEnd.format('YYYY-MM-DD HH:mm') : null,
+    };
+    onFinish(updatedValues);
+  };
+
+  const handleTimeStartChange = (value: dayjs.Dayjs | null) => {
+    setTimeStart(value ? dayjs(value) : null);
+  };
+
+  const handleTimeEndChange = (value: dayjs.Dayjs | null) => {
+    setTimeEnd(value ? dayjs(value) : null);
   };
 
   return (
     <>
       <Form
         form={form}
-        onFinish={onFinish}
+        onFinish={handleFinish}
         initialValues={{
           user_ids: initialValues?.user_ids,
           user_names: initialValues?.user_names,
           room_id: initialValues?.room_id,
-          time_start: moment(initialValues?.start),
-          time_end: moment(initialValues?.end),
           title: initialValues?.title,
         }}
         preserve={false}
@@ -71,11 +107,14 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
               message: 'Time start is not required',
             },
           ]}
+          initialValue={dayjs(initialValues?.start)}
         >
           <DatePicker
             showTime
             format='YYYY-MM-DD HH:mm'
             placeholder='Select start time'
+            value={timeStart}
+            onChange={handleTimeStartChange}
           />
         </Form.Item>
         <Form.Item
@@ -87,11 +126,14 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
               message: 'Time end is not required',
             },
           ]}
+          initialValue={dayjs(initialValues?.end)}
         >
           <DatePicker
             showTime
             format='YYYY-MM-DD HH:mm'
             placeholder='Select end time'
+            value={timeEnd}
+            onChange={handleTimeEndChange}
           />
         </Form.Item>
         <Form.Item
@@ -122,4 +164,5 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
     </>
   );
 };
+
 export default FormEditBooking;

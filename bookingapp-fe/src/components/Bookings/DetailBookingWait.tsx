@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { BookingData, DataType, HEADER } from "../../constant/constant";
-import { Card, Modal, Spin, Table } from "antd";
-import "./Booking.css";
-import axios from "axios";
-import { url } from "../../ultils/urlApi";
-import { ColumnsType } from "antd/es/table";
-import { handleErrorShow } from "../../ultils/ultilsApi";
-import InfoInvitation from "./InfoInvitation";
-import BtnAccept from "./BtnAccept";
-import BtnReject from "./BtnReject";
+import React, { useEffect, useState } from 'react';
+import { BookingData, DataType, HEADER } from '../../constant/constant';
+import { Card, Spin, Table } from 'antd';
+import './Booking.css';
+import axios from 'axios';
+import { url } from '../../ultils/urlApi';
+import { ColumnsType } from 'antd/es/table';
+import { handleErrorShow } from '../../ultils/ultilsApi';
+import InfoInvitation from './InfoInvitation';
+import BtnAccept from './BtnAccept';
+import BtnReject from './BtnReject';
 interface DetailBookingWaitProps {
-  selectBooking: BookingData | undefined ;
+  selectBooking: BookingData | undefined;
   handleAction: (selectBooking: BookingData, key: string) => void;
 }
 const DetailBookingWait: React.FC<DetailBookingWaitProps> = ({
@@ -46,35 +46,35 @@ const DetailBookingWait: React.FC<DetailBookingWaitProps> = ({
   };
   const columns: ColumnsType<DataType> = [
     {
-      align: "center",
-      title: "User ID",
-      key: "user_id",
-      dataIndex: "user_id",
+      align: 'center',
+      title: 'User ID',
+      key: 'user_id',
+      dataIndex: 'user_id',
     },
     {
-align: "center",
-      title: "User Name",
-      dataIndex: "user_name",
-      key: "user_name",
+      align: 'center',
+      title: 'User Name',
+      dataIndex: 'user_name',
+      key: 'user_name',
     },
     {
-      align: "center",
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
+      align: 'center',
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
     },
     {
-      align: "center",
-      title: "Phone Number",
-      dataIndex: "phone_number",
-      key: "phone_number",
+      align: 'center',
+      title: 'Phone Number',
+      dataIndex: 'phone_number',
+      key: 'phone_number',
     },
   ];
   const handleSelectAction = (selectBooking: BookingData, key: string) => {
     if (selectBooking) {
-      key === "accept"
-        ? handleAction(selectBooking, "accept")
-        : handleAction(selectBooking, "reject");
+      key === 'accept'
+        ? handleAction(selectBooking, 'accept')
+        : handleAction(selectBooking, 'reject');
     }
   };
 
@@ -82,36 +82,36 @@ align: "center",
     <div>
       <Spin
         spinning={loading}
-        size="large"
-        tip="Loading..."
-        className="spin-loading"
+        size='large'
+        tip='Loading...'
+        className='spin-loading'
       >
         <Card
-          className="item-booking-wait"
+          className='item-booking-wait'
           key={selectBooking!.title}
           title={
-            <div className="title-booking-wait">{selectBooking!.title}</div>
+            <div className='title-booking-wait'>{selectBooking!.title}</div>
           }
         >
-          <div className="info-booking-wait">
+          <div className='info-booking-wait'>
             <InfoInvitation data={selectBooking} />
-            <div className="container-btn">
+            <div className='container-btn'>
               <BtnAccept
                 selectBooking={selectBooking}
                 handleSelectAction={async () =>
-                  handleSelectAction(selectBooking!, "accept")
+                  handleSelectAction(selectBooking!, 'accept')
                 }
               />
               <BtnReject
                 selectBooking={selectBooking}
                 handleSelectAction={async () =>
-                  handleSelectAction(selectBooking!, "reject")
+                  handleSelectAction(selectBooking!, 'reject')
                 }
               />
             </div>
           </div>
         </Card>
-        <Table className="list-user" columns={columns} dataSource={listUsers} />
+        <Table className='list-user' columns={columns} dataSource={listUsers} />
       </Spin>
     </div>
   );
