@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BookingData, DataType, HEADER } from "../../constant/constant";
-import { Card, Modal, Spin, Table } from "antd";
+import { Card, Col, Modal, Row, Spin, Table } from "antd";
 import "./Booking.css";
 import axios from "axios";
 import { url } from "../../ultils/urlApi";
@@ -10,7 +10,7 @@ import InfoInvitation from "./InfoInvitation";
 import BtnAccept from "./BtnAccept";
 import BtnReject from "./BtnReject";
 interface DetailBookingWaitProps {
-  selectBooking: BookingData | undefined ;
+  selectBooking: BookingData | undefined;
   handleAction: (selectBooking: BookingData, key: string) => void;
 }
 const DetailBookingWait: React.FC<DetailBookingWaitProps> = ({
@@ -52,7 +52,7 @@ const DetailBookingWait: React.FC<DetailBookingWaitProps> = ({
       dataIndex: "user_id",
     },
     {
-align: "center",
+      align: "center",
       title: "User Name",
       dataIndex: "user_name",
       key: "user_name",
@@ -95,20 +95,24 @@ align: "center",
         >
           <div className="info-booking-wait">
             <InfoInvitation data={selectBooking} />
-            <div className="container-btn">
-              <BtnAccept
-                selectBooking={selectBooking}
-                handleSelectAction={async () =>
-                  handleSelectAction(selectBooking!, "accept")
-                }
-              />
-              <BtnReject
-                selectBooking={selectBooking}
-                handleSelectAction={async () =>
-                  handleSelectAction(selectBooking!, "reject")
-                }
-              />
-            </div>
+            <Row className="container-btn">
+              <Col>
+                <BtnAccept
+                  selectBooking={selectBooking}
+                  handleSelectAction={async () =>
+                    handleSelectAction(selectBooking!, "accept")
+                  }
+                />
+              </Col>
+              <Col>
+                <BtnReject
+                  selectBooking={selectBooking}
+                  handleSelectAction={async () =>
+                    handleSelectAction(selectBooking!, "reject")
+                  }
+                />
+              </Col>
+            </Row>
           </div>
         </Card>
         <Table className="list-user" columns={columns} dataSource={listUsers} />

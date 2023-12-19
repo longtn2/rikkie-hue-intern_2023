@@ -13,9 +13,10 @@ const BtnReject: React.FC<BtnProps> = ({
   return (
     <Button
       className="btn-action btn--reject"
+      type="text"
       onClick={() => handleSelectAction(selectBooking!, "reject")}
     >
-      VIEW DETAIL
+      REJECT
     </Button>
   );
 };
