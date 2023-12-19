@@ -32,6 +32,13 @@ const FormEditRoom: React.FC<FormEdit> = ({
     form.resetFields();
   };
 
+  const handelFinish = (values: any) => {
+    if (values) {
+      form.resetFields();
+      onFinish(values);
+    }
+  };
+
   return (
     <Form
       form={form}
@@ -39,7 +46,7 @@ const FormEditRoom: React.FC<FormEdit> = ({
         room_name: initialValues?.room_name,
         description: initialValues?.description,
       }}
-      onFinish={onFinish}
+      onFinish={handelFinish}
       labelCol={{ span: 5 }}
       labelAlign='left'
       preserve={false}

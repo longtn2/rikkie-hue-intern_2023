@@ -16,13 +16,19 @@ const RoomModalContent: React.FC<RoomModalContentProps> = ({ room }) => {
   return (
     <Card className='card'>
       <div className='text'>
-        <Text strong>Room ID: {room?.room_id}</Text>
+        <Text className='text-content' strong>
+          Room ID: {room?.room_id}
+        </Text>
       </div>
       <div className='text'>
-        <Text strong>Status: {room?.is_blocked ? 'Active' : 'Inactive'}</Text>
+        <Text strong className='text-content'>
+          Status: {room?.is_blocked ? 'Active' : 'Inactive'}
+        </Text>
       </div>
       <div className='text'>
-        <Text strong>Description:</Text> {room?.description}
+        <Text className='text-content' strong>
+          Description: {room?.description}
+        </Text>
       </div>
     </Card>
   );

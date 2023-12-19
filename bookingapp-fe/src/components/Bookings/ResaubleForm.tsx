@@ -78,7 +78,14 @@ const ReusableForm: React.FC<TypeSubmit> = ({
     form.resetFields();
   };
   return (
-    <Form form={form} onFinish={handleSubmit} preserve={false}>
+    <Form
+      form={form}
+      onFinish={handleSubmit}
+      preserve={false}
+      labelCol={{ span: 5 }}
+      labelAlign='left'
+      wrapperCol={{ flex: 4 }}
+    >
       <Form.Item
         name='room_id'
         label='Room'
@@ -123,6 +130,8 @@ const ReusableForm: React.FC<TypeSubmit> = ({
           showTime
           format='YYYY-MM-DD HH:mm'
           placeholder='Select start time'
+          picker='date'
+          allowClear={true}
           value={startTime}
           onChange={handleTimeStartChange}
         />
@@ -137,6 +146,8 @@ const ReusableForm: React.FC<TypeSubmit> = ({
           showTime
           format='YYYY-MM-DD HH:mm'
           placeholder='Select end time'
+          picker='date'
+          allowClear={true}
           value={endTime}
           onChange={handleTimeEndChange}
         />

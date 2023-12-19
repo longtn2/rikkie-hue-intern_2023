@@ -20,10 +20,12 @@ import './Room.css';
 import FormAddRoom from './FormAddRoom';
 import FormEditRoom from './FormEditRoom';
 import { getHeaders } from '../../helper/Header';
+import RoomDetails from './RoomDetails';
+import Title from 'antd/es/typography/Title';
 interface Room {
   room_id: number;
   room_name: string;
-  description: string | null;
+  description: string;
   is_blocked: boolean;
 }
 
@@ -40,15 +42,17 @@ const Rooms: React.FC = () => {
   const perPage = 6;
   const [totalRooms, setTotalRooms] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [roomId, setRoomId] = useState<Room>();
+  const [visibleModal, setVisibleModal] = useState<boolean>(false);
 
   useEffect(() => {
     fetchData();
   }, [currentPage]);
 
   useEffect(() => {
+    handleDataRoomId();
     getInitalValues();
-  }, [selectedRoom]);
-
+  }, [roomId?.room_id]);
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -64,6 +68,80 @@ const Rooms: React.FC = () => {
         setRooms(response.data.data.rooms);
         setTotalRooms(response.data.data.total_items);
         setCurrentPage(response.data.data.current_page);
+      }
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRoomId = async (roomId: number) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${url}/v1/rooms/${roomId}`, {
+        withCredentials: true,
+        headers: await getHeaders(),
+      });
+      if (response?.data?.data) {
+        setRoomId(response.data.data);
+      }
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleRoomId = (id: number) => {
+    fetchRoomId(id);
+    setVisibleModal(true);
+  };
+
+  const handleDataRoomId = () => {
+    return roomId || null;
+  };
+  const handleLookRoom = async (description: string | undefined) => {
+    try {
+      setLoading(true);
+      if (roomId?.room_id && description) {
+        const response = await axios.put(
+          `${url}/v1/rooms/${roomId?.room_id}/blocked`,
+          {
+            description: description,
+          },
+          {
+            headers: await getHeaders(),
+          }
+        );
+        if (response) {
+          fetchRoomId(roomId?.room_id);
+          handleSuccessShow(response);
+        }
+      }
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenRoom = async (description: string | undefined) => {
+    try {
+      setLoading(true);
+      if (roomId?.room_id && description) {
+        const response = await axios.put(
+          `${url}/v1/rooms/${roomId?.room_id}/opened`,
+          {
+            description: description,
+          },
+          {
+            headers: await getHeaders(),
+          }
+        );
+        if (response) {
+          fetchRoomId(roomId?.room_id);
+          handleSuccessShow(response);
+        }
       }
     } catch (error: any) {
       handleErrorShow(error);
@@ -132,14 +210,17 @@ const Rooms: React.FC = () => {
     setShowEditModal(true);
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (values: any) => {
     try {
       setLoading(true);
-      const values = await formEdit.validateFields();
       if (selectedRoom) {
         const response = await axios.put(
           `${url}/v1/rooms/${selectedRoom.room_id}`,
-          { room_name: values.room_name, description: values.description },
+          {
+            ...values,
+            room_name: values.room_name,
+            description: values.description,
+          },
           {
             headers: await getHeaders(),
           }
@@ -181,7 +262,9 @@ const Rooms: React.FC = () => {
       }
     }
   };
-
+  const handleCancelRoomId = () => {
+    setVisibleModal(false);
+  };
   const getInitalValues = () => {
     return selectedRoom || null;
   };
@@ -222,11 +305,14 @@ const Rooms: React.FC = () => {
               <List.Item className='listItem'>
                 <div key={room.room_id} className='room-card'>
                   <div className='room-info'>
-                    <h2>
-                      <Link to={`/roomManager/${room.room_id}`}>
+                    <div
+                      className='room-info-title'
+                      onClick={() => handleRoomId(room.room_id)}
+                    >
+                      <Title level={3} style={{ color: '#1677FF' }}>
                         {room.room_name}
-                      </Link>
-                    </h2>
+                      </Title>
+                    </div>
                     <p
                       style={{
                         color: room.is_blocked ? 'red' : 'black',
@@ -291,6 +377,15 @@ const Rooms: React.FC = () => {
           form={formAdd}
         />
       </Modal>
+
+      {visibleModal && (
+        <RoomDetails
+          getRoom={handleDataRoomId}
+          onCancel={handleCancelRoomId}
+          onAction={roomId?.is_blocked ? handleOpenRoom : handleLookRoom}
+          loading={loading}
+        />
+      )}
     </div>
   );
 };

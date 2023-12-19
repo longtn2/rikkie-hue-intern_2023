@@ -1,5 +1,6 @@
-import React from 'react';
-import { Modal, Form, Input, Button, Typography } from 'antd';
+import React, { useState } from 'react';
+import { Modal, Form, Input, Button, Typography, FormInstance } from 'antd';
+
 const { Title } = Typography;
 
 interface FormConfigItem {
@@ -14,6 +15,8 @@ interface CustomModalProps {
   formId: string;
   formConfig: FormConfigItem[];
   onFinish: (values: any) => void;
+  initialValues: string | undefined;
+  form: FormInstance;
 }
 
 const CustomModal: React.FC<CustomModalProps> = ({
@@ -22,24 +25,29 @@ const CustomModal: React.FC<CustomModalProps> = ({
   onCancel,
   formId,
   formConfig,
+  initialValues,
   onFinish,
+  form,
 }) => {
-  const [form] = Form.useForm();
+  const [success, setSuccess] = useState(false);
 
-  const handleFinish = () => {
-    form.validateFields().then(values => {
-      form.resetFields();
-      onFinish(values);
-    });
+  const handleFinish = (values: string) => {
+    onFinish(values);
+    setSuccess(true);
+  };
+
+  const handleCloseModal = () => {
+    setSuccess(false);
+    onCancel();
   };
 
   return (
     <Modal
       title={<Title level={2}>{title}</Title>}
-      visible={visible}
-      onCancel={onCancel}
+      visible={visible && !success}
+      onCancel={handleCloseModal}
       footer={[
-        <Button key='cancel' onClick={onCancel}>
+        <Button key='cancel' onClick={handleCloseModal}>
           Cancel
         </Button>,
         <Button key='submit' type='primary' form={formId} htmlType='submit'>
@@ -53,7 +61,8 @@ const CustomModal: React.FC<CustomModalProps> = ({
             key={item.name}
             name={item.name}
             label={item.label}
-            rules={[{ required: true, message: `Please enter ${item.label} ` }]}
+            rules={[{ required: true, message: `Please enter ${item.label}` }]}
+            initialValue={initialValues}
           >
             <Input type='text' />
           </Form.Item>
@@ -62,4 +71,5 @@ const CustomModal: React.FC<CustomModalProps> = ({
     </Modal>
   );
 };
+
 export default CustomModal;

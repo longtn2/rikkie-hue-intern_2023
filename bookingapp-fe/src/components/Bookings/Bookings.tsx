@@ -284,6 +284,8 @@ const CalendarBooking = () => {
     } catch (error: any) {
       handleErrorShow(error);
       fetchBookingData(startDate, endDate);
+    } finally {
+      setModalShow(false);
     }
   };
 
@@ -466,27 +468,23 @@ const CalendarBooking = () => {
 
       <ModalConfirm
         title={
-          <>
+          <div className='modal-confirm'>
             <Typography.Title level={2} className='title-modal'>
               Update Booking
             </Typography.Title>
             <div className='modal-container-title'>
-              <div className='modal-title-div'>
-                Title:
-                <Typography.Title level={5}>
-                  {selectedBookingData?.title}
-                </Typography.Title>
-              </div>
+              <label className='modal-label'>Title:</label>
+              <Space className='modal-value'>
+                {selectedBookingData?.title}
+              </Space>
             </div>
             <div className='modal-container-title'>
-              <div className='modal-title-div'>
-                Room Name:
-                <Typography.Title level={5}>
-                  {selectedBookingData?.room_name}
-                </Typography.Title>
-              </div>
+              <label className='modal-label'>Room Name:</label>
+              <Space className='modal-value'>
+                {selectedBookingData?.room_name}
+              </Space>
             </div>
-          </>
+          </div>
         }
         visible={isEditing ? true : false}
         onCancel={() => visibleModal('edit', false)}

@@ -70,6 +70,27 @@
   align-items: flex-start;
 }
 
+.modal-title {
+  display: flex;
+  align-items: center;
+}
+
+.text {
+  margin-left: 1.5rem;
+}
+
+.text-content {
+  font-size: 1.2rem;
+}
+
+.btnClick {
+  margin-top: 16px;
+  margin-right: 1rem;
+}
+.modal-title Title {
+  font-size: 1.5rem;
+}
+
 .customBtn {
   background-color: #ff0000;
   color: white;
@@ -77,17 +98,21 @@
 
 .card {
   width: 100%;
-}
-
-.body-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  max-width: 400px;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
 }
 
 .text {
-  margin-bottom: 8px;
-  font-size: 2rem;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+@media (max-width: 576px) {
+  .card {
+    max-width: 100%;
+  }
 }
 
 .action-btn {
@@ -125,4 +150,22 @@
 .form-item-input {
   margin-left: 1rem;
   max-width: 250px;
+}
+
+.modal-subtitle {
+  margin-bottom: 10px;
+}
+
+.modal-extra {
+  display: flex;
+  align-items: center;
+}
+
+.modal-extra-text {
+  margin-right: 10px;
+  text-align: center;
+}
+
+.modal-extra-button {
+  margin-top: 16px;
 }

@@ -76,6 +76,9 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
           title: initialValues?.title,
         }}
         preserve={false}
+        labelCol={{ span: 5 }}
+        labelAlign='left'
+        wrapperCol={{ flex: 4 }}
       >
         <Form.Item
           name='user_ids'
@@ -112,6 +115,8 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
           <DatePicker
             showTime
             format='YYYY-MM-DD HH:mm'
+            allowClear={true}
+            picker='date'
             placeholder='Select start time'
             value={timeStart}
             onChange={handleTimeStartChange}
@@ -131,6 +136,8 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
           <DatePicker
             showTime
             format='YYYY-MM-DD HH:mm'
+            allowClear={true}
+            picker='date'
             placeholder='Select end time'
             value={timeEnd}
             onChange={handleTimeEndChange}
