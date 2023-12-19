@@ -1,7 +1,8 @@
-import { Tag } from 'antd';
-import getCookie from '../Route/Cookie';
+import { Tag } from "antd";
+import getCookie from "../Route/Cookie";
+import { useState } from "react";
 
-export const TYPE_USER = { ADMIN: 'admin' };
+export const TYPE_USER = { ADMIN: "admin" };
 export interface DataType {
   user_id: number;
   role_id: number[];
@@ -62,25 +63,25 @@ export interface Room {
   is_blocked: boolean;
 }
 
-export const token = getCookie('token');
-export const roles = getCookie('roles');
+export const token = getCookie("token");
+export const roles = getCookie("roles");
 
 export const statuTag = (item: BookingData) => {
   if (item.is_deleted) {
     return (
-      <Tag className='status-tag' color='#ff0000'>
+      <Tag className="status-tag" color="#ff0000">
         Rejected
       </Tag>
     );
   } else if (item.is_eccept) {
     return (
-      <Tag className='status-tag' color='#009900'>
+      <Tag className="status-tag" color="#009900">
         Successed
       </Tag>
     );
   } else {
     return (
-      <Tag className='status-tag' color='#ff9933'>
+      <Tag className="status-tag" color="#ff9933">
         Pending
       </Tag>
     );
@@ -93,16 +94,28 @@ export interface ActionBookingType {
 }
 
 export const firebaseConfig = {
-  apiKey: 'AIzaSyDeyU826NnvMNoFlXI-tN_qsBMbFkHwGf4',
-  authDomain: 'rikkei-intern-web-2023.firebaseapp.com',
-  projectId: 'rikkei-intern-web-2023',
-  storageBucket: 'rikkei-intern-web-2023.appspot.com',
-  messagingSenderId: '189121251757',
-  appId: '1:189121251757:web:f56e773f6eebe65601f924',
-  measurementId: 'G-9YR2Y5Q7HK',
+  apiKey: "AIzaSyDeyU826NnvMNoFlXI-tN_qsBMbFkHwGf4",
+  authDomain: "rikkei-intern-web-2023.firebaseapp.com",
+  projectId: "rikkei-intern-web-2023",
+  storageBucket: "rikkei-intern-web-2023.appspot.com",
+  messagingSenderId: "189121251757",
+  appId: "1:189121251757:web:f56e773f6eebe65601f924",
+  measurementId: "G-9YR2Y5Q7HK",
 };
 
 export const HEADER = {
   Authorization: `Bearer ${token}`,
-  'ngrok-skip-browser-warning': true,
+  "ngrok-skip-browser-warning": true,
+};
+export const ChangePageSize = () => {
+  const [perPage, setPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handlePageSizeChange = (pageSize: number) => {
+    const newPerPage = pageSize;
+    const newCurrentPage =
+      Math.ceil(((currentPage - 1) * perPage) / newPerPage) + 1;
+    setCurrentPage(newCurrentPage);
+  };
+  return { handlePageSizeChange };
 };

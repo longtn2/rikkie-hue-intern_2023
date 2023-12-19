@@ -1,16 +1,17 @@
 import { Tag, Space, Modal, Button, Spin } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 import { url } from "../../ultils/urlApi";
 import FormAdd from "./FormAdd";
-import { DataType, HEADER, TYPE_USER } from "../../constant/constant";
 import {
-  DeleteOutlined,
-  EditOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+  ChangePageSize,
+  DataType,
+  HEADER,
+  TYPE_USER,
+} from "../../constant/constant";
+import { DeleteTwoTone, EditTwoTone, SearchOutlined } from "@ant-design/icons";
 import Search from "antd/es/input/Search";
 import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 import FormEdit from "./FormEdit";
@@ -21,7 +22,7 @@ const UsersManager = () => {
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<DataType>();
-  const [perPage, setPerPage] = useState(0);
+  const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,7 +33,7 @@ const UsersManager = () => {
     setLoading(true);
     try {
       await axios
-        .get(url + "/v1/users", {
+        .get(`${url}/v1/users`, {
           params: {
             page: currentPage,
             per_page: perPage,
@@ -57,7 +58,7 @@ const UsersManager = () => {
     } else {
       try {
         await axios
-          .get(url + "/v1/users/search", {
+          .get(`${url}/v1/users/search`, {
             params: {
               search: value,
             },
@@ -84,15 +85,14 @@ const UsersManager = () => {
     }
   };
 
-  const handleDelete = (_id: any) => {
+  const handleDelete = () => {
     if (selectedUser) {
       try {
         axios
-          .delete(url + "/v1/users/" + selectedUser.user_id, {
+          .delete(`${url}/v1/users/${selectedUser.user_id}`, {
             headers: HEADER,
           })
           .then((response) => {
-            setListUsers(response?.data?.data?.users);
             handleSuccessShow(response);
             setIsModalDeleteOpen(false);
             getData();
@@ -102,23 +102,15 @@ const UsersManager = () => {
       }
     }
   };
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-  };
-
-  const handlePageSizeChange = (pageSize: number) => {
-    const newPerPage = pageSize;
-    const newCurrentPage =
-      Math.ceil(((currentPage - 1) * perPage) / newPerPage) + 1;
-    setCurrentPage(newCurrentPage);
   };
   const pagination = {
     current: currentPage,
     pageSize: perPage,
     total: totalItems,
     onChange: handlePageChange,
-    onShowSizeChange: handlePageSizeChange,
+    onShowSizeChange: ChangePageSize,
   };
   const columns: ColumnsType<DataType> = [
     {
@@ -138,17 +130,20 @@ const UsersManager = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      responsive: ["sm"],
     },
     {
       align: "center",
       title: "Phone Number",
       dataIndex: "phone_number",
       key: "phone_number",
+      responsive: ["md"],
     },
     {
       align: "center",
       title: "Role Name",
       dataIndex: "role_name",
+      responsive: ["lg"],
       render: (_, { role_name }) => (
         <>
           {role_name.map((role_name, key) => {
@@ -168,8 +163,11 @@ const UsersManager = () => {
       key: "action",
       render: (_text, user) => (
         <Space size="middle">
-          <EditOutlined onClick={() => handleSelectUser(user)} />
-          <DeleteOutlined onClick={() => handleToggleDelete(user)} />
+          <EditTwoTone onClick={() => handleSelectUser(user)} />
+          <DeleteTwoTone
+            twoToneColor={"red"}
+            onClick={() => handleToggleDelete(user)}
+          />
         </Space>
       ),
     },
@@ -185,9 +183,7 @@ const UsersManager = () => {
     setIsModalOpen(true);
   };
   const handleAddUser = (user: DataType) => {
-    const users = { ...user, role_name: [""] };
-    const listUserSet = listUsers.concat(users);
-    setListUsers(listUserSet);
+    getData();
   };
   const handleModalAddUser = (status: boolean) => {
     setIsModalOpen(status);
@@ -207,7 +203,7 @@ const UsersManager = () => {
   return (
     <>
       <div className="header-component">
-        <h1 className="component-name">User Manager</h1>
+        <h2 className="component-name">User Manager</h2>
       </div>
       <Space className="search">
         <Search
@@ -234,6 +230,7 @@ const UsersManager = () => {
 
       <Modal
         title="User Infomation"
+        className="small-modal"
         destroyOnClose={true}
         open={isModalOpen}
         footer={[]}

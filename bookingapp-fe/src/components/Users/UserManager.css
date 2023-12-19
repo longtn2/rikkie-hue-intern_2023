@@ -16,6 +16,15 @@
 .form-info {
   max-width: 600px;
 }
+.footer-modal {
+  display: flex;
+  justify-content: center;
+}
 
-
-
+.ant-form-item-explain-error {
+  display: flex;
+  align-items: start;
+}
+.ant-form-item-control-input-content {
+  display: flex;
+}

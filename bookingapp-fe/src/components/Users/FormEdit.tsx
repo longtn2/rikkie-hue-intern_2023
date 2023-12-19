@@ -22,10 +22,10 @@ const FormEdit: React.FC<FormEditProps> = ({
       try {
         setLoading(true);
         const urlUpdate = roles.includes("admin")
-          ? ("/v1/users/" + data.user_id)
-          : ("/v1/users/profile");
+          ? `/v1/users/${data.user_id}`
+          : `/v1/users/profile`;
         await axios
-          .put(url + urlUpdate, value, {
+          .put(`${url}${urlUpdate}`, value, {
             headers: HEADER,
           })
           .then((response: any) => {
@@ -124,14 +124,16 @@ const FormEdit: React.FC<FormEditProps> = ({
               </Checkbox.Group>
             </Form.Item>
           ) : null}
-          <Button
-            className="btn-modal"
-            type="primary"
-            htmlType="submit"
-            loading={loading}
-          >
-            Update
-          </Button>
+          <div className="footer-modal">
+            <Button
+              className="btn-modal"
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+            >
+              Update
+            </Button>
+          </div>
         </Form>
       </div>
     </div>
