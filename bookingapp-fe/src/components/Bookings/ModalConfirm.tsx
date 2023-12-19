@@ -30,6 +30,12 @@ const ModalConfirm: React.FC<ModalConfirmProps> = ({
         </div>
       }
       visible={visible}
+      bodyStyle={{
+        border: '1px solid #d6e4ec',
+        borderRadius: '5px',
+        boxShadow: '2px 2px 4px 2px rgba(0, 0, 0, 0.3)',
+        padding: '20px',
+      }}
       onCancel={onCancel}
       footer={footer}
     >

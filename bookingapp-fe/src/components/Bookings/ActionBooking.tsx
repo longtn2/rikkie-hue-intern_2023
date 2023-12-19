@@ -8,7 +8,7 @@ const ActionBooking: React.FC<ActionBookingType> = ({
   return is_accepted ? (
     <>
       <Popover content='Edit'>
-        <Button onClick={() => visible('add', true)}>Edit</Button>
+        <Button onClick={() => visible('edit', true)}>Edit</Button>
       </Popover>
       <Popover content='Delete'>
         <Button danger onClick={() => visible('delete', true)}>

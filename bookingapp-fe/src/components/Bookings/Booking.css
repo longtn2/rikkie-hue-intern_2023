@@ -115,6 +115,32 @@
   display: flex;
 }
 
+.item-booking-wait .ant-card-body {
+  padding: 15px;
+}
+.info-booking-wait {
+  display: flex;
+  justify-content: center;
+}
+.detail-booking-wait {
+  width: 900px;
+}
+.group-btn-action {
+  display: flex;
+  align-items: center;
+}
+.btn-action {
+  display: flex;
+  width: 100px;
+  margin-left: 30px;
+  justify-content: center;
+  color: white;
+}
+.title-booking-wait {
+  font-size: 27px;
+  justify-content: center;
+  display: flex;
+}
 .list-user {
   margin-top: 10px;
 }
@@ -219,20 +245,38 @@
 
 .title-modal {
   font-size: 24px;
-  font-weight: bold;
+  color: #333;
+}
+
+.modal-confirm {
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title-modal {
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
   color: #333;
 }
 
 .modal-container-title {
-  display: inline;
-  margin-bottom: 20px;
-  display: flex;
+  margin-bottom: 0.5rem;
 }
 
-.modal-title-div {
+.modal-label {
+  display: inline-block;
+  margin-right: 0.5rem;
   font-weight: bold;
-  color: #777;
-  display: flex;
+  color: #555;
+}
+
+.modal-value {
+  display: inline-block;
+  background-color: #eee;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
 }
 
 .btn-right {
@@ -266,4 +310,26 @@
 
 .ant-modal-close {
   display: none;
+}
+
+.time-grid-week {
+  width: 100%;
+  font-size: 100%;
+  padding: 1% 5% 8% 2%;
+}
+
+.time-grid-week .ant-typography {
+  font-size: 1rem;
+  color: #f5f5f5;
+}
+
+.full-calendar {
+  width: 100%;
+  height: 100%;
+  position: unset;
+  overflow: hidden;
+}
+
+.fc-event-main {
+  cursor: move;
 }

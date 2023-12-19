@@ -1,5 +1,8 @@
-import { Form, Select, DatePicker, Input, Button } from 'antd';
-import moment from 'moment';
+import { Form, Select, DatePicker, Input, Button, FormInstance } from 'antd';
+import dayjs from 'dayjs';
+import moment, { Moment } from 'moment';
+import { useEffect, useState } from 'react';
+import { formatMonth, formatMonthDayjs } from '../../ultils/ultils';
 
 interface Room {
   room_id: number;
@@ -19,35 +22,70 @@ interface DataType {
 
 interface TypeSubmit {
   onSubmit: (values: any) => void;
-  timeStart: moment.Moment | null;
-  timeEnd: moment.Moment | null;
+  getTime: () => {
+    timeStart: moment.Moment | null;
+    timeEnd: moment.Moment | null;
+  };
   rooms: Room[];
   onCancel: () => void;
   users: DataType[] | null;
+  form: FormInstance;
+  loading: boolean;
 }
 
 const ReusableForm: React.FC<TypeSubmit> = ({
   onSubmit,
   onCancel,
-  timeStart,
-  timeEnd,
+  getTime,
   rooms,
   users,
+  form,
+  loading,
 }) => {
-  const [form] = Form.useForm();
+  const { timeStart, timeEnd } = getTime();
+  const [startTime, setStartTime] = useState<dayjs.Dayjs | null>(null);
+  const [endTime, setEndTime] = useState<dayjs.Dayjs | null>(null);
+
+  useEffect(() => {
+    getTime();
+    form.resetFields();
+  }, [timeStart, timeEnd]);
+
+  const handleTimeStartChange = (value: dayjs.Dayjs | null) => {
+    const valueTime = value ? dayjs(value) : null;
+    setStartTime(valueTime);
+  };
+
+  const handleTimeEndChange = (value: dayjs.Dayjs | null) => {
+    const valueTime = value ? dayjs(value) : null;
+    setEndTime(valueTime);
+  };
 
   const handleSubmit = (values: any) => {
-    onSubmit(values);
+    const formattedValues = {
+      ...values,
+      time_start: startTime
+        ? formatMonthDayjs(startTime)
+        : formatMonth(timeStart),
+      time_end: endTime ? formatMonthDayjs(endTime) : formatMonth(timeEnd),
+    };
+    onSubmit(formattedValues);
     form.resetFields();
   };
 
   const handleCancel = () => {
     onCancel();
     form.resetFields();
-  }
-
+  };
   return (
-    <Form form={form} onFinish={handleSubmit} preserve={false}>
+    <Form
+      form={form}
+      onFinish={handleSubmit}
+      preserve={false}
+      labelCol={{ span: 5 }}
+      labelAlign='left'
+      wrapperCol={{ flex: 4 }}
+    >
       <Form.Item
         name='room_id'
         label='Room'
@@ -92,6 +130,10 @@ const ReusableForm: React.FC<TypeSubmit> = ({
           showTime
           format='YYYY-MM-DD HH:mm'
           placeholder='Select start time'
+          picker='date'
+          allowClear={true}
+          value={startTime}
+          onChange={handleTimeStartChange}
         />
       </Form.Item>
       <Form.Item
@@ -104,6 +146,10 @@ const ReusableForm: React.FC<TypeSubmit> = ({
           showTime
           format='YYYY-MM-DD HH:mm'
           placeholder='Select end time'
+          picker='date'
+          allowClear={true}
+          value={endTime}
+          onChange={handleTimeEndChange}
         />
       </Form.Item>
       <Form.Item
@@ -114,19 +160,14 @@ const ReusableForm: React.FC<TypeSubmit> = ({
         <Input type='text' />
       </Form.Item>
       <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          htmlType='button'
-          onClick={handleCancel}
-          className = 'button'
-        >
+        <Button htmlType='button' onClick={handleCancel} className='button'>
           Cancel
         </Button>
-        <Button type='primary' htmlType='submit'>
+        <Button type='primary' htmlType='submit' loading={loading}>
           Create
         </Button>
       </Form.Item>
     </Form>
   );
 };
-
 export default ReusableForm;
