@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { url } from "../../ultils/urlApi";
-import { BookingData, HEADER } from "../../constant/constant";
+import { BookingData, ChangePageSize, HEADER } from "../../constant/constant";
 import "./Booking.css";
 import DetailBookingWait from "./DetailBookingWait";
-import { Button, Card, List, Modal, Spin } from "antd";
+import { Card, Col, List, Modal, Row, Spin } from "antd";
 import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 import InfoInvitation from "./InfoInvitation";
 import ConfirmAction from "./ConfirmAction";
@@ -47,13 +47,13 @@ const WaitingBookingList = () => {
       setLoading(false);
     }
   };
-  const handleAction = async (key: string) => {
-    if (selectBooking) {
+  const handleAction = async (key: string, data: BookingData) => {
+    if (data) {
       try {
         setLoading(true);
         await axios
           .put(
-            `${url}/v1/bookings/${selectBooking.booking_id}/${key}`,
+            `${url}/v1/bookings/${data.booking_id}/${key}`,
             {},
             {
               headers: HEADER,
@@ -87,7 +87,7 @@ const WaitingBookingList = () => {
     } else {
       handleModalAction(true);
       const message: string = `Are you sure to ${key} this booking?`;
-      ConfirmAction(key, isModalAction, handleAction, message);
+      ConfirmAction(key, isModalAction, message, handleAction, booking);
     }
   };
   const handlePageChange = (page: number) => {
@@ -98,12 +98,12 @@ const WaitingBookingList = () => {
     pageSize: perPage,
     total: totalItems,
     onChange: handlePageChange,
-    onShowSizeChange: PaginationSize,
+    onShowSizeChange: ChangePageSize,
   };
   return (
     <div>
       <div className="header-component">
-        <h1 className="component-name">List of waiting booking</h1>
+        <h2 className="component-name">List of waiting booking</h2>
       </div>
       <Spin
         spinning={loading}
@@ -124,24 +124,32 @@ const WaitingBookingList = () => {
                 <div className="info-booking-wait">
                   <InfoInvitation data={item} />
                   <div className="container-btn">
-                    <BtnDetail
-                      selectBooking={item}
-                      handleSelectAction={async () =>
-                        handleShowModalAction(item, "view")
-                      }
-                    />
-                    <BtnAccept
-                      selectBooking={item}
-                      handleSelectAction={async () =>
-                        handleShowModalAction(item, "accept")
-                      }
-                    />
-                    <BtnReject
-                      selectBooking={item}
-                      handleSelectAction={async () =>
-                        handleShowModalAction(item, "reject")
-                      }
-                    />
+                    <Row className="container-row">
+                      <Col>
+                        <BtnDetail
+                          selectBooking={item}
+                          handleSelectAction={async () =>
+                            handleShowModalAction(item, "view")
+                          }
+                        />
+                      </Col>
+                      <Col>
+                        <BtnAccept
+                          selectBooking={item}
+                          handleSelectAction={async () =>
+                            handleShowModalAction(item, "accept")
+                          }
+                        />
+                      </Col>
+                      <Col>
+                        <BtnReject
+                          selectBooking={item}
+                          handleSelectAction={async () =>
+                            handleShowModalAction(item, "reject")
+                          }
+                        />
+                      </Col>
+                    </Row>
                   </div>
                 </div>
               </Card>
