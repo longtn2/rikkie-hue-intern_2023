@@ -1,10 +1,10 @@
-import { Button, Form, Input, Modal } from "antd";
+import { Button, Form, Input } from "antd";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { url } from "../../ultils/urlApi";
-import { token } from "../../constant/constant";
-// import "./ChangePassword.css"
-import { handleError, handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
+import { HEADER } from "../../constant/constant";
+import "./ChangePass.css";
+import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 
 interface ChangePasswordProps {
   onChange: (status: boolean) => void;
@@ -16,17 +16,15 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onChange }) => {
     try {
       setLoading(true);
       await axios
-        .put(url + "/v1/users/change_password", value, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        .put(`${url}/v1/users/change_password`, value, {
+          headers: HEADER,
         })
         .then((response: any) => {
-          handleSuccessShow(response)
+          handleSuccessShow(response);
           onChange(false);
         });
     } catch (error: any) {
-     handleErrorShow(error)
+      handleErrorShow(error);
     } finally {
       setLoading(false);
     }
