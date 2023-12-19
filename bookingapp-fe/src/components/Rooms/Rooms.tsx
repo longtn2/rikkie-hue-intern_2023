@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
 import {
   Button,
   Modal,
@@ -12,17 +10,15 @@ import {
   Spin,
   Typography,
 } from 'antd';
-import { url } from '../../ultils/urlApi';
+import { get, post, put } from '../../ultils/request';
 import { SearchOutlined } from '@ant-design/icons';
 import { EditOutlined } from '@ant-design/icons';
 import { handleErrorShow, handleSuccessShow } from '../../ultils/ultilsApi';
 import './Room.css';
 import FormAddRoom from './FormAddRoom';
 import FormEditRoom from './FormEditRoom';
-import { getHeaders } from '../../helper/Header';
 import RoomDetails from './RoomDetails';
 import Title from 'antd/es/typography/Title';
-import { HEADER } from '../../constant/constant';
 interface Room {
   room_id: number;
   room_name: string;
@@ -57,18 +53,14 @@ const Rooms: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${url}/v1/rooms`, {
-        params: {
-          page: currentPage,
-          per_page: perPage,
-        },
-        withCredentials: true,
-        headers: HEADER,
+      const response = await get('/v1/rooms', {
+        page: currentPage,
+        per_page: perPage,
       });
-      if (response?.data?.data) {
-        setRooms(response.data.data.rooms);
-        setTotalRooms(response.data.data.total_items);
-        setCurrentPage(response.data.data.current_page);
+      if (response) {
+        setRooms(response.rooms);
+        setTotalRooms(response.total_items);
+        setCurrentPage(response.current_page);
       }
     } catch (error: any) {
       handleErrorShow(error);
@@ -80,12 +72,9 @@ const Rooms: React.FC = () => {
   const fetchRoomId = async (roomId: number) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${url}/v1/rooms/${roomId}`, {
-        withCredentials: true,
-        headers: HEADER,
-      });
-      if (response?.data?.data) {
-        setRoomId(response.data.data);
+      const response = await get(`/v1/rooms/${roomId}`);
+      if (response) {
+        setRoomId(response);
       }
     } catch (error: any) {
       handleErrorShow(error);
@@ -102,44 +91,15 @@ const Rooms: React.FC = () => {
   const handleDataRoomId = () => {
     return roomId || null;
   };
-  const handleLookRoom = async (description: string | undefined) => {
-    try {
-      setLoading(true);
-      if (roomId?.room_id && description) {
-        const response = await axios.put(
-          `${url}/v1/rooms/${roomId?.room_id}/blocked`,
-          {
-            description: description,
-          },
-          {
-            headers: HEADER,
-          }
-        );
-        if (response) {
-          fetchRoomId(roomId?.room_id);
-          handleSuccessShow(response);
-        }
-      }
-    } catch (error: any) {
-      handleErrorShow(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleOpenRoom = async (description: string | undefined) => {
+  const handleActionRoom = async (description: string | undefined) => {
     try {
       setLoading(true);
       if (roomId?.room_id && description) {
-        const response = await axios.put(
-          `${url}/v1/rooms/${roomId?.room_id}/opened`,
-          {
-            description: description,
-          },
-          {
-            headers: HEADER,
-          }
-        );
+        const urlConfirmApi = roomId?.is_blocked
+          ? `/v1/rooms/${roomId?.room_id}/opened`
+          : `/v1/rooms/${roomId?.room_id}/blocked`;
+        const response = await put(urlConfirmApi, { description: description });
         if (response) {
           fetchRoomId(roomId?.room_id);
           handleSuccessShow(response);
@@ -181,16 +141,10 @@ const Rooms: React.FC = () => {
   const handleAddRoom = async (values: any) => {
     try {
       const { room_name, description } = values;
-      const response = await axios.post(
-        `${url}/v1/rooms`,
-        {
-          room_name,
-          description,
-        },
-        {
-          headers: await HEADER,
-        }
-      );
+      const response = await post('/v1/rooms', {
+        room_name: room_name,
+        description: description,
+      });
       if (response) {
         fetchData();
         handleSuccessShow(response);
@@ -216,17 +170,9 @@ const Rooms: React.FC = () => {
     try {
       setLoading(true);
       if (selectedRoom) {
-        const response = await axios.put(
-          `${url}/v1/rooms/${selectedRoom.room_id}`,
-          {
-            ...values,
-            room_name: values.room_name,
-            description: values.description,
-          },
-          {
-            headers: HEADER,
-          }
-        );
+        const response = await put(`/v1/rooms/${selectedRoom?.room_id}`, {
+          ...values,
+        });
         if (response) {
           fetchData();
           setShowEditModal(false);
@@ -241,26 +187,22 @@ const Rooms: React.FC = () => {
   const handleCloseEditModal = () => {
     setShowEditModal(false);
   };
-
   const handleSearch = async (value: string) => {
     if (value.length === 0) {
       fetchData();
     } else {
       try {
-        const response = await axios.get(`${url}/v1/rooms/search`, {
-          params: {
-            name: value,
-          },
-          headers: HEADER,
-        });
-        if (response?.data?.data) {
-          handleSuccessShow(response);
-          setRooms(response.data.data.rooms);
-          setTotalRooms(response.data.data.total_items);
-          setCurrentPage(response.data.data.current_page);
+        setLoading(true);
+        const response = await get('v1/rooms/search', { name: value });
+        if (response) {
+          setRooms(response.rooms);
+          setTotalRooms(response.total_items);
+          setCurrentPage(response.current_page);
         }
       } catch (error: any) {
         handleErrorShow(error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -384,7 +326,7 @@ const Rooms: React.FC = () => {
         <RoomDetails
           getRoom={handleDataRoomId}
           onCancel={handleCancelRoomId}
-          onAction={roomId?.is_blocked ? handleOpenRoom : handleLookRoom}
+          onAction={handleActionRoom}
           loading={loading}
         />
       )}

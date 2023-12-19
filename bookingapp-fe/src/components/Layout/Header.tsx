@@ -6,12 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { getCookie } from '../../helper/Cookie';
 import ChangePassword from '../InfoUser/ChangePassword';
-import { url } from '../../ultils/urlApi';
 import './Layout.css';
-import axios from 'axios';
-import { HEADER } from '../../constant/constant';
 import { handleErrorShow } from '../../ultils/ultilsApi';
-import { getHeaders } from '../../helper/Header';
+import { post } from '../../ultils/request';
 
 const HeaderComponent = () => {
   const role = getCookie('roles');
@@ -21,22 +18,15 @@ const HeaderComponent = () => {
 
   const fetchLogout = async () => {
     try {
-      await axios.post(
-        `${url}/v1/logout`,
-        {},
-        {
-          withCredentials: true,
-          headers: HEADER,
-        }
-      );
+      await post('/v1/logout', {});
     } catch (error: any) {
       handleErrorShow(error);
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const cookies = Cookies.get();
-    fetchLogout();
+    await fetchLogout();
     for (const cookie in cookies) {
       Cookies.remove(cookie);
     }

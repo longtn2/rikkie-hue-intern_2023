@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { showPopup } from './Popup';
+import { result } from 'lodash';
 
 type axiosApi = {
   status: number;
@@ -19,6 +20,11 @@ export const handleSuccess = (response: AxiosResponse<axiosApi>) => {
 };
 
 export const handleError = (error: any) => {
+  if (typeof error === 'object' && error !== null && error.message) {
+    const { message } = error;
+    return { message };
+  }
+
   const { response } = error;
 
   if (response?.data) {
@@ -40,6 +46,9 @@ export const handleError = (error: any) => {
         return { status: status, message: errors, error: null };
       }
     }
+  } else {
+    const message = response;
+    return { message };
   }
 
   return { status: '', message: '', error: null };
