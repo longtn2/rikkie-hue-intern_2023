@@ -18,7 +18,7 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
     setLoading(true);
     try {
       await axios
-        .post(url + "/v1/users", value, {
+        .post(`${url}/v1/users`, value, {
           headers: HEADER,
         })
         .then((response) => {
@@ -108,20 +108,20 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
           hasFeedback
         >
           <Input.Password placeholder="Password" />
-          <Form.Item
-            label="Confirm password"
-            name="confirm_password"
-            dependencies={["password"]}
-            rules={[
-              { required: true, message: "Please input password!" },
-              { whitespace: true, message: "Please input password!" },
-              { min: 8, message: "Password has at least 8 numbers" },
-              { validator: validateConfirmPassword },
-            ]}
-            hasFeedback
-          >
-            <Input.Password placeholder="Confirm password" />
-          </Form.Item>
+        </Form.Item>
+        <Form.Item
+          label="Confirm password"
+          name="confirm_password"
+          dependencies={["password"]}
+          rules={[
+            { required: true, message: "Please input password!" },
+            { whitespace: true, message: "Please input password!" },
+            { min: 8, message: "Password has at least 8 numbers" },
+            { validator: validateConfirmPassword },
+          ]}
+          hasFeedback
+        >
+          <Input.Password placeholder="Confirm password" />
         </Form.Item>
         <Form.Item
           name="role_id"
@@ -144,14 +144,16 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
             </Row>
           </Checkbox.Group>
         </Form.Item>
-        <Button
-          className="btn-modal"
-          type="primary"
-          htmlType="submit"
-          loading={loading}
-        >
-          Submit
-        </Button>
+        <div className="footer-modal">
+          <Button
+            className="btn-modal"
+            type="primary"
+            htmlType="submit"
+            loading={loading}
+          >
+            Submit
+          </Button>
+        </div>
       </Form>
     </div>
   );
