@@ -135,18 +135,24 @@ const WaitingBookingList = () => {
                       </Col>
                       <Col>
                         <BtnAccept
-                          selectBooking={item}
+                          name="ACCEPT"
+                          data={item}
                           handleSelectAction={async () =>
                             handleShowModalAction(item, "accept")
                           }
+                          defaultType={true}
+                          disabled={false}
                         />
                       </Col>
                       <Col>
                         <BtnReject
-                          selectBooking={item}
+                          name="REJECT"
+                          data={item}
                           handleSelectAction={async () =>
                             handleShowModalAction(item, "reject")
                           }
+                          defaultType={true}
+                          disabled={false}
                         />
                       </Col>
                     </Row>

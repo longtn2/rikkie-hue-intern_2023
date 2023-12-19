@@ -77,7 +77,6 @@ const DetailBookingWait: React.FC<DetailBookingWaitProps> = ({
         : handleAction(selectBooking, "reject");
     }
   };
-
   return (
     <div>
       <Spin
@@ -98,18 +97,24 @@ const DetailBookingWait: React.FC<DetailBookingWaitProps> = ({
             <Row className="container-btn">
               <Col>
                 <BtnAccept
-                  selectBooking={selectBooking}
+                  name="ACCEPT"
+                  data={selectBooking}
                   handleSelectAction={async () =>
                     handleSelectAction(selectBooking!, "accept")
                   }
+                  defaultType={true}
+                  disabled={false}
                 />
               </Col>
               <Col>
                 <BtnReject
-                  selectBooking={selectBooking}
+                  name="REJECT"
+                  data={selectBooking}
                   handleSelectAction={async () =>
                     handleSelectAction(selectBooking!, "reject")
                   }
+                  defaultType={true}
+                  disabled={false}
                 />
               </Col>
             </Row>
