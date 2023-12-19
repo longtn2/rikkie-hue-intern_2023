@@ -14,11 +14,16 @@ const customLabelStyle = {
 const customContentStyle = {
   display: "flex",
   justifyContent: "end",
-  marginRight: 100,
+  marginRight: 50,
 };
+
 const InfoInvitation: React.FC<InfoInvitationProps> = ({ data }) => {
   return (
-    <Descriptions className="detail-booked" layout="horizontal" column={2}>
+    <Descriptions
+      className="detail-booked"
+      layout="horizontal"
+      column={{ xxl: 4, xl: 3, lg: 2, md: 2 }}
+    >
       <Descriptions.Item
         labelStyle={customLabelStyle}
         contentStyle={customContentStyle}
@@ -43,7 +48,7 @@ const InfoInvitation: React.FC<InfoInvitationProps> = ({ data }) => {
       <Descriptions.Item
         labelStyle={customLabelStyle}
         contentStyle={customContentStyle}
-        label="TOTAL PARTICIPATIONS"
+        label="PARTICIPATIONS"
       >
         {data!.user_ids.length}
       </Descriptions.Item>

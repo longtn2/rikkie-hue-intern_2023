@@ -1,10 +1,10 @@
 import { Button } from "antd";
 import "./Booking.css";
-import { BookingData } from "../../constant/constant";
 import React from "react";
+import { BookingData } from "../../constant/constant";
 interface BtnProps {
   selectBooking: BookingData | undefined;
-  handleSelectAction: (selectBooking: BookingData, key: string) => void;
+  handleSelectAction: (selectBooking: BookingData) => void;
 }
 const BtnDetail: React.FC<BtnProps> = ({
   handleSelectAction,
@@ -12,9 +12,9 @@ const BtnDetail: React.FC<BtnProps> = ({
 }) => {
   return (
     <Button
-      className="btn-action btn--view"
+      className="btn-action btn__view"
       type="text"
-      onClick={() => handleSelectAction(selectBooking!, "view")}
+      onClick={() => handleSelectAction(selectBooking!)}
     >
       VIEW DETAIL
     </Button>

@@ -1,22 +1,37 @@
 import { Button } from "antd";
 import "./Booking.css";
 import { BookingData } from "../../constant/constant";
-import React from "react";
+import React, { useMemo } from "react";
 interface BtnProps {
-  selectBooking: BookingData | undefined;
-  handleSelectAction: (selectBooking: BookingData, key: string) => void;
+  name: string;
+  data: BookingData | undefined;
+  handleSelectAction: (selectBooking: BookingData) => void;
+  defaultType: boolean;
+  disabled: boolean;
 }
+
 const BtnReject: React.FC<BtnProps> = ({
+  name,
   handleSelectAction,
-  selectBooking,
+  data,
+  defaultType,
+  disabled,
 }) => {
+  const buttonStyle = useMemo(() => {
+    return {
+      backgroundColor: data?.status !== null && !data?.status ? "red" : "white",
+      color: !data?.status ? "white" : "black",
+    };
+  }, [data?.status]);
   return (
     <Button
-      className="btn-action btn--reject"
+      className="btn-action btn__reject"
+      disabled={disabled}
+      style={defaultType ? {} : buttonStyle}
       type="text"
-      onClick={() => handleSelectAction(selectBooking!, "reject")}
+      onClick={() => handleSelectAction(data!)}
     >
-      REJECT
+      {name}
     </Button>
   );
 };
