@@ -5,10 +5,9 @@ import { DataType, HEADER } from "../../constant/constant";
 import { url } from "../../ultils/urlApi";
 import { handleErrorShow } from "../../ultils/ultilsApi";
 
-import avatar from "../../../public/avatar.png";
 import "./InfoAccount.css";
-import getCookie from "../../Route/Cookie";
 import FormEdit from "../Users/FormEdit";
+import { getCookie } from "../../helper/Cookie";
 
 const InfoUser = () => {
   const [infoUser, setInfoUser] = useState<DataType>();
@@ -59,15 +58,17 @@ const InfoUser = () => {
   };
   return (
     <>
-      <h1 className="component-name">Account information</h1>
+      <div className="header-component">
+        <h2 className="component-name">Account information</h2>
+      </div>
       <div className="show-info">
         <Spin
           spinning={loading}
           size="large"
           tip="Loading..."
-          className="loading"
+          className="spin-loading"
         >
-          <Descriptions className="info-detail" layout="horizontal" column={1}>
+          <Descriptions className="info-detail" column={1}>
             <Descriptions.Item
               contentStyle={customContentStyle}
               labelStyle={customLabelStyle}
@@ -95,14 +96,13 @@ const InfoUser = () => {
                   style={{ marginTop: 20 }}
                   type="primary"
                   htmlType="submit"
-                  onClick={() => handleModalEditUser(false)}
+                  onClick={() => handleModalEditUser(true)}
                 >
                   Edit
                 </Button>
               </div>
             </Descriptions.Item>
           </Descriptions>
-          <Image width={200} src={avatar} />
         </Spin>
       </div>
       <Modal
