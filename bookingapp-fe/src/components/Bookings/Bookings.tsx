@@ -3,7 +3,7 @@ import { Typography, Spin, Space, Form } from 'antd';
 import moment from 'moment';
 import axios from 'axios';
 import './Booking.css';
-import { url } from '../../ultils/urlApi';
+import { useSelector } from 'react-redux';
 import {
   DateSelectArg,
   EventClickArg,
@@ -32,8 +32,6 @@ import {
   BookingDataApi,
   DataType,
   Room,
-  HEADER,
-  renderHeader,
 } from '../../constant/constant';
 import ActionBooking from './ActionBooking';
 import ModalConfirm from './ModalConfirm';
@@ -62,6 +60,13 @@ const CalendarBooking = () => {
   const [timeEndAdd, setTimeEndAdd] = useState<moment.Moment | null>(null);
   const [updateModal, setUpdateModal] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
+  const shouldRender = useSelector(
+    (state: any) => state.shouldRender.shouldRender
+  );
+
+  useEffect(() => {
+    fetchBookingData(startDate, endDate);
+  }, [shouldRender]);
 
   useEffect(() => {
     fetchBookingData(startDate, endDate);
@@ -315,7 +320,7 @@ const CalendarBooking = () => {
         start_date: startDate,
         end_date: endDate,
       });
-      const updatedData = response.data.data.map((booking: BookingDataApi) => {
+      const updatedData = response.map((booking: BookingDataApi) => {
         const { time_end, time_start, is_accepted, ...rest } = booking;
         return {
           ...rest,
@@ -349,6 +354,22 @@ const CalendarBooking = () => {
       timeStart: timeStartAdd,
       timeEnd: timeEndAdd,
     };
+  };
+  const handleAction = async (key: string) => {
+    try {
+      setLoading(true);
+      const response = await put(
+        `/v1/bookings/${selectedBookingData?.booking_id}/${key}`,
+        {}
+      );
+      fetchBookingData(startDate, endDate);
+      handleSuccessShow(response);
+      setModalShow(false);
+    } catch (error: any) {
+      handleErrorShow(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -406,6 +427,8 @@ const CalendarBooking = () => {
               <Space className='space'>
                 <ActionBooking
                   is_accepted={selectedBookingData?.is_accepted ?? false}
+                  loading={loading}
+                  action={handleAction}
                   visible={visibleModal}
                 />
               </Space>
@@ -461,6 +484,7 @@ const CalendarBooking = () => {
       >
         <FormEditBooking
           users={users ?? []}
+          loading={loading}
           onCancel={() => setIsEditing(false)}
           getInitialValues={handleSelectedBookingData}
           form={formEdit}

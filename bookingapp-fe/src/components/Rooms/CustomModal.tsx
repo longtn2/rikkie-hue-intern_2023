@@ -15,6 +15,7 @@ interface CustomModalProps {
   formId: string;
   formConfig: FormConfigItem[];
   onFinish: (values: any) => void;
+  loading: boolean;
   initialValues: string | undefined;
   form: FormInstance;
 }
@@ -25,6 +26,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   onCancel,
   formId,
   formConfig,
+  loading,
   initialValues,
   onFinish,
   form,
@@ -55,7 +57,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
         </Button>,
       ]}
     >
-      <Form form={form} id={formId} onFinish={handleFinish}>
+      <Form form={form} id={formId} onFinish={handleFinish} disabled={loading}>
         {formConfig.map(item => (
           <Form.Item
             key={item.name}

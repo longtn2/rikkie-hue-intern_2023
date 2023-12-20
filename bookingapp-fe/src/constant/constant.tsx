@@ -90,7 +90,9 @@ export const statuTag = (item: BookingData) => {
 
 export interface ActionBookingType {
   is_accepted: boolean;
+  action: (type: string) => void;
   visible: (action: string, visible: boolean) => void;
+  loading: boolean;
 }
 
 export const firebaseConfig = {

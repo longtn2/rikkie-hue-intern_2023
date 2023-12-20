@@ -134,6 +134,7 @@ const RoomDetails: React.FC<RoomDetailsPropsType> = ({
 
       <CustomModal
         title='Lock Rooms'
+        loading={loading}
         visible={isLookModalVisible}
         onCancel={() => handleModal(false, '', 'look')}
         formId='lookForm'
@@ -149,6 +150,7 @@ const RoomDetails: React.FC<RoomDetailsPropsType> = ({
         title='Open Rooms'
         visible={isOpenModalVisible}
         onCancel={() => handleModal(false, '', 'open')}
+        loading={loading}
         formId='openForm'
         formConfig={openFormConfig}
         onFinish={(values: { description: string } | undefined) =>
