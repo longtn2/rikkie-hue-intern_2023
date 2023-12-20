@@ -1,5 +1,6 @@
 import { Modal, Typography } from 'antd';
 import { ReactNode } from 'react';
+import './Booking.css';
 
 interface ModalConfirmProps {
   title: string | ReactNode;
@@ -16,6 +17,12 @@ const ModalConfirm: React.FC<ModalConfirmProps> = ({
   footer,
   children,
 }) => {
+  const closeIcon = (
+    <button className='modal-close-button' onClick={onCancel}>
+      X
+    </button>
+  );
+
   return (
     <Modal
       title={
@@ -37,7 +44,8 @@ const ModalConfirm: React.FC<ModalConfirmProps> = ({
         padding: '20px',
       }}
       onCancel={onCancel}
-      footer={footer}
+      closeIcon={closeIcon}
+      footer={<div className='custom-modal-footer-content'>{footer}</div>}
     >
       {children}
     </Modal>

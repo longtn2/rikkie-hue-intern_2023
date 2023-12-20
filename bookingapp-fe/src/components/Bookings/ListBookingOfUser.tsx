@@ -1,21 +1,24 @@
-import { useEffect, useState } from "react";
-import {
-  BookingData,
-  ChangePageSize,
-  statuTag,
-} from "../../constant/constant";
-import { Card,  List, Spin } from "antd";
-import "./Booking.css";
-import { handleErrorShow } from "../../ultils/ultilsApi";
-import { get } from "../../ultils/request";
-import InfoInvitation from "./InfoInvitation";
-
+import { useEffect, useState } from 'react';
+import { BookingData, ChangePageSize, statuTag } from '../../constant/constant';
+import { Card, List, Spin } from 'antd';
+import './Booking.css';
+import { handleErrorShow } from '../../ultils/ultilsApi';
+import { get } from '../../ultils/request';
+import InfoInvitation from './InfoInvitation';
+import { useSelector } from 'react-redux';
 const ListBookingOfUser = () => {
   const [listBooking, setListBooking] = useState<BookingData[]>([]);
   const [perPage, setPerPage] = useState(3);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const shouldRender = useSelector(
+    (state: any) => state.shouldRender.shouldRender
+  );
+
+  useEffect(() => {
+    getData();
+  }, [shouldRender]);
   useEffect(() => {
     getData();
   }, [currentPage, perPage]);
@@ -49,24 +52,24 @@ const ListBookingOfUser = () => {
     onShowSizeChange: ChangePageSize,
   };
   const customLabelStyle = {
-    fontWeight: "bold",
-    marginRight: "8px",
-    color: "black",
+    fontWeight: 'bold',
+    marginRight: '8px',
+    color: 'black',
   };
   const customContentStyle = {
-    display: "flex",
-    justifyContent: "end",
+    display: 'flex',
+    justifyContent: 'end',
     marginRight: 100,
   };
 
   return (
     <div>
-      <h1 className="component-name">List of scheduled meetings</h1>
+      <h1 className='component-name'>List of scheduled meetings</h1>
       <Spin
         spinning={loading}
-        size="large"
-        tip="Loading..."
-        className="loading"
+        size='large'
+        tip='Loading...'
+        className='loading'
       >
         <List
           dataSource={listBooking}
@@ -74,13 +77,13 @@ const ListBookingOfUser = () => {
           renderItem={(item: BookingData) => (
             <List.Item>
               <Card
-                className="item-booked"
+                className='item-booked'
                 key={item.title}
-                title={<div className="title-booked">{item.title}</div>}
+                title={<div className='title-booked'>{item.title}</div>}
               >
-                <div className="info-booked">
+                <div className='info-booked'>
                   <InfoInvitation data={item} />
-                  <div className="status-booked">{statuTag(item)}</div>
+                  <div className='status-booked'>{statuTag(item)}</div>
                 </div>
               </Card>
             </List.Item>

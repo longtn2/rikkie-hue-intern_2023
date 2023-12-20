@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { BookingData, DataType, HEADER } from "../../constant/constant";
-import { Card, Spin, Table } from "antd";
-import "./Booking.css";
-import axios from "axios";
-import { url } from "../../ultils/urlApi";
-import { handleErrorShow } from "../../ultils/ultilsApi";
-import { ColumnsType } from "antd/es/table";
-import InfoInvitation from "./InfoInvitation";
-import { get } from "../../ultils/request";
+import React, { useEffect, useState } from 'react';
+import { BookingData, DataType, HEADER } from '../../constant/constant';
+import { Card, Spin, Table } from 'antd';
+import './Booking.css';
+import { url } from '../../ultils/urlApi';
+import { handleErrorShow } from '../../ultils/ultilsApi';
+import { ColumnsType } from 'antd/es/table';
+import InfoInvitation from './InfoInvitation';
+import { get } from '../../ultils/request';
 
 interface DetailInvitationProps {
   selectInvite: BookingData | undefined;
@@ -42,28 +41,28 @@ const DetailInvitation: React.FC<DetailInvitationProps> = ({
 
   const columns: ColumnsType<DataType> = [
     {
-      align: "center",
-      title: "User ID",
-      key: "user_id",
-      dataIndex: "user_id",
+      align: 'center',
+      title: 'User ID',
+      key: 'user_id',
+      dataIndex: 'user_id',
     },
     {
-      align: "center",
-      title: "User Name",
-      dataIndex: "user_name",
-      key: "user_name",
+      align: 'center',
+      title: 'User Name',
+      dataIndex: 'user_name',
+      key: 'user_name',
     },
     {
-      align: "center",
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
+      align: 'center',
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
     },
     {
-      align: "center",
-      title: "Phone Number",
-      dataIndex: "phone_number",
-      key: "phone_number",
+      align: 'center',
+      title: 'Phone Number',
+      dataIndex: 'phone_number',
+      key: 'phone_number',
     },
   ];
 
@@ -71,22 +70,22 @@ const DetailInvitation: React.FC<DetailInvitationProps> = ({
     <div>
       <Spin
         spinning={loading}
-        size="large"
-        tip="Loading..."
-        className="loading"
+        size='large'
+        tip='Loading...'
+        className='loading'
       >
         <Card
-          className="item-booking-wait"
+          className='item-booking-wait'
           key={selectInvite!.title}
           title={
-            <div className="title-booking-wait">{selectInvite!.title}</div>
+            <div className='title-booking-wait'>{selectInvite!.title}</div>
           }
         >
-          <div className="info-booking-wait">
+          <div className='info-booking-wait'>
             <InfoInvitation data={selectInvite} />
           </div>
         </Card>
-        <Table className="list-user" columns={columns} dataSource={listUsers} />
+        <Table className='list-user' columns={columns} dataSource={listUsers} />
       </Spin>
     </div>
   );

@@ -101,8 +101,9 @@ const Rooms: React.FC = () => {
           : `/v1/rooms/${roomId?.room_id}/blocked`;
         const response = await put(urlConfirmApi, { description: description });
         if (response) {
-          fetchRoomId(roomId?.room_id);
+          fetchData();
           handleSuccessShow(response);
+          handleCancelRoomId();
         }
       }
     } catch (error: any) {
@@ -193,7 +194,9 @@ const Rooms: React.FC = () => {
     } else {
       try {
         setLoading(true);
-        const response = await get('v1/rooms/search', { name: value });
+        const response = await get('v1/rooms/search', {
+          name: value,
+        });
         if (response) {
           setRooms(response.rooms);
           setTotalRooms(response.total_items);

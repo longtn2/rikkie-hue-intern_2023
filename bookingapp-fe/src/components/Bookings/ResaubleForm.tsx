@@ -70,13 +70,18 @@ const ReusableForm: React.FC<TypeSubmit> = ({
       time_end: endTime ? formatMonthDayjs(endTime) : formatMonth(timeEnd),
     };
     onSubmit(formattedValues);
+    setStartTime(null);
+    setEndTime(null);
     form.resetFields();
   };
 
   const handleCancel = () => {
     onCancel();
     form.resetFields();
+    setStartTime(null);
+    setEndTime(null);
   };
+
   return (
     <Form
       form={form}
@@ -85,6 +90,12 @@ const ReusableForm: React.FC<TypeSubmit> = ({
       disabled={loading}
       labelCol={{ span: 5 }}
       labelAlign='left'
+      initialValues={{
+        time_start: startTime
+          ? dayjs(startTime)
+          : dayjs(timeStart as dayjs.Dayjs),
+        time_end: endTime ? dayjs(endTime) : dayjs(timeEnd as dayjs.Dayjs),
+      }}
       wrapperCol={{ flex: 4 }}
     >
       <Form.Item
@@ -125,13 +136,11 @@ const ReusableForm: React.FC<TypeSubmit> = ({
         name='time_start'
         label='Start Time'
         rules={[{ required: true, message: 'Time start is not empty' }]}
-        // initialValue={timeStart}
       >
         <DatePicker
           showTime
           format='YYYY-MM-DD HH:mm'
           placeholder='Select start time'
-          defaultValue={dayjs(timeEnd as dayjs.Dayjs)}
           picker='date'
           allowClear={true}
           value={startTime}
@@ -142,13 +151,11 @@ const ReusableForm: React.FC<TypeSubmit> = ({
         name='time_end'
         label='End Time'
         rules={[{ required: true, message: 'Time end is not empty' }]}
-        // initialValue={timeEnd}
       >
         <DatePicker
           showTime
           format='YYYY-MM-DD HH:mm'
           placeholder='Select end time'
-          defaultValue={dayjs(timeEnd as dayjs.Dayjs)}
           picker='date'
           allowClear={true}
           value={endTime}
