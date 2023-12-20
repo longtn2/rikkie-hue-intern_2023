@@ -33,11 +33,12 @@ import {
   DataType,
   Room,
   HEADER,
+  renderHeader,
 } from '../../constant/constant';
 import ActionBooking from './ActionBooking';
 import ModalConfirm from './ModalConfirm';
+import { get, post, put, del } from '../../ultils/request';
 const { Title } = Typography;
-
 const CalendarBooking = () => {
   const [rooms, setRooms] = useState<Room[]>();
   const [users, setUsers] = useState<DataType[]>();
@@ -78,12 +79,9 @@ const CalendarBooking = () => {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${url}/v1/rooms`, {
-        withCredentials: true,
-        headers: HEADER,
-      });
-      if (response?.data?.data) {
-        setRooms(response.data.data.rooms);
+      const response = await get('/v1/rooms');
+      if (response?.rooms) {
+        setRooms(response.rooms);
       }
     } catch (error: any) {
       handleErrorShow(error);
@@ -94,11 +92,9 @@ const CalendarBooking = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get(`${url}/v1/users`, {
-        headers: HEADER,
-      });
-      if (response?.data?.data) {
-        setUsers(response.data.data.users);
+      const response = await get('/v1/users');
+      if (response?.users) {
+        setUsers(response.users);
       }
     } catch (error: any) {
       handleErrorShow(error);
@@ -114,31 +110,23 @@ const CalendarBooking = () => {
         endDate === moment(endDate).format('YYYY-MM-DD')
       ) {
         const urlCallApi = roles.includes('admin')
-          ? `${url}/v1/bookings`
-          : `${url}/v1/user/bookings`;
-        const response = await axios.get(urlCallApi, {
-          params: {
-            start_date: startDate,
-            end_date: endDate,
-          },
-          headers: HEADER,
+          ? `/v1/bookings`
+          : `/v1/user/bookings`;
+        const response = await get(urlCallApi, {
+          start_date: startDate,
+          end_date: endDate,
         });
-
-        if (response?.data?.data) {
-          const updatedData = response.data.data.map(
-            (booking: BookingDataApi) => {
-              const { time_end, time_start, is_accepted, ...rest } = booking;
-              return {
-                ...rest,
-                is_accepted: is_accepted,
-                start: time_start,
-                end: time_end,
-                backgroundColor: is_accepted ? '#009900' : '#ff9933',
-              };
-            }
-          );
-          setBookingData(updatedData);
-        }
+        const updatedData = response.map((booking: BookingDataApi) => {
+          const { time_end, time_start, is_accepted, ...rest } = booking;
+          return {
+            ...rest,
+            is_accepted: is_accepted,
+            start: time_start,
+            end: time_end,
+            backgroundColor: is_accepted ? '#009900' : '#ff9933',
+          };
+        });
+        setBookingData(updatedData);
       }
     } catch (error: any) {
       handleErrorShow(error);
@@ -216,23 +204,16 @@ const CalendarBooking = () => {
     try {
       setLoading(true);
       const urlCallApi: string = roles.includes('admin')
-        ? `${url}/v1/bookings`
-        : `${url}/v1/user/bookings`;
-      const response = await axios.post(
-        urlCallApi,
-        {
-          ...values,
-          room_id: values.room_id,
-          user_ids: values.user_ids,
-          title: values.title,
-          time_start: values.time_start,
-          time_end: values.time_end,
-        },
-        {
-          withCredentials: true,
-          headers: HEADER,
-        }
-      );
+        ? `/v1/bookings`
+        : `/v1/user/bookings`;
+      const response = await post(urlCallApi, {
+        ...values,
+        room_id: values.room_id,
+        user_ids: values.user_ids,
+        title: values.title,
+        time_start: values.time_start,
+        time_end: values.time_end,
+      });
       if (response) {
         visibleModal('add', false);
         fetchBookingData(startDate, endDate);
@@ -275,13 +256,9 @@ const CalendarBooking = () => {
         formattedBookingData.time_end ===
           formatMonth(formattedBookingData.time_end)
       ) {
-        const response = await axios.put(
-          `${url}/v1/bookings/${formattedBookingData.booking_id}`,
-          formattedBookingData,
-          {
-            withCredentials: true,
-            headers: HEADER,
-          }
+        const response = await put(
+          `/v1/bookings/${formattedBookingData.booking_id}`,
+          { ...formattedBookingData }
         );
         if (response) {
           fetchBookingData(startDate, endDate);
@@ -299,11 +276,8 @@ const CalendarBooking = () => {
 
   const handleDeleteBooking = async (id: number) => {
     try {
-      const response = await axios.delete(
-        `${url}/v1/bookings/${selectedBookingData?.booking_id}`,
-        {
-          headers: HEADER,
-        }
+      const response = await del(
+        `/v1/bookings/${selectedBookingData?.booking_id}`
       );
       if (response) {
         fetchBookingData(startDate, endDate);
@@ -334,37 +308,24 @@ const CalendarBooking = () => {
     };
     handleUpdate(selectedData);
   };
-
   const handleSearchRoom = async (values: number) => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${url}/v1/bookings/search_room/${values}`,
-        {
-          params: {
-            start_date: startDate,
-            end_date: endDate,
-          },
-          withCredentials: true,
-          headers: HEADER,
-        }
-      );
-
-      if (response?.data?.data) {
-        const updatedData = response.data.data.map(
-          (booking: BookingDataApi) => {
-            const { time_end, time_start, is_accepted, ...rest } = booking;
-            return {
-              ...rest,
-              is_accepted: is_accepted,
-              start: time_start,
-              end: time_end,
-              backgroundColor: is_accepted ? '#009900' : '#ff9933',
-            };
-          }
-        );
-        setBookingData(updatedData);
-      }
+      const response = await get(`/v1/bookings/search_room/${values}`, {
+        start_date: startDate,
+        end_date: endDate,
+      });
+      const updatedData = response.data.data.map((booking: BookingDataApi) => {
+        const { time_end, time_start, is_accepted, ...rest } = booking;
+        return {
+          ...rest,
+          is_accepted: is_accepted,
+          start: time_start,
+          end: time_end,
+          backgroundColor: is_accepted ? '#009900' : '#ff9933',
+        };
+      });
+      setBookingData(updatedData);
     } catch (error: any) {
       handleErrorShow(error);
     } finally {
