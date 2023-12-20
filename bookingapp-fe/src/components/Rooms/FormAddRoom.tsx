@@ -1,15 +1,21 @@
 import React from 'react';
-import { Form, Input, Button, FormInstance, Col, Row } from 'antd';
+import { Form, Button, FormInstance } from 'antd';
 import './Room.css';
 import CustomFormItem from './CustomFormItem';
 
 interface FormAdd {
   onFinish: (values: any) => void;
   onCancel: () => void;
+  loading: boolean;
   form: FormInstance;
 }
 
-const FormAddRoom: React.FC<FormAdd> = ({ onFinish, onCancel, form }) => {
+const FormAddRoom: React.FC<FormAdd> = ({
+  onFinish,
+  onCancel,
+  form,
+  loading,
+}) => {
   const handleCancel = () => {
     onCancel();
     form.resetFields();
@@ -26,6 +32,7 @@ const FormAddRoom: React.FC<FormAdd> = ({ onFinish, onCancel, form }) => {
       onFinish={handleSubmit}
       labelCol={{ span: 5 }}
       labelAlign='left'
+      disabled={loading}
       preserve={false}
       wrapperCol={{ flex: 4 }}
     >
@@ -43,7 +50,7 @@ const FormAddRoom: React.FC<FormAdd> = ({ onFinish, onCancel, form }) => {
         <Button htmlType='button' onClick={handleCancel} className='btn-right'>
           Cancel
         </Button>
-        <Button type='primary' htmlType='submit'>
+        <Button type='primary' htmlType='submit' loading={loading}>
           Add
         </Button>
       </Form.Item>

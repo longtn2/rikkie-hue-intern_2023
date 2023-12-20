@@ -1,7 +1,7 @@
-import { Button } from "antd";
-import "./Booking.css";
-import { BookingData } from "../../constant/constant";
-import React, { useMemo } from "react";
+import { Button } from 'antd';
+import './Booking.css';
+import { BookingData } from '../../constant/constant';
+import React, { useMemo } from 'react';
 interface BtnProps {
   name: string;
   data: BookingData | undefined;
@@ -16,18 +16,19 @@ const BtnAccept: React.FC<BtnProps> = ({
   defaultType,
   disabled,
 }) => {
-  const buttonStyle = useMemo(() =>{
+  const buttonStyle = useMemo(() => {
     return {
-      backgroundColor: data?.status !== null && data?.status ? "green" : "#ece1f6",
-      color: data?.status ? "white" : "black",
+      backgroundColor:
+        data?.status !== null && data?.status ? 'green' : '#ece1f6',
+      color: data?.status ? 'white' : 'black',
     };
   }, [data?.status]);
   return (
     <Button
-      type="text"
+      type='text'
       disabled={disabled ? true : false}
       style={defaultType ? {} : buttonStyle}
-      className="btn-action btn__accept"
+      className='btn-action btn__accept'
       onClick={() => handleSelectAction(data!)}
     >
       {name}

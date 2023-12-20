@@ -10,6 +10,7 @@ interface FormEditBooking {
   getInitialValues: () => BookingDataCalendar | null;
   onCancel: () => void;
   users: DataType[] | null;
+  loading: boolean;
   form: FormInstance;
 }
 
@@ -26,6 +27,7 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
   onFinish,
   onCancel,
   getInitialValues,
+  loading,
   users,
   form,
 }) => {
@@ -75,6 +77,7 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
           title: initialValues?.title,
         }}
         preserve={false}
+        disabled={loading}
         labelCol={{ span: 5 }}
         labelAlign='left'
         wrapperCol={{ flex: 4 }}
@@ -117,6 +120,7 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
             allowClear={true}
             picker='date'
             placeholder='Select start time'
+            defaultValue={dayjs(initialValues?.start as unknown as dayjs.Dayjs)}
             value={timeStart}
             onChange={handleTimeStartChange}
           />
@@ -130,7 +134,6 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
               message: 'Time end is not required',
             },
           ]}
-          initialValue={dayjs(initialValues?.end)}
         >
           <DatePicker
             showTime
@@ -138,6 +141,7 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
             allowClear={true}
             picker='date'
             placeholder='Select end time'
+            defaultValue={dayjs(initialValues?.end as unknown as dayjs.Dayjs)}
             value={timeEnd}
             onChange={handleTimeEndChange}
           />
@@ -162,7 +166,7 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
           >
             Cancel
           </Button>
-          <Button type='primary' htmlType='submit'>
+          <Button type='primary' htmlType='submit' loading={loading}>
             Update
           </Button>
         </Form.Item>

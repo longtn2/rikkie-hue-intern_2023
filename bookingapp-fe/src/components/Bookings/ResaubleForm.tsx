@@ -82,6 +82,7 @@ const ReusableForm: React.FC<TypeSubmit> = ({
       form={form}
       onFinish={handleSubmit}
       preserve={false}
+      disabled={loading}
       labelCol={{ span: 5 }}
       labelAlign='left'
       wrapperCol={{ flex: 4 }}
@@ -124,12 +125,13 @@ const ReusableForm: React.FC<TypeSubmit> = ({
         name='time_start'
         label='Start Time'
         rules={[{ required: true, message: 'Time start is not empty' }]}
-        initialValue={timeStart}
+        // initialValue={timeStart}
       >
         <DatePicker
           showTime
           format='YYYY-MM-DD HH:mm'
           placeholder='Select start time'
+          defaultValue={dayjs(timeEnd as dayjs.Dayjs)}
           picker='date'
           allowClear={true}
           value={startTime}
@@ -140,12 +142,13 @@ const ReusableForm: React.FC<TypeSubmit> = ({
         name='time_end'
         label='End Time'
         rules={[{ required: true, message: 'Time end is not empty' }]}
-        initialValue={timeEnd}
+        // initialValue={timeEnd}
       >
         <DatePicker
           showTime
           format='YYYY-MM-DD HH:mm'
           placeholder='Select end time'
+          defaultValue={dayjs(timeEnd as dayjs.Dayjs)}
           picker='date'
           allowClear={true}
           value={endTime}

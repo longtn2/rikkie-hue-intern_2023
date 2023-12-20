@@ -20,7 +20,7 @@ export const handleSuccess = (response: AxiosResponse<axiosApi>) => {
 };
 
 export const handleError = (error: any) => {
-  if (typeof error === 'object' && error !== null && error.message) {
+  if (typeof error.message === 'object' && error?.message) {
     const { message } = error;
     return { message };
   }
@@ -46,9 +46,6 @@ export const handleError = (error: any) => {
         return { status: status, message: errors, error: null };
       }
     }
-  } else {
-    const message = response;
-    return { message };
   }
 
   return { status: '', message: '', error: null };

@@ -52,7 +52,7 @@ const SearchRoomBooking: React.FC<AutocompleteProps> = ({
       onSelect={handleSelect}
       onSearch={handleSearch}
       value={searchValue}
-      placeholder='Nhập ID phòng...'
+      placeholder='Input Room Name...'
       style={{ width: 300 }}
       allowClear
       autoFocus

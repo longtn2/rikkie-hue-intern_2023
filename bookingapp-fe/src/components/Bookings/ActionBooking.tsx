@@ -3,6 +3,8 @@ import { ActionBookingType } from '../../constant/constant';
 
 const ActionBooking: React.FC<ActionBookingType> = ({
   is_accepted,
+  action,
+  loading,
   visible,
 }) => {
   return is_accepted ? (
@@ -19,10 +21,18 @@ const ActionBooking: React.FC<ActionBookingType> = ({
   ) : (
     <>
       <Popover content='Accepted'>
-        <Button type='primary'>Accepted</Button>
+        <Button
+          type='primary'
+          loading={loading}
+          onClick={() => action('accept')}
+        >
+          Accepted
+        </Button>
       </Popover>
       <Popover content='Rejected'>
-        <Button danger>Rejected</Button>
+        <Button danger loading={loading} onClick={() => action('reject')}>
+          Rejected
+        </Button>
       </Popover>
     </>
   );

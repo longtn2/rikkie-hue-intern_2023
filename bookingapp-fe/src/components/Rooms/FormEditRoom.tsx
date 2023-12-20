@@ -13,12 +13,14 @@ interface FormEdit {
   getInitialValues: () => Room | null;
   onFinish: (values: any) => void;
   onCancel: () => void;
+  loading: boolean;
   form: FormInstance;
 }
 
 const FormEditRoom: React.FC<FormEdit> = ({
   getInitialValues,
   onFinish,
+  loading,
   onCancel,
   form,
 }) => {
@@ -49,6 +51,7 @@ const FormEditRoom: React.FC<FormEdit> = ({
       onFinish={handelFinish}
       labelCol={{ span: 5 }}
       labelAlign='left'
+      disabled={loading}
       preserve={false}
       wrapperCol={{ flex: 4 }}
     >
@@ -66,7 +69,7 @@ const FormEditRoom: React.FC<FormEdit> = ({
         <Button htmlType='button' onClick={handleCancel} className='btn-right'>
           Cancel
         </Button>
-        <Button type='primary' htmlType='submit'>
+        <Button type='primary' htmlType='submit' loading={loading}>
           Update
         </Button>
       </Form.Item>

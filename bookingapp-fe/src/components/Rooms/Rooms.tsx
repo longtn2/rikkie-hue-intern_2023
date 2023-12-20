@@ -303,6 +303,7 @@ const Rooms: React.FC = () => {
       >
         <FormEditRoom
           form={formAdd}
+          loading={loading}
           getInitialValues={getInitalValues}
           onFinish={handleUpdate}
           onCancel={handleCloseEditModal}
@@ -317,6 +318,7 @@ const Rooms: React.FC = () => {
       >
         <FormAddRoom
           onFinish={handleAddRoom}
+          loading={loading}
           onCancel={handleCancel}
           form={formAdd}
         />
