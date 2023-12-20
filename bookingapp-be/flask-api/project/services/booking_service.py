@@ -16,7 +16,7 @@ from project.services.notification_service import PushNotification
 
 
 class BookingService:
-
+    
     @staticmethod
     def show_list_booking(bookings: List[Booking]):
         list_bookings = []
@@ -114,7 +114,19 @@ class BookingService:
                 room_id, title, time_start, time_end, user_ids)
             BookingService.send_email_inviting_join_the_meeting(
                 new_booking, user_ids)
+            BookingService.push_notification(booking=new_booking)
         return BaseResponse.success(message='Booking created successfully')
+    
+    @staticmethod
+    def push_notification(booking: Booking):
+        users = []
+        users.extend([booking_user.user for booking_user in booking.booking_user])  
+        for user in users:
+            if user.fcm_token:
+                PushNotification.send_notification_reminder(
+                    fcm_token = user.fcm_token,
+                    message_title = "Successful Booking",
+                    message_body = f"The {booking.title} is booking by admin ")
 
     @staticmethod
     def send_email_inviting_join_the_meeting(new_booking: Booking, user_ids: List[int]):

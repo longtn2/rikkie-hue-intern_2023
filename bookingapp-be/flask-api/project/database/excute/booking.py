@@ -173,3 +173,11 @@ class BookingExecutor:
                 Booking.time_start == (time_cooming)
             ).all()
         return bookings
+
+    @staticmethod 
+    def check_attending(booking_id: int, user_id: int):
+        booking_user = BookingUser.query.filter(
+            BookingUser.booking_id == booking_id,
+            BookingUser.user_id == user_id
+        ).first()
+        return booking_user.is_attending
