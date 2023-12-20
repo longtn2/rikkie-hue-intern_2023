@@ -15,6 +15,7 @@ import { DeleteTwoTone, EditTwoTone, SearchOutlined } from "@ant-design/icons";
 import Search from "antd/es/input/Search";
 import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 import FormEdit from "./FormEdit";
+import { del, get } from "../../ultils/request";
 
 const UsersManager = () => {
   const [listUsers, setListUsers] = useState<DataType[]>([]);
@@ -32,21 +33,17 @@ const UsersManager = () => {
   const getData = async () => {
     setLoading(true);
     try {
-      await axios
-        .get(`${url}/v1/users`, {
-          params: {
-            page: currentPage,
-            per_page: perPage,
-          },
-          withCredentials: true,
-          headers: HEADER,
-        })
-        .then((response) => {
-          setListUsers(response?.data?.data?.users);
-          setTotalItems(response?.data?.data?.total_items);
-          setPerPage(response?.data?.data?.per_page);
-        });
-    } catch (error) {
+      setLoading(true);
+      const response = await get("/v1/users", {
+        page: currentPage,
+        per_page: perPage,
+      });
+      if (response) {
+        setListUsers(response.users);
+        setTotalItems(response.total_items);
+        setPerPage(response.per_page);
+      }
+    } catch (error: any) {
       handleErrorShow(error);
     } finally {
       setLoading(false);
@@ -57,19 +54,16 @@ const UsersManager = () => {
       getData();
     } else {
       try {
-        await axios
-          .get(`${url}/v1/users/search`, {
-            params: {
-              search: value,
-            },
-            headers: HEADER,
-          })
-          .then((response) => {
-            setListUsers(response?.data?.data?.users);
-            setTotalItems(response?.data?.data?.total_items);
-          });
-      } catch (error) {
+        setLoading(true);
+        const response = await get("v1/users/search", { search: value });
+        if (response) {
+          setListUsers(response.users);
+          setTotalItems(response.total_items);
+        }
+      } catch (error: any) {
         handleErrorShow(error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -83,22 +77,22 @@ const UsersManager = () => {
         )
       );
     }
+    getData()
   };
-
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (selectedUser) {
       try {
-        axios
-          .delete(`${url}/v1/users/${selectedUser.user_id}`, {
-            headers: HEADER,
-          })
-          .then((response) => {
-            handleSuccessShow(response);
-            setIsModalDeleteOpen(false);
-            getData();
-          });
-      } catch (error) {
+        setLoading(true);
+        const response = await del(`/v1/users/${selectedUser.user_id}`);
+        if (response) {
+          getData();
+          handleSuccessShow(response);
+          setIsModalDeleteOpen(false);
+        }
+      } catch (error: any) {
         handleErrorShow(error);
+      } finally {
+        setLoading(false);
       }
     }
   };

@@ -5,6 +5,7 @@ import { DataType, HEADER, roles } from "../../constant/constant";
 import { url } from "../../ultils/urlApi";
 import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
 import "./UserManager.css";
+import { put } from "../../ultils/request";
 interface FormEditProps {
   onModalEditUser: (status: boolean) => void;
   data: DataType | undefined;
@@ -24,15 +25,12 @@ const FormEdit: React.FC<FormEditProps> = ({
         const urlUpdate = roles.includes("admin")
           ? `/v1/users/${data.user_id}`
           : `/v1/users/profile`;
-        await axios
-          .put(`${url}${urlUpdate}`, value, {
-            headers: HEADER,
-          })
-          .then((response: any) => {
-            onEditUser(value);
-            handleSuccessShow(response);
-            onModalEditUser(false);
-          });
+        const response = await put(`${urlUpdate}`, value);
+        if (response) {
+          onEditUser(value);
+          handleSuccessShow(response);
+          onModalEditUser(false);
+        }
       } catch (error: any) {
         handleErrorShow(error);
       } finally {

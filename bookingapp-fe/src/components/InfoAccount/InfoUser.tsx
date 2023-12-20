@@ -8,6 +8,7 @@ import { handleErrorShow } from "../../ultils/ultilsApi";
 import "./InfoAccount.css";
 import FormEdit from "../Users/FormEdit";
 import { getCookie } from "../../helper/Cookie";
+import { get } from "../../ultils/request";
 
 const InfoUser = () => {
   const [infoUser, setInfoUser] = useState<DataType>();
@@ -16,18 +17,15 @@ const InfoUser = () => {
   const id = getCookie("id");
   useEffect(() => {
     getData();
+    console.log(infoUser)
   }, []);
   const getData = async () => {
     try {
       setLoading(true);
-      await axios
-        .get(url + "/v1/users/" + id, {
-          withCredentials: true,
-          headers: HEADER,
-        })
-        .then((response) => {
-          setInfoUser(response.data.data);
-        });
+      const response = await get(`/v1/users/${id}`);
+      if (response) {
+        setInfoUser(response);
+      }
     } catch (error: any) {
       handleErrorShow(error);
     } finally {

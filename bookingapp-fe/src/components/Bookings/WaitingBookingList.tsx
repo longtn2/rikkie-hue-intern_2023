@@ -11,6 +11,7 @@ import ConfirmAction from "./ConfirmAction";
 import BtnAccept from "./BtnAccept";
 import BtnReject from "./BtnReject";
 import BtnDetail from "./BtnDetail";
+import { get, put } from "../../ultils/request";
 
 const WaitingBookingList = () => {
   const [listBooking, setListBooking] = useState<BookingData[]>([]);
@@ -27,21 +28,17 @@ const WaitingBookingList = () => {
   const getData = async () => {
     setLoading(true);
     try {
-      await axios
-        .get(`${url}/v1/admin/view_booking_pending`, {
-          params: {
-            page: currentPage,
-            per_page: perPage,
-          },
-          withCredentials: true,
-          headers: HEADER,
-        })
-        .then((response: any) => {
-          setListBooking(response?.data?.data?.list_bookings);
-          setTotalItems(response?.data?.data?.total_items);
-          setPerPage(response?.data?.data?.per_page);
-        });
-    } catch (error) {
+      setLoading(true);
+      const response = await get(`/v1/admin/view_booking_pending`, {
+        page: currentPage,
+        per_page: perPage,
+      });
+      if (response?.list_bookings) {
+        setListBooking(response.list_bookings);
+        setTotalItems(response.total_items);
+        setPerPage(response.per_page);
+      }
+    } catch (error: any) {
       handleErrorShow(error);
     } finally {
       setLoading(false);
@@ -51,21 +48,16 @@ const WaitingBookingList = () => {
     if (data) {
       try {
         setLoading(true);
-        await axios
-          .put(
-            `${url}/v1/bookings/${data.booking_id}/${key}`,
-            {},
-            {
-              headers: HEADER,
-            }
-          )
-          .then((response: any) => {
-            setListBooking(response?.data?.data?.list_bookings);
-            handleSuccessShow(response);
-            handleModalAction(false);
-            handelViewDetail(false);
-            getData();
-          });
+        const response = await put(
+          `/v1/bookings/${data.booking_id}/${key}`,
+          {}
+        );
+        if (response) {
+          handleModalAction(false);
+          handelViewDetail(false);
+          handleSuccessShow(response);
+          getData();
+        }
       } catch (error: any) {
         handleErrorShow(error);
       } finally {
@@ -125,7 +117,7 @@ const WaitingBookingList = () => {
                   <InfoInvitation data={item} />
                   <div className="container-btn">
                     <Row className="container-row">
-                      <Col>
+                      <Col xxl={8} xl={8} sm={13}>
                         <BtnDetail
                           selectBooking={item}
                           handleSelectAction={async () =>
@@ -133,7 +125,7 @@ const WaitingBookingList = () => {
                           }
                         />
                       </Col>
-                      <Col>
+                      <Col xxl={8} xl={8} sm={13}>
                         <BtnAccept
                           name="ACCEPT"
                           data={item}
@@ -141,10 +133,10 @@ const WaitingBookingList = () => {
                             handleShowModalAction(item, "accept")
                           }
                           defaultType={true}
-                          disabled={false}
+                          disabled={null}
                         />
                       </Col>
-                      <Col>
+                      <Col xxl={8} xl={8} sm={13}>
                         <BtnReject
                           name="REJECT"
                           data={item}
@@ -152,7 +144,7 @@ const WaitingBookingList = () => {
                             handleShowModalAction(item, "reject")
                           }
                           defaultType={true}
-                          disabled={false}
+                          disabled={null}
                         />
                       </Col>
                     </Row>

@@ -7,7 +7,7 @@ interface BtnProps {
   data: BookingData | undefined;
   handleSelectAction: (selectBooking: BookingData) => void;
   defaultType: boolean;
-  disabled: boolean;
+  disabled: boolean | null;
 }
 
 const BtnReject: React.FC<BtnProps> = ({
@@ -19,14 +19,14 @@ const BtnReject: React.FC<BtnProps> = ({
 }) => {
   const buttonStyle = useMemo(() => {
     return {
-      backgroundColor: data?.status !== null && !data?.status ? "red" : "white",
-      color: !data?.status ? "white" : "black",
+      backgroundColor: data?.status !== null && !data?.status ? "red" : "#ece1f6",
+      color: data?.status === false ? "white" : "black",
     };
   }, [data?.status]);
   return (
     <Button
       className="btn-action btn__reject"
-      disabled={disabled}
+      disabled={disabled !== false ? false : true }
       style={defaultType ? {} : buttonStyle}
       type="text"
       onClick={() => handleSelectAction(data!)}
