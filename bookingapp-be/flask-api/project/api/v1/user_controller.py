@@ -63,8 +63,6 @@ def delete_user(user_id):
         return response
     except NotFound as e:
         return BaseResponse.error(e)
-    except Exception as e:
-        raise InternalServerError() from e
 
 @user_blueprint.route('/users/search', methods=['GET'])
 @jwt_required()
@@ -78,8 +76,6 @@ def search_user_by_name_or_email():
         return response
     except NotFound as e:
         raise BaseResponse.error(e)
-    except Exception as e:
-        raise InternalServerError('Internal Server Error') from e
     
 @user_blueprint.route('/users/<int:user_id>', methods=['GET'])
 @jwt_required()
@@ -90,5 +86,34 @@ def get_detail_user(user_id):
         return BaseResponse.success(user)
     except NotFound as e:
         raise BaseResponse.error(e)
+    
+@user_blueprint.route('/users/change_password', methods=['PUT'])
+@jwt_required()
+@has_permission("update")
+def change_password():
+    try:
+        data = request.get_json()
+        response = UserService.change_password(data)
+        return response
+    except NotFound as e:
+        return BaseResponse.error(e)
+    except BadRequest as e:
+        return BaseResponse.error(e)
+    except Unauthorized as e:
+        return BaseResponse.error(e)
+    
+@user_blueprint.route('/users/profile', methods=['PUT'])
+@jwt_required()
+@has_permission("update")
+def edit_profile():
+    try:
+        data = request.get_json()
+        response = UserService.edit_profile(data)
+        return response
+    except NotFound as e:
+        return BaseResponse.error(e)
+    except Conflict as e:
+        return BaseResponse.error(e)
     except Exception as e:
-        raise InternalServerError('Internal Server Error') from e 
+        return BaseResponse.error_validate(e)
+    
