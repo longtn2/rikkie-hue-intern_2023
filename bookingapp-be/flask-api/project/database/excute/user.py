@@ -3,7 +3,7 @@ from project.models.user_has_role import UserHasRole
 from project.models.role import Role
 from project.models.role_has_permission import RoleHasPermission
 from project.models.permission import Permission
-from typing import Optional, Union, List
+from typing import List
 from project import db
 
 

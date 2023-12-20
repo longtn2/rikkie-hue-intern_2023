@@ -7,7 +7,9 @@ from typing import Dict, List
 from math import ceil
 from datetime import datetime
 from flask_jwt_extended import get_jwt_identity
-
+import os
+from flask import request
+from project.api.common.constant import DEFAULT_PAGE, DEFAULT_PER_PAGE , MAX_ITEMS_PER_PAGE
 class UserService:
 
     @staticmethod
@@ -28,7 +30,12 @@ class UserService:
         return paginated_users
 
     @staticmethod
-    def get_list_users(page: int, per_page: int):
+    def get_list_users() -> List[User]:
+        page = int(request.args.get('page', DEFAULT_PAGE))
+        per_page = int(request.args.get('per_page', DEFAULT_PER_PAGE))
+        if per_page == -1:
+            per_page = MAX_ITEMS_PER_PAGE
+
         users = UserExecutor.get_list_users(page, per_page)
         paginated_users = UserService.paginated_users(users)
 
@@ -202,11 +209,15 @@ class UserService:
         return BaseResponse.success(message="Update profile successfully!")
     
     @staticmethod
-    def search_list_user(page: int, per_page: int, search: str):
+    def search_list_user() ->  List[User]:
+        search = request.args.get('search')
+        page = int(request.args.get('page', DEFAULT_PAGE))
+        per_page = int(request.args.get('per_page', DEFAULT_PER_PAGE))
+        if per_page == -1:
+            per_page = MAX_ITEMS_PER_PAGE
         users = UserExecutor.search_list_user(page, per_page, search)
         if users is None:
             raise NotFound("No data found")
-
         paginated_users = UserService.paginated_users(users)
 
         total_items = users.total
@@ -220,4 +231,4 @@ class UserService:
             'current_page': current_page,
             'total_pages': total_pages
         }
-        return BaseResponse.success(result)
+        return result

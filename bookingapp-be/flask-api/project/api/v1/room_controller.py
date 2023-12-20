@@ -1,7 +1,7 @@
 from flask import Blueprint, request
-from flask_jwt_extended import JWTManager, jwt_required
+from flask_jwt_extended import jwt_required
 from project.api.v1.has_permission import has_permission
-from werkzeug.exceptions import BadRequest, NotFound, Conflict, InternalServerError, UnprocessableEntity
+from werkzeug.exceptions import BadRequest, NotFound, Conflict, InternalServerError
 from project.api.common.base_response import BaseResponse
 from project.services.room_service import RoomService
 from typing import Optional, Dict
@@ -14,14 +14,9 @@ room_blueprint = Blueprint('room_controller', __name__)
 @has_permission("view")
 def get_rooms():
     try:
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 10, type=int)
-
-        response_data = RoomService.get_paginated_rooms(page, per_page)
-
+        response_data = RoomService.get_paginated_rooms()
         return BaseResponse.success(response_data)
-
-    except NotFound as e:
+    except NotFound  as e:
         return BaseResponse.error(e)
 
 
@@ -97,11 +92,9 @@ def open_room(room_id: int):
     try:
         data = request.get_json()
         response_data = RoomService.open_room(room_id, data)
-        return response_data
-
+        return BaseResponse.success(response_data)
     except NotFound as e:
         return BaseResponse.error(e)
-
     except BadRequest as e:
         return BaseResponse.error(e)
 
@@ -111,11 +104,7 @@ def open_room(room_id: int):
 @has_permission("view")
 def search_rooms_endpoint():
     try:
-        page: int = request.args.get('page', 1, type=int)
-        per_page: int = request.args.get('per_page', 10, type=int)
-        search_name: str = request.args.get('name', '')
-
-        response_data = RoomService.search_rooms(page, per_page, search_name)
+        response_data = RoomService.search_rooms()
         return BaseResponse.success(response_data)
 
     except NotFound as e:
@@ -127,10 +116,7 @@ def search_rooms_endpoint():
 @has_permission("view")
 def get_status_rooms_endpoint():
     try:
-        page: int = request.args.get('page', 1, type=int)
-        per_page: int = request.args.get('per_page', 10, type=int)
-
-        response_data = RoomService.get_status_rooms(page, per_page)
+        response_data = RoomService.get_status_rooms()
         return BaseResponse.success(response_data)
 
     except NotFound as e:

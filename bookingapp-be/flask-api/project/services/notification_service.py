@@ -1,9 +1,4 @@
-from flask_mail import Message
-import os
-from project import mail, app, celery, push_service, scheduler
-from werkzeug.exceptions import InternalServerError
-from project.api.common.base_response import BaseResponse
-from project.database.excute.room import RoomExecutor
+from project import app, push_service, scheduler
 from project.database.excute.booking import BookingExecutor
 from datetime import datetime, timedelta
 from project.services.email_service import EmailSender
