@@ -22,7 +22,7 @@ const InfoInvitation: React.FC<InfoInvitationProps> = ({ data }) => {
     <Descriptions
       className="detail-booked"
       layout="horizontal"
-      column={{ xxl: 4, xl: 3, lg: 2, md: 2 }}
+      column={{ xxl: 3, xl: 3, lg: 2, md: 2 }}
     >
       <Descriptions.Item
         labelStyle={customLabelStyle}

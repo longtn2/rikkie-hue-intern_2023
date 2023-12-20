@@ -5,6 +5,7 @@ import { url } from "../../ultils/urlApi";
 import { HEADER } from "../../constant/constant";
 import "./ChangePass.css";
 import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
+import { put } from "../../ultils/request";
 
 interface ChangePasswordProps {
   onChange: (status: boolean) => void;
@@ -15,14 +16,11 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onChange }) => {
   const handleChangepassword = async (value: any) => {
     try {
       setLoading(true);
-      await axios
-        .put(`${url}/v1/users/change_password`, value, {
-          headers: HEADER,
-        })
-        .then((response: any) => {
-          handleSuccessShow(response);
-          onChange(false);
-        });
+      const response = await put("/v1/users/change_password", value);
+      if (response) {
+        handleSuccessShow(response);
+        onChange(false);
+      }
     } catch (error: any) {
       handleErrorShow(error);
     } finally {

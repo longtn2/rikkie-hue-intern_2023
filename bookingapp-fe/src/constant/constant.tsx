@@ -21,7 +21,7 @@ export interface BookingData {
   user_name: string[];
   time_start: string;
   time_end: string;
-  is_eccept: boolean;
+  is_accepted: boolean;
   is_deleted: boolean;
   booking_users: [];
   creator_name: string;
@@ -73,7 +73,7 @@ export const statuTag = (item: BookingData) => {
         Rejected
       </Tag>
     );
-  } else if (item.is_eccept) {
+  } else if (item.is_accepted) {
     return (
       <Tag className='status-tag' color='#009900'>
         Successed

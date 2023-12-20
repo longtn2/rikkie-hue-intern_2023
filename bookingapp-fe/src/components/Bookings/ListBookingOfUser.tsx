@@ -1,15 +1,18 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { url } from "../../ultils/urlApi";
-import { BookingData, statuTag, token } from "../../constant/constant";
-import { Card, Descriptions, List, Spin } from "antd";
+import {
+  BookingData,
+  ChangePageSize,
+  statuTag,
+} from "../../constant/constant";
+import { Card,  List, Spin } from "antd";
 import "./Booking.css";
 import { handleErrorShow } from "../../ultils/ultilsApi";
-import { formatDate, formatTime } from "../../ultils/ultils";
+import { get } from "../../ultils/request";
+import InfoInvitation from "./InfoInvitation";
 
 const ListBookingOfUser = () => {
   const [listBooking, setListBooking] = useState<BookingData[]>([]);
-  const [perPage, setPerPage] = useState(1);
+  const [perPage, setPerPage] = useState(3);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -19,24 +22,18 @@ const ListBookingOfUser = () => {
   const getData = async () => {
     setLoading(true);
     try {
-      await axios
-        .get(url + "/v1/user/view_booked", {
-          params: {
-            page: currentPage,
-            per_page: perPage,
-          },
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          setListBooking(response?.data?.data?.list_bookings);
-          setTotalItems(response?.data?.data?.total_items);
-          setPerPage(response?.data?.data?.per_page);
-        });
+      setLoading(true);
+      const response = await get(`/v1/user/view_booked`, {
+        page: currentPage,
+        per_page: perPage,
+      });
+      if (response) {
+        setListBooking(response.list_bookings);
+        setTotalItems(response.total_items);
+        setPerPage(response.per_page);
+      }
     } catch (error: any) {
-      handleErrorShow(error)
+      handleErrorShow(error);
     } finally {
       setLoading(false);
     }
@@ -44,18 +41,12 @@ const ListBookingOfUser = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-  const handlePageSizeChange = (pageSize: number) => {
-    const newPerPage = pageSize;
-    const newCurrentPage =
-      Math.ceil(((currentPage - 1) * perPage) / newPerPage) + 1;
-    setCurrentPage(newCurrentPage);
-  };
   const pagination = {
     current: currentPage,
     pageSize: perPage,
     total: totalItems,
     onChange: handlePageChange,
-    onShowSizeChange: handlePageSizeChange,
+    onShowSizeChange: ChangePageSize,
   };
   const customLabelStyle = {
     fontWeight: "bold",
@@ -77,65 +68,24 @@ const ListBookingOfUser = () => {
         tip="Loading..."
         className="loading"
       >
-      <List
-        dataSource={listBooking}
-        pagination={pagination}
-        renderItem={(item: BookingData) => (
-          <List.Item>
-            <Card
-              className="item-booked"
-              key={item.title}
-              title={<div className="title-booked">{item.title}</div>}
-            >
-              <div className="info-booked">
-                <Descriptions
-                  className="detail-booked"
-                  layout="horizontal"
-                  column={2}
-                >
-                  <Descriptions.Item
-                    labelStyle={customLabelStyle}
-                    contentStyle={customContentStyle}
-                    label="ROOM"
-                  >
-                    {item.room_name}
-                  </Descriptions.Item>
-                  <Descriptions.Item
-                    labelStyle={customLabelStyle}
-                    contentStyle={customContentStyle}
-                    label="DATE"
-                  >
-                    {formatDate(item.time_start)}
-                  </Descriptions.Item>
-                  <Descriptions.Item
-                    labelStyle={customLabelStyle}
-                    contentStyle={customContentStyle}
-                    label="TOTAL PARTICIPATIONS"
-                  >
-                    {item.user_name}
-                  </Descriptions.Item>
-                  <Descriptions.Item
-                    labelStyle={customLabelStyle}
-                    contentStyle={customContentStyle}
-                    label="TIME START"
-                  >
-                    {formatTime(item.time_start)}
-                  </Descriptions.Item>
-                  <Descriptions.Item> </Descriptions.Item>
-                  <Descriptions.Item
-                    labelStyle={customLabelStyle}
-                    contentStyle={customContentStyle}
-                    label="TIME END"
-                  >
-                    {formatTime(item.time_end)}
-                  </Descriptions.Item>
-                </Descriptions>
-                <div className="status-booked">{statuTag(item)}</div>
-              </div>
-            </Card>
-          </List.Item>
-        )}
-      />
+        <List
+          dataSource={listBooking}
+          pagination={pagination}
+          renderItem={(item: BookingData) => (
+            <List.Item>
+              <Card
+                className="item-booked"
+                key={item.title}
+                title={<div className="title-booked">{item.title}</div>}
+              >
+                <div className="info-booked">
+                  <InfoInvitation data={item} />
+                  <div className="status-booked">{statuTag(item)}</div>
+                </div>
+              </Card>
+            </List.Item>
+          )}
+        />
       </Spin>
     </div>
   );

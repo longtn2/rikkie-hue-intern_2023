@@ -6,6 +6,7 @@ import "./UserManager.css";
 import { url } from "../../ultils/urlApi";
 import { DataType, HEADER } from "../../constant/constant";
 import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
+import { post } from "../../ultils/request";
 interface FormAddProps {
   onModalAddUser: (status: boolean) => void;
   onAddUser: (addUser: DataType) => void;
@@ -15,17 +16,14 @@ const FormAdd: React.FC<FormAddProps> = ({ onModalAddUser, onAddUser }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
   const handleSubmit = async (value: any) => {
-    setLoading(true);
     try {
-      await axios
-        .post(`${url}/v1/users`, value, {
-          headers: HEADER,
-        })
-        .then((response) => {
-          onAddUser(value);
-          handleSuccessShow(response);
-          onModalAddUser(false);
-        });
+      setLoading(true);
+      const response = await post("/v1/users", value);
+      if (response) {
+        onAddUser(value);
+        handleSuccessShow(response);
+        onModalAddUser(false);
+      }
     } catch (error: any) {
       handleErrorShow(error);
     } finally {

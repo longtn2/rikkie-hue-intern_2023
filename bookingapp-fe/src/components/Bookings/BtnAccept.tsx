@@ -18,7 +18,7 @@ const BtnAccept: React.FC<BtnProps> = ({
 }) => {
   const buttonStyle = useMemo(() =>{
     return {
-      backgroundColor: data?.status !== null && data?.status ? "green" : "white",
+      backgroundColor: data?.status !== null && data?.status ? "green" : "#ece1f6",
       color: data?.status ? "white" : "black",
     };
   }, [data?.status]);
