@@ -1,11 +1,11 @@
 import { Menu } from "antd";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AppstoreOutlined,
   HomeOutlined,
   SelectOutlined,
   UserOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import Sider from "antd/es/layout/Sider";
 import { getCookie } from "../../helper/Cookie";
@@ -18,6 +18,8 @@ const SiderComponent = () => {
       {role.includes("admin") ? (
         <Sider
           style={{ marginTop: 13 }}
+          breakpoint="lg"
+          collapsedWidth={70}
           trigger={null}
           theme="light"
           width={"200px"}
@@ -39,7 +41,7 @@ const SiderComponent = () => {
               },
               {
                 key: "/calendarmeeting",
-                icon: <AppstoreOutlined />,
+                icon: <CalendarOutlined />,
                 label: "Calendar Meeting",
               },
               {
