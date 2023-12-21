@@ -206,23 +206,10 @@ class BookingService:
             booking.is_accepted = True
             booking.is_deleted = False
             booking.deleted_at = None
-            user_ids = [user.user_id for user in booking.booking_user]
+            users = [user.user for user in booking.booking_user]
+            db.session.commit()
             BookingService.send_email_accepting_the_scheduled(
-                booking, user_ids)
-            db.session.commit()
-            if booking.creator_id:
-                user = UserExecutor.get_user(user_id=booking.creator_id)
-                if user and user.fcm_token:
-                    PushNotification.send_notification_reminder(
-                        fcm_token=user.fcm_token,
-                        message_title="Booking Accepted",
-                        message_body=f"The booking '{booking.title}' scheduled for {
-                            booking.time_start} - {booking.time_end} has been accepted."
-                    )
-            else:
-                raise NotFound('Creator not found')
-
-            db.session.commit()
+                booking, users)
             return BaseResponse.success(message='Booking accepted successfully')
 
         except Exception as e:
@@ -230,22 +217,34 @@ class BookingService:
             raise InternalServerError(str(e))
 
     @staticmethod
-    def send_email_accepting_the_scheduled(booking: Booking, user_ids: List[int]):
-        for user_id in user_ids:
-            user_email = UserExecutor.get_user_email_by_id(user_id)
-            title = booking.title
-            time_start = booking.time_start
-            time_end = booking.time_end
-            room_name = booking.room.room_name
-            attendees = [
+    def send_email_accepting_the_scheduled(booking: Booking, users: List[User]):
+        title = booking.title
+        time_start = booking.time_start
+        time_end = booking.time_end
+        room_name = booking.room.room_name
+        attendees = [
                 booking_user.user.user_name for booking_user in booking.booking_user]
-
-            if user_id == booking.creator_id:
+        for user in users:
+            if user.user_id == booking.creator_id:
                 EmailSender.send_email_accepting_the_scheduled(
-                    user_email, title, time_start, time_end, room_name, attendees)
+                    user.email, title, time_start, time_end, room_name, attendees)
+                if user.fcm_token:
+                    PushNotification.send_notification_reminder(
+                        fcm_token=user.fcm_token,
+                        message_title="Booking Accepted",
+                        message_body=f"The booking '{booking.title}' scheduled for {
+                            booking.time_start} - {booking.time_end} has been accepted."
+                    )
+
             else:
                 EmailSender.send_email_inviting_join_the_meeting(
-                    user_email, title, time_start, time_end, room_name, attendees)
+                    user.email, title, time_start, time_end, room_name, attendees)
+                if user.fcm_token:
+                    PushNotification.send_notification_reminder(
+                        fcm_token = user.fcm_token,
+                        message_title = "Notification: Meeting invite",
+                        message_body = f"You are added to {title} "
+                    )
 
     @staticmethod
     def book_room_belong_to_user(data:  Dict):
