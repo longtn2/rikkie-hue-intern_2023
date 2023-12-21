@@ -1,6 +1,6 @@
 import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useState } from "react";
-import "./Dashboard.css";
+import "./dashboard.css";
 import { handleErrorShow } from "../../ultils/ultilsApi";
 import { Space, Spin } from "antd";
 import { get } from "../../ultils/request";
