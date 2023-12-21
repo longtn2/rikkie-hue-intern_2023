@@ -6,6 +6,7 @@ from project.api.common.base_response import BaseResponse
 from project.models import Room, Booking
 from typing import Optional, List, Dict
 
+
 class RoomService:
     @staticmethod
     def get_paginated_rooms(page, per_page):
@@ -25,41 +26,45 @@ class RoomService:
         return RoomExecutor.get_room_detail(room_id)
 
     @staticmethod
-    def create_room(data: Dict) -> Dict:
-        room_name: str = data.get("room_name")
-        is_blocked: Optional[bool] = data.get("is_blocked", False)
-        description: Optional[str] = data.get("description")
+    def create_room(data: Dict):
+        room_name = data.get("room_name")
+        description= data.get("description")
+        new_room = Room(room_name= room_name, description= description, is_blocked= False)
 
+        errors = new_room.validate_all_fields()
+        if errors:
+            return BaseResponse.error_validate(errors)
+         
         existing_room: Optional[Room] = RoomExecutor.get_room_by_name(room_name)
         if existing_room:
             raise Conflict("Room already exists")
 
-        new_room = Room(room_name=room_name, description=description, is_blocked=is_blocked)
         RoomExecutor.add_room(new_room)
+        return BaseResponse.success(message="Room created successfully!")
 
-        return {"message": "Room created successfully"}
-    
     @staticmethod
     def update_room(room_id: int, data: Dict) -> None:
         room_name = data.get("room_name")
-
+        description= data.get("description")
         room_to_update = Room.query.get(room_id)
 
         if not room_to_update:
             raise NotFound("Room not found")
         
-        validate_room_name=Room.validate_room_name(room_name)
-        if validate_room_name:
-            return BaseResponse.error_validate(validate_room_name)
-        
-        existing_room = RoomExecutor.get_room_by_name(room_name)
-        if existing_room:
-            raise BadRequest("Room name already exists")
-
         room_to_update.room_name = room_name
-        db.commit()
-        return BaseResponse.success(message="update room successfully!")
-    
+        room_to_update.description= description
+
+        errors = room_to_update.validate_all_fields()
+        if errors:
+            return BaseResponse.error_validate(errors)
+
+        existing_room = RoomExecutor.get_room_by_name(room_name,room_id)
+        if existing_room:
+            raise Conflict("Room name already exists")
+        
+        db.session.commit()
+        return BaseResponse.success(message="Update room successfully!")
+
     @staticmethod
     def delete_room(room_id: int, data: Optional[Dict]) -> Dict:
         try:
@@ -71,20 +76,24 @@ class RoomService:
             if room_to_delete.is_blocked:
                 raise BadRequest("Cannot block locked rooms")
 
-            description: Optional[str] = data.get("description") if data else None
+            description: Optional[str] = data.get(
+                "description") if data else None
 
-            bookings_to_delete: List[Booking] = RoomExecutor.get_bookings_by_room_id(room_id)
+            bookings_to_delete: List[Booking] = RoomExecutor.get_bookings_by_room_id(
+                room_id)
 
-            RoomExecutor.soft_delete_room_and_bookings(room_to_delete, bookings_to_delete, description)
+            RoomExecutor.soft_delete_room_and_bookings(
+                room_to_delete, bookings_to_delete, description)
 
-            return {"message": "Room and associated bookings blocked successfully"}
+            return BaseResponse.success(message="Room and associated bookings blocked successfully")
 
         except Exception as e:
-            raise InternalServerError(e)
-        
+            raise NotFound(e)
+
     @staticmethod
     def get_status_rooms(page: int, per_page: int):
-        paginated_rooms, total_items, total_pages = RoomExecutor.get_rooms_with_status(page, per_page)
+        paginated_rooms, total_items, total_pages = RoomExecutor.get_rooms_with_status(
+            page, per_page)
 
         return {
             "rooms": [room.serialize() for room in paginated_rooms],
@@ -93,11 +102,11 @@ class RoomService:
             "per_page": per_page,
             "total_pages": total_pages
         }
-        
 
     @staticmethod
     def search_rooms(page: int, per_page: int, search_name: Optional[str]) -> Dict[str, int]:
-        paginated_rooms, total_items, total_pages = RoomExecutor.search_rooms_in_db(page, per_page, search_name)
+        paginated_rooms, total_items, total_pages = RoomExecutor.filter_room_by_name(
+            page, per_page, search_name)
 
         return {
             "rooms": [room.serialize() for room in paginated_rooms],
@@ -106,7 +115,7 @@ class RoomService:
             "per_page": per_page,
             "total_pages": total_pages
         }
-    
+
     @staticmethod
     def open_room(room_id: int, data: Dict) -> Dict:
         room_to_open = RoomExecutor.get_room_by_id(room_id)
@@ -123,4 +132,4 @@ class RoomService:
 
         RoomExecutor.open_room(room_to_open, bookings_to_open, description)
 
-        return {"message": "Room and associated bookings opened successfully"}
+        return BaseResponse.success(message="Room and associated bookings opened successfully")

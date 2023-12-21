@@ -200,3 +200,24 @@ class UserService:
         user.phone_number = new_phone_number
         db.session.commit()
         return BaseResponse.success(message="Update profile successfully!")
+    
+    @staticmethod
+    def search_list_user(page: int, per_page: int, search: str):
+        users = UserExecutor.search_list_user(page, per_page, search)
+        if users is None:
+            raise NotFound("No data found")
+
+        paginated_users = UserService.paginated_users(users)
+
+        total_items = users.total
+        total_pages = ceil(total_items / per_page)
+        per_page = per_page
+        current_page = page
+        result = {
+            'users': paginated_users,
+            'total_items': total_items,
+            'per_page': per_page,
+            'current_page': current_page,
+            'total_pages': total_pages
+        }
+        return BaseResponse.success(result)

@@ -16,7 +16,7 @@ from project.services.notification_service import PushNotification
 
 
 class BookingService:
-    
+
     @staticmethod
     def show_list_booking(bookings: List[Booking]):
         list_bookings = []
@@ -28,7 +28,7 @@ class BookingService:
             creator_name=user_created.user_name if user_created else None
             room = Room.query.filter_by(room_id=booking.room_id).first()
             room_name = room.room_name if room else None
-
+            
             booking_info = {
                 "booking_id": booking.booking_id,
                 "title": booking.title,
@@ -36,7 +36,7 @@ class BookingService:
                 "time_end": booking.time_end.strftime('%Y-%m-%d %H:%M:%S'),
                 "room_id": booking.room_id,
                 "room_name": room_name,
-                "user_ids": user_ids,
+                "user_ids": user_ids,  
                 "user_names": user_names,
                 "creator_id": booking.creator_id,
                 "creator_name": creator_name,
@@ -44,7 +44,7 @@ class BookingService:
                 "is_deleted":booking.is_deleted,
                 "booking_users":booking_users
             }
-            list_bookings.append(booking_info)
+            list_bookings.append(booking_info) 
         return list_bookings
 
     @staticmethod
@@ -110,10 +110,12 @@ class BookingService:
         if existing_booking:
             raise Conflict('Room is already booked for this time')
         else:
-            new_booking = BookingExecutor.create_booking(room_id, title, time_start, time_end, user_ids)
-            BookingService.send_email_inviting_join_the_meeting(new_booking, user_ids)
+            new_booking = BookingExecutor.create_booking(
+                room_id, title, time_start, time_end, user_ids)
+            BookingService.send_email_inviting_join_the_meeting(
+                new_booking, user_ids)
         return BaseResponse.success(message='Booking created successfully')
-    
+
     @staticmethod
     def send_email_inviting_join_the_meeting(new_booking: Booking, user_ids: List[int]):
         for user_id in user_ids:
@@ -122,9 +124,11 @@ class BookingService:
             time_start = new_booking.time_start
             time_end = new_booking.time_end
             room_name = new_booking.room.room_name
-            attendees = [booking_user.user.user_name for booking_user in new_booking.booking_user]
-            EmailSender.send_email_inviting_join_the_meeting(user_email, title, time_start, time_end, room_name, attendees)
-    
+            attendees = [
+                booking_user.user.user_name for booking_user in new_booking.booking_user]
+            EmailSender.send_email_inviting_join_the_meeting(
+                user_email, title, time_start, time_end, room_name, attendees)
+
     @staticmethod
     def update_booking(booking_id: int, data: Dict) -> Union[Dict, None]:
         room_id: int = data.get('room_id')
@@ -159,7 +163,7 @@ class BookingService:
         BookingExecutor.update_booking(
             booking, room_id, title, time_start, time_end, user_ids,)
 
-        return BaseResponse.success('Booking updated successfully')
+        return BaseResponse.success(message='Booking updated successfully')
 
     @staticmethod
     def delete_booking_service(booking_id: int) -> Dict:
@@ -180,9 +184,9 @@ class BookingService:
         booking.is_deleted = True
         booking.deleted_at = datetime.now()
 
-        BookingExecutor.commit()
+        db.session.commit()
         return BaseResponse.success(message='Booking deleted successfully')
-    
+
     @staticmethod
     def accept_booking(booking_id: int):
         booking = BookingExecutor.get_booking(booking_id)
@@ -191,7 +195,8 @@ class BookingService:
             booking.is_deleted = False
             booking.deleted_at = None
             user_ids = [user.user_id for user in booking.booking_user]
-            BookingService.send_email_accepting_the_scheduled(booking, user_ids)
+            BookingService.send_email_accepting_the_scheduled(
+                booking, user_ids)
             db.session.commit()
             if booking.creator_id:
                 user = UserExecutor.get_user(user_id=booking.creator_id)
@@ -199,18 +204,19 @@ class BookingService:
                     PushNotification.send_notification_reminder(
                         fcm_token=user.fcm_token,
                         message_title="Booking Accepted",
-                        message_body=f"The booking '{booking.title}' scheduled for {booking.time_start} - {booking.time_end} has been accepted."
+                        message_body=f"The booking '{booking.title}' scheduled for {
+                            booking.time_start} - {booking.time_end} has been accepted."
                     )
             else:
                 raise NotFound('Creator not found')
-            
+
             db.session.commit()
             return BaseResponse.success(message='Booking accepted successfully')
 
         except Exception as e:
             db.session.rollback()
             raise InternalServerError(str(e))
-        
+
     @staticmethod
     def send_email_accepting_the_scheduled(booking: Booking, user_ids: List[int]):
         for user_id in user_ids:
@@ -218,17 +224,16 @@ class BookingService:
             title = booking.title
             time_start = booking.time_start
             time_end = booking.time_end
-            room_name = booking.room.room_name 
-            attendees = [booking_user.user.user_name for booking_user in booking.booking_user]
-            
+            room_name = booking.room.room_name
+            attendees = [
+                booking_user.user.user_name for booking_user in booking.booking_user]
+
             if user_id == booking.creator_id:
-                EmailSender.send_email_accepting_the_scheduled(user_email, title, time_start, time_end, room_name, attendees)
+                EmailSender.send_email_accepting_the_scheduled(
+                    user_email, title, time_start, time_end, room_name, attendees)
             else:
-                EmailSender.send_email_inviting_join_the_meeting(user_email, title, time_start, time_end, room_name, attendees)   
-            
-    @staticmethod      
-    def book_room_belong_to_user(data:  Dict) :
-            raise InternalServerError(e)
+                EmailSender.send_email_inviting_join_the_meeting(
+                    user_email, title, time_start, time_end, room_name, attendees)
 
     @staticmethod
     def book_room_belong_to_user(data:  Dict):
@@ -255,20 +260,21 @@ class BookingService:
         if existing_booking:
             raise Conflict('Room is already booked for this time')
         else:
-            new_booking = BookingExecutor.create_booking_belong_to_user(room_id, title, time_start, time_end, user_ids)
-        admins=UserExecutor.get_list_user_by_role_name(role_name="admin")
+            new_booking = BookingExecutor.create_booking_belong_to_user(
+                room_id, title, time_start, time_end, user_ids)
+        admins = UserExecutor.get_list_user_by_role_name(role_name="admin")
         if not admins:
             raise NotFound('Admins not found')
-        creator=UserExecutor.get_user(user_id=new_booking.creator_id)
-        
+        creator = UserExecutor.get_user(user_id=new_booking.creator_id)
+
         for admin in admins:
             if admin.fcm_token:
                 PushNotification.send_notification_reminder(
-                            fcm_token=admin.fcm_token,
-                            message_title="Meeting pending",
-                            message_body=f"There is a meeting schedule set by {creator.user_name}")
+                    fcm_token=admin.fcm_token,
+                    message_title="Meeting pending",
+                    message_body=f"There is a meeting schedule set by {creator.user_name}")
         return BaseResponse.success(message='Booking created successfully')
-    
+
     @staticmethod
     def reject_booking(booking_id: int):
         booking = BookingExecutor.get_booking(booking_id)
@@ -277,15 +283,17 @@ class BookingService:
             booking.is_deleted = True
             booking.deleted_at = datetime.now()
             user_ids = [user.user_id for user in booking.booking_user]
-            BookingService.send_email_rejecting_the_scheduled(booking, user_ids)
-            
+            BookingService.send_email_rejecting_the_scheduled(
+                booking, user_ids)
+
             if booking.creator_id:
                 user = UserExecutor.get_user(user_id=booking.creator_id)
                 if user and user.fcm_token:
                     PushNotification.send_notification_reminder(
                         fcm_token=user.fcm_token,
                         message_title="Booking Rejected",
-                        message_body=f"The booking '{booking.title}' scheduled for {booking.time_start} - {booking.time_end} has been rejected."
+                        message_body=f"The booking '{booking.title}' scheduled for {
+                            booking.time_start} - {booking.time_end} has been rejected."
                     )
             else:
                 raise NotFound('Creator not found')
@@ -296,8 +304,8 @@ class BookingService:
 
         except Exception as e:
             db.session.rollback()
-            raise InternalServerError(e)
-        
+            raise UnprocessableEntity(e)
+
     @staticmethod
     def send_email_rejecting_the_scheduled(booking: Booking, user_ids: List[int]):
         for user_id in user_ids:
@@ -305,11 +313,13 @@ class BookingService:
             title = booking.title
             time_start = booking.time_start
             time_end = booking.time_end
-            room_name = booking.room.room_name 
-            attendees = [booking_user.user.user_name for booking_user in booking.booking_user]
-            
+            room_name = booking.room.room_name
+            attendees = [
+                booking_user.user.user_name for booking_user in booking.booking_user]
+
             if user_id == booking.creator_id:
-                EmailSender.send_email_rejecting_the_scheduled(user_email, title, time_start, time_end, room_name, attendees) 
+                EmailSender.send_email_rejecting_the_scheduled(
+                    user_email, title, time_start, time_end, room_name, attendees)
 
     @staticmethod
     def view_list_invite(page: int, per_page: int) -> list[Booking]:
@@ -328,7 +338,7 @@ class BookingService:
             'total_pages': total_pages
         }
         return result
-    
+
     @staticmethod
     def admin_view_booking_pending(page: int, per_page: int) -> List[Booking]:
         bookings=BookingExecutor.admin_view_booking_pending(page, per_page)
@@ -348,9 +358,10 @@ class BookingService:
 
     @staticmethod
     def user_view_list_booked(page: int, per_page: int) -> List[Booking]:
-        creator_id=get_jwt_identity()
-        bookings=BookingExecutor.user_view_list_booked(page, per_page, creator_id)
-        list_bookings = BookingService.show_list_booking(bookings)   
+        creator_id = get_jwt_identity()
+        bookings = BookingExecutor.user_view_list_booked(
+            page, per_page, creator_id)
+        list_bookings = BookingService.show_list_booking(bookings)
         total_items = bookings.total
         total_pages = ceil(total_items / per_page)
         per_page = per_page
@@ -363,7 +374,7 @@ class BookingService:
             'total_pages': total_pages
         }
         return result
-    
+
     @staticmethod
     def user_decline_booking(booking_id: int):
         user_id = get_jwt_identity()
@@ -372,17 +383,19 @@ class BookingService:
             booking_user.is_attending = False
             db.session.commit()
             booking = BookingExecutor.get_booking(booking_id)
-            creator=UserExecutor.get_user(user_id=booking.creator_id)
+            creator = UserExecutor.get_user(user_id=booking.creator_id)
+            user=UserExecutor.get_user(user_id)
             if creator.fcm_token:
                 PushNotification.send_notification_reminder(
                             fcm_token=creator.fcm_token,
                             message_title="Invitation confirme",
-                            message_body=f"{creator.user_name} decline participation in meeting schedule")
-            return BaseResponse.success('Invitation successfully declined')
+                            message_body=f"{user.user_name} decline participation in meeting schedule"
+                        )
+            return BaseResponse.success(message='Invitation successfully declined')
 
         except Exception as e:
             db.session.rollback()
-            raise InternalServerError(e)
+            raise UnprocessableEntity(str(e))
 
     @staticmethod
     def user_confirm_booking(booking_id: int):
@@ -392,25 +405,28 @@ class BookingService:
             booking_user.is_attending = True
             db.session.commit()
             booking = BookingExecutor.get_booking(booking_id)
-            creator=UserExecutor.get_user(user_id=booking.creator_id)
+            creator = UserExecutor.get_user(user_id=booking.creator_id)
+            user=UserExecutor.get_user(user_id)
             if creator.fcm_token:
                 PushNotification.send_notification_reminder(
                             fcm_token=creator.fcm_token,
                             message_title="Invitation confirme",
-                            message_body=f"{creator.user_name} confirm participation in meeting schedule")
-            return BaseResponse.success('Invitation successfully confirmed')
+                            message_body=f"{user.user_name} confirm participation in meeting schedule")
+            return BaseResponse.success(message='Invitation successfully confirmed')
 
         except Exception as e:
             db.session.rollback()
             raise UnprocessableEntity(str(e))
-        
+
     @staticmethod
     def detail_booking(booking_id: int):
-        booking=BookingExecutor.get_booking(booking_id)
+        booking = BookingExecutor.get_booking(booking_id)
         if not booking:
             raise NotFound('Booking not found')
-        user_ids = [booking_user.user.user_id for booking_user in booking.booking_user]
-        user_names = [booking_user.user.user_name for booking_user in booking.booking_user]
+        user_ids = [
+            booking_user.user.user_id for booking_user in booking.booking_user]
+        user_names = [
+            booking_user.user.user_name for booking_user in booking.booking_user]
 
         user_created = User.query.filter_by(user_id=booking.creator_id).first()
         creator_name = user_created.user_name if user_created else None
@@ -432,21 +448,25 @@ class BookingService:
             "is_accepted": booking.is_accepted,
             "is_deleted": booking.is_deleted
         }
-        return  booking_info
-    
+        return booking_info
+
     @staticmethod
-    def search_booking_room(room_id: int ) -> List[Booking]:
+    def search_booking_room(room_id: int) -> List[Booking]:
 
         start_date_str = request.args.get('start_date', None)
         end_date_str = request.args.get('end_date', None)
 
         if start_date_str and end_date_str:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-            end_date = datetime.strptime(end_date_str, '%Y-%m-%d') + timedelta(days=1)
+            end_date = datetime.strptime(
+                end_date_str, '%Y-%m-%d') + timedelta(days=1)
         else:
-            raise BadRequest("Both start_date and end_date are required for date range query.")
-       
-        bookings = BookingExecutor.search_booking_room(start_date, end_date, room_id)
+            raise BadRequest(
+                "Both start_date and end_date are required for date range query.")
+
+        bookings = BookingExecutor.search_booking_room(
+            start_date, end_date, room_id)
         list_bookings = BookingService.show_list_booking(bookings)
         return list_bookings
 
+    
