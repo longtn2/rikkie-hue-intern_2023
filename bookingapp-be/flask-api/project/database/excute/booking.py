@@ -118,8 +118,9 @@ class BookingExecutor:
         bookings = (Booking.query.filter(
             Booking.is_accepted == False, 
             Booking.is_deleted == False,
-            Booking.deleted_at == None
-            ).paginate( page=page, per_page=per_page, error_out=False)
+            Booking.deleted_at == None)
+            .order_by(Booking.booking_id.desc())
+            .paginate( page=page, per_page=per_page, error_out=False)
         )
         return bookings
     
@@ -156,13 +157,16 @@ class BookingExecutor:
 
     @staticmethod    
     def view_list_invite(page: int, per_page: int, user_id: int) -> List[Booking]:
-        bookings = Booking.query.join(BookingUser, Booking.booking_id == BookingUser.booking_id).filter(
+        bookings = (Booking.query.join(BookingUser, Booking.booking_id == BookingUser.booking_id).filter(
             Booking.is_deleted == False,
             Booking.deleted_at == None,
             Booking.is_accepted == True,
             Booking.time_start > datetime.now(),
-            BookingUser.user_id == user_id
-        ).paginate(page=page, per_page=per_page, error_out=False)
+            BookingUser.user_id == user_id,
+            Booking.creator_id != user_id)
+        .order_by(Booking.booking_id.desc())
+        .paginate(page=page, per_page=per_page, error_out=False)
+        )
         return bookings
     
     @staticmethod
