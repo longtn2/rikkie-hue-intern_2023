@@ -39,16 +39,18 @@ const ListBooking: React.FC<ListBookingData> = ({ selectedBookingData }) => {
       <div className='container-show-list-content'>
         <Typography.Title level={4}>
           <div className='container-show-list-content'>Người tham dự:</div>
-          <List
-            footer={null}
-            dataSource={selectedBookingData.user_names}
-            renderItem={user => (
-              <List.Item className='container-show-listitem'>
-                <span>• {user}</span>
-              </List.Item>
-            )}
-            style={{ padding: '1px' }}
-          />
+          <div className='flex-container'>
+            <List
+              footer={null}
+              dataSource={selectedBookingData.user_names}
+              renderItem={user => (
+                <List.Item className='container-show-listitem'>
+                  <span>• {user}</span>
+                </List.Item>
+              )}
+              style={{ padding: '1px' }}
+            />
+          </div>
         </Typography.Title>
       </div>
       <div className='container-show-time'>

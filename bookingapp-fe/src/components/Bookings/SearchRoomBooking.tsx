@@ -1,7 +1,7 @@
 import { Input, AutoComplete, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-
+import './Booking.css';
 interface Room {
   room_id: number;
   room_name: string;
@@ -52,7 +52,6 @@ const SearchRoomBooking: React.FC<AutocompleteProps> = ({
       onSelect={handleSelect}
       onSearch={handleSearch}
       value={searchValue}
-      placeholder='Input Room Name...'
       style={{ width: 300 }}
       allowClear
       autoFocus
@@ -60,6 +59,8 @@ const SearchRoomBooking: React.FC<AutocompleteProps> = ({
       <Input.Search
         enterButton={<Button icon={<SearchOutlined />} />}
         autoComplete='off'
+        className='input-search-name'
+        placeholder='Input Room Name...'
       />
     </AutoComplete>
   );

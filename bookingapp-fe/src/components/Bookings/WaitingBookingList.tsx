@@ -1,17 +1,16 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { url } from "../../ultils/urlApi";
-import { BookingData, ChangePageSize, HEADER } from "../../constant/constant";
-import "./Booking.css";
-import DetailBookingWait from "./DetailBookingWait";
-import { Card, Col, List, Modal, Row, Spin } from "antd";
-import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
-import InfoInvitation from "./InfoInvitation";
-import ConfirmAction from "./ConfirmAction";
-import BtnAccept from "./BtnAccept";
-import BtnReject from "./BtnReject";
-import BtnDetail from "./BtnDetail";
-import { get, put } from "../../ultils/request";
+import { useEffect, useState } from 'react';
+import { BookingData, ChangePageSize, HEADER } from '../../constant/constant';
+import './Booking.css';
+import DetailBookingWait from './DetailBookingWait';
+import { Card, Col, List, Modal, Row, Spin } from 'antd';
+import { handleErrorShow, handleSuccessShow } from '../../ultils/ultilsApi';
+import InfoInvitation from './InfoInvitation';
+import ConfirmAction from './ConfirmAction';
+import BtnAccept from './BtnAccept';
+import BtnReject from './BtnReject';
+import BtnDetail from './BtnDetail';
+import { get, put } from '../../ultils/request';
+import { useSelector } from 'react-redux';
 
 const WaitingBookingList = () => {
   const [listBooking, setListBooking] = useState<BookingData[]>([]);
@@ -22,6 +21,13 @@ const WaitingBookingList = () => {
   const [isModalDetail, setIsModalDetail] = useState<boolean>(false);
   const [isModalAction, setIsModalAction] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const shouldRender = useSelector(
+    (state: any) => state.shouldRender.shouldRender
+  );
+
+  useEffect(() => {
+    getData();
+  }, [shouldRender]);
   useEffect(() => {
     getData();
   }, [currentPage, perPage]);
@@ -74,7 +80,7 @@ const WaitingBookingList = () => {
 
   const handleShowModalAction = (booking: BookingData, key: string) => {
     setSelectBooking(booking);
-    if (key === "view") {
+    if (key === 'view') {
       handelViewDetail(true);
     } else {
       handleModalAction(true);
@@ -94,14 +100,14 @@ const WaitingBookingList = () => {
   };
   return (
     <div>
-      <div className="header-component">
-        <h2 className="component-name">List of waiting booking</h2>
+      <div className='header-component'>
+        <h2 className='component-name'>List of waiting booking</h2>
       </div>
       <Spin
         spinning={loading}
-        size="large"
-        tip="Loading..."
-        className="spin-loading"
+        size='large'
+        tip='Loading...'
+        className='spin-loading'
       >
         <List
           dataSource={listBooking}
@@ -109,28 +115,28 @@ const WaitingBookingList = () => {
           renderItem={(item: BookingData) => (
             <List.Item>
               <Card
-                className="item-booking-wait"
+                className='item-booking-wait'
                 key={item.title}
-                title={<div className="title-booking-wait">{item.title}</div>}
+                title={<div className='title-booking-wait'>{item.title}</div>}
               >
-                <div className="info-booking-wait">
+                <div className='info-booking-wait'>
                   <InfoInvitation data={item} />
-                  <div className="container-btn">
-                    <Row className="container-row">
+                  <div className='container-btn'>
+                    <Row className='container-row'>
                       <Col xxl={8} xl={8} sm={13}>
                         <BtnDetail
                           selectBooking={item}
                           handleSelectAction={async () =>
-                            handleShowModalAction(item, "view")
+                            handleShowModalAction(item, 'view')
                           }
                         />
                       </Col>
                       <Col xxl={8} xl={8} sm={13}>
                         <BtnAccept
-                          name="ACCEPT"
+                          name='ACCEPT'
                           data={item}
                           handleSelectAction={async () =>
-                            handleShowModalAction(item, "accept")
+                            handleShowModalAction(item, 'accept')
                           }
                           defaultType={true}
                           disabled={null}
@@ -138,10 +144,10 @@ const WaitingBookingList = () => {
                       </Col>
                       <Col xxl={8} xl={8} sm={13}>
                         <BtnReject
-                          name="REJECT"
+                          name='REJECT'
                           data={item}
                           handleSelectAction={async () =>
-                            handleShowModalAction(item, "reject")
+                            handleShowModalAction(item, 'reject')
                           }
                           defaultType={true}
                           disabled={null}
@@ -158,7 +164,7 @@ const WaitingBookingList = () => {
       <Modal
         open={isModalDetail}
         onCancel={() => handelViewDetail(false)}
-        width={"80%"}
+        width={'80%'}
         footer={[]}
       >
         <DetailBookingWait

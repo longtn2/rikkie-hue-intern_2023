@@ -1,23 +1,21 @@
-import { Card, Col, List, Modal, Row, Spin } from "antd";
-import { useEffect, useState } from "react";
+import { Card, Col, List, Modal, Row, Spin } from 'antd';
+import { useEffect, useState } from 'react';
 import {
   BookingData,
   ChangePageSize,
   DataType,
   HEADER,
-} from "../../constant/constant";
-import axios from "axios";
-import { url } from "../../ultils/urlApi";
-import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
-import DetailInvitation from "./DetailInvitation";
-import InfoInvitation from "./InfoInvitation";
-import { getCookie } from "../../helper/Cookie";
-import "./Booking.css";
-import BtnReject from "./BtnReject";
-import ConfirmAction from "./ConfirmAction";
-import BtnAccept from "./BtnAccept";
-import BtnDetail from "./BtnDetail";
-import { get, put } from "../../ultils/request";
+} from '../../constant/constant';
+import { handleErrorShow, handleSuccessShow } from '../../ultils/ultilsApi';
+import DetailInvitation from './DetailInvitation';
+import InfoInvitation from './InfoInvitation';
+import { getCookie } from '../../helper/Cookie';
+import './Booking.css';
+import BtnReject from './BtnReject';
+import ConfirmAction from './ConfirmAction';
+import BtnAccept from './BtnAccept';
+import BtnDetail from './BtnDetail';
+import { get, put } from '../../ultils/request';
 
 const InvitationList = () => {
   const [listInvitation, setListInvitation] = useState<BookingData[]>([]);
@@ -30,7 +28,7 @@ const InvitationList = () => {
   const [isModalAction, setIsModalAction] = useState<boolean>(false);
 
   const formatData = (data: any) => {
-    const userId = parseInt(getCookie("id"), 10);
+    const userId = parseInt(getCookie('id'), 10);
     const updatedData = data.map((item: BookingData) => {
       const user = item.booking_users.find(
         (user: DataType) => user.user_id === userId
@@ -43,12 +41,10 @@ const InvitationList = () => {
     setLoading(true);
     try {
       setLoading(true);
-      const response = await get(`/v1/user/view_list_invite`, 
-       {
-          page: currentPage,
-          per_page: perPage,
-        },
-      );
+      const response = await get(`/v1/user/view_list_invite`, {
+        page: currentPage,
+        per_page: perPage,
+      });
       if (response) {
         formatData(response.list_bookings);
         setTotalItems(response.total_items);
@@ -101,7 +97,7 @@ const InvitationList = () => {
   };
   const handleShowModalAction = (booking: BookingData, key: string) => {
     setSelectInvite(booking);
-    if (key === "view") {
+    if (key === 'view') {
       handelModalViewDetail(true);
     } else {
       handleModalAction(true);
@@ -111,14 +107,14 @@ const InvitationList = () => {
   };
   return (
     <>
-      <div className="header-component">
-        <h2 className="component-name">List of invitations</h2>
+      <div className='header-component'>
+        <h2 className='component-name'>List of invitations</h2>
       </div>
       <Spin
         spinning={loading}
-        size="large"
-        tip="Loading..."
-        className="spin-loading"
+        size='large'
+        tip='Loading...'
+        className='spin-loading'
       >
         <List
           dataSource={listInvitation}
@@ -126,38 +122,38 @@ const InvitationList = () => {
           renderItem={(item: BookingData) => (
             <List.Item>
               <Card
-                className="item-booked"
+                className='item-booked'
                 key={item.title}
-                title={<div className="item-booked-title">{item.title}</div>}
+                title={<div className='item-booked-title'>{item.title}</div>}
               >
-                <div className="item-booked-info">
+                <div className='item-booked-info'>
                   <InfoInvitation data={item} />
-                  <Row className="container-btn">
-                    <Col xxl={8} xl={8} sm={13} >
+                  <Row className='container-btn'>
+                    <Col xxl={8} xl={8} sm={13}>
                       <BtnDetail
                         selectBooking={item}
                         handleSelectAction={async () =>
-                          handleShowModalAction(item, "view")
+                          handleShowModalAction(item, 'view')
                         }
                       />
                     </Col>
-                    <Col xxl={8} xl={8} sm={13} >
+                    <Col xxl={8} xl={8} sm={13}>
                       <BtnAccept
-                        name="CONFIRM"
+                        name='CONFIRM'
                         data={item}
                         handleSelectAction={async () =>
-                          handleShowModalAction(item, "confirm")
+                          handleShowModalAction(item, 'confirm')
                         }
                         defaultType={false}
                         disabled={item.status}
                       />
                     </Col>
-                    <Col xxl={8} xl={8} sm={13} >
+                    <Col xxl={8} xl={8} sm={13}>
                       <BtnReject
-                        name="DECLINE"
+                        name='DECLINE'
                         data={item}
                         handleSelectAction={async () =>
-                          handleShowModalAction(item, "decline")
+                          handleShowModalAction(item, 'decline')
                         }
                         defaultType={false}
                         disabled={item.status}
@@ -174,7 +170,7 @@ const InvitationList = () => {
       <Modal
         open={isModalDetail}
         onCancel={() => handelModalViewDetail(false)}
-        width={"80%"}
+        width={'80%'}
         footer={[]}
       >
         <DetailInvitation selectInvite={selectInvite} />

@@ -44,6 +44,8 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
 
   const handleCancel = () => {
     onCancel();
+    setTimeStart(null);
+    setTimeEnd(null);
   };
 
   const handleFinish = (values: any) => {
@@ -53,6 +55,8 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
       time_end: timeEnd ? formatMonthDayjs(timeEnd) : null,
     };
     onFinish(updatedValues);
+    setTimeStart(null);
+    setTimeEnd(null);
   };
 
   const handleTimeStartChange = (value: dayjs.Dayjs | null) => {
@@ -73,6 +77,12 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
         initialValues={{
           user_ids: initialValues?.user_ids,
           user_names: initialValues?.user_names,
+          time_start: timeStart
+            ? dayjs(timeStart)
+            : dayjs(initialValues?.start as unknown as dayjs.Dayjs),
+          time_end: timeEnd
+            ? dayjs(timeEnd)
+            : dayjs(initialValues?.end as unknown as dayjs.Dayjs),
           room_id: initialValues?.room_id,
           title: initialValues?.title,
         }}
@@ -112,7 +122,6 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
               message: 'Time start is not required',
             },
           ]}
-          initialValue={dayjs(initialValues?.start)}
         >
           <DatePicker
             showTime
@@ -120,7 +129,6 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
             allowClear={true}
             picker='date'
             placeholder='Select start time'
-            defaultValue={dayjs(initialValues?.start as unknown as dayjs.Dayjs)}
             value={timeStart}
             onChange={handleTimeStartChange}
           />
@@ -141,7 +149,6 @@ const FormEditBooking: React.FC<FormEditBooking> = ({
             allowClear={true}
             picker='date'
             placeholder='Select end time'
-            defaultValue={dayjs(initialValues?.end as unknown as dayjs.Dayjs)}
             value={timeEnd}
             onChange={handleTimeEndChange}
           />

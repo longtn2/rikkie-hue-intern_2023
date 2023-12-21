@@ -330,6 +330,35 @@
   overflow: hidden;
 }
 
+.full-calendar-wrapper {
+  overflow: hidden;
+}
+
 .fc-event-main {
-  cursor: move;
+  cursor: pointer;
+}
+
+.custom-modal-footer-content {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-right {
+  margin-left: 1.5rem;
+}
+.custom-input-search {
+  padding: 4rem;
+}
+.custom-input-search input::placeholder {
+  text-align: left;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex-container .container-show-listitem {
+  flex: 0 0 25%;
+  padding: 1rem;
 }

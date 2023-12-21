@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Typography, Spin, Space, Form } from 'antd';
 import moment from 'moment';
-import axios from 'axios';
 import './Booking.css';
 import { useSelector } from 'react-redux';
 import {
@@ -84,7 +83,7 @@ const CalendarBooking = () => {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const response = await get('/v1/rooms');
+      const response = await get('/v1/rooms', { per_page: -1 });
       if (response?.rooms) {
         setRooms(response.rooms);
       }
@@ -97,7 +96,7 @@ const CalendarBooking = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await get('/v1/users');
+      const response = await get('/v1/users', { per_page: -1 });
       if (response?.users) {
         setUsers(response.users);
       }

@@ -1,5 +1,6 @@
 import { Button, Popover } from 'antd';
 import { ActionBookingType } from '../../constant/constant';
+import confirm from '../../ultils/ModalConfirm';
 
 const ActionBooking: React.FC<ActionBookingType> = ({
   is_accepted,
@@ -7,9 +8,16 @@ const ActionBooking: React.FC<ActionBookingType> = ({
   loading,
   visible,
 }) => {
+  const handleAction = (typeAction: string) => {
+    const message =
+      typeAction === 'accept'
+        ? 'Do you want to accept booking'
+        : 'Would you like to decline this meeting?';
+    confirm(message, typeAction, action, loading);
+  };
   return is_accepted ? (
     <>
-      <Popover content='Edit'>
+      <Popover content='Edit' className='btn-right'>
         <Button onClick={() => visible('edit', true)}>Edit</Button>
       </Popover>
       <Popover content='Delete'>
@@ -20,18 +28,14 @@ const ActionBooking: React.FC<ActionBookingType> = ({
     </>
   ) : (
     <>
-      <Popover content='Accepted'>
-        <Button
-          type='primary'
-          loading={loading}
-          onClick={() => action('accept')}
-        >
-          Accepted
+      <Popover content='Rejected' className='btn-right'>
+        <Button danger onClick={() => handleAction('reject')}>
+          Rejected
         </Button>
       </Popover>
-      <Popover content='Rejected'>
-        <Button danger loading={loading} onClick={() => action('reject')}>
-          Rejected
+      <Popover content='Accepted'>
+        <Button type='primary' onClick={() => handleAction('accept')}>
+          Accepted
         </Button>
       </Popover>
     </>
