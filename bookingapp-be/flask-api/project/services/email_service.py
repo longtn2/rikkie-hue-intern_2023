@@ -1,12 +1,11 @@
 from flask_mail import Message
 import os
+from project.api.common.constant import DEFAULT_PAGE, DEFAULT_PER_PAGE , MAX_ITEMS_PER_PAGE
 from project import mail, app, celery
-from werkzeug.exceptions import InternalServerError
 from project.api.common.base_response import BaseResponse
 from project.database.excute.room import RoomExecutor
 from project.models import User, Booking
 import smtplib
-import asyncio
 
 
 class EmailSender:

@@ -1,16 +1,9 @@
-from flask import Blueprint, request, jsonify
-from project import app, db
-from werkzeug.exceptions import Conflict, InternalServerError, NotFound, BadRequest, Unauthorized
-from project.models.user import User
-from project.models.role import Role
-from project.models.role_has_permission import RoleHasPermission
-from project.models.permission import Permission
-from project.models.user_has_role import UserHasRole
+from flask import Blueprint, request
+from werkzeug.exceptions import Conflict, NotFound, BadRequest, Unauthorized
 from flask_jwt_extended import jwt_required
 from project.api.v1.has_permission import has_permission
 from project.services.user_service import UserService
 from project.api.common.base_response import BaseResponse
-from datetime import datetime
 
 user_blueprint = Blueprint('user', __name__)
 
@@ -19,12 +12,10 @@ user_blueprint = Blueprint('user', __name__)
 @has_permission("view")
 def view_list_user():
     try:
-        page = int(request.args.get('page', 1))
-        per_page = int(request.args.get('per_page', 10))
-        result = UserService.get_list_users(page, per_page)
-        return BaseResponse.success(result)
-    except Exception as e:
-        raise NotFound() from e
+        response = UserService.get_list_users()
+        return BaseResponse.success(response)
+    except NotFound as e:
+        return BaseResponse.error(e)
 
 @user_blueprint.route('/users', methods=['POST'])
 @jwt_required()
@@ -69,11 +60,8 @@ def delete_user(user_id):
 @has_permission("view")
 def search_user_by_name_or_email():
     try:
-        search = request.args.get('search')
-        page = int(request.args.get('page', 1))
-        per_page = int(request.args.get('per_page', 10))
-        response = UserService.search_list_user(page, per_page, search)
-        return response
+        response = UserService.search_list_user()
+        return BaseResponse.success(response)
     except NotFound as e:
         raise BaseResponse.error(e)
     

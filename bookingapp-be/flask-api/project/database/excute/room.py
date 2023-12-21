@@ -4,8 +4,7 @@ from project import db
 from datetime import datetime
 from itertools import islice
 from sqlalchemy import or_
-from typing import Optional, Union, List, Tuple
-from werkzeug.exceptions import UnprocessableEntity, InternalServerError
+from typing import Optional, List, Tuple
 
 
 class RoomExecutor:

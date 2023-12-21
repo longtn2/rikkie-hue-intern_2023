@@ -1,4 +1,3 @@
-import os
 from flask import Flask
 from project.config import BaseConfig
 from flask_cors import CORS
@@ -10,7 +9,6 @@ from celery import Celery
 from pyfcm import FCMNotification
 import firebase_admin
 from firebase_admin import credentials
-from firebase_admin import messaging
 from flask_apscheduler import APScheduler
 
 app=Flask(__name__)

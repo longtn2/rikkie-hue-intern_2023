@@ -1,15 +1,20 @@
 from project.database.excute.room import RoomExecutor
-from math import ceil
 from project import db
-from werkzeug.exceptions import Conflict, BadRequest, NotFound, InternalServerError
+from werkzeug.exceptions import Conflict, BadRequest, NotFound
 from project.api.common.base_response import BaseResponse
 from project.models import Room, Booking
 from typing import Optional, List, Dict
-
+from flask import request
+from project.api.common.constant import DEFAULT_PAGE, DEFAULT_PER_PAGE , MAX_ITEMS_PER_PAGE
 
 class RoomService:
     @staticmethod
-    def get_paginated_rooms(page, per_page):
+    def get_paginated_rooms():
+
+        page = int(request.args.get('page', DEFAULT_PAGE))
+        per_page = int(request.args.get('per_page', DEFAULT_PER_PAGE))
+        if per_page == -1:
+            per_page = MAX_ITEMS_PER_PAGE    
         items, total_items, total_pages = RoomExecutor.get_paginated_rooms(
             page, per_page)
 
@@ -91,9 +96,12 @@ class RoomService:
             raise NotFound(e)
 
     @staticmethod
-    def get_status_rooms(page: int, per_page: int):
-        paginated_rooms, total_items, total_pages = RoomExecutor.get_rooms_with_status(
-            page, per_page)
+    def get_status_rooms():
+        page = int(request.args.get('page', DEFAULT_PAGE))
+        per_page = int(request.args.get('per_page', DEFAULT_PER_PAGE))
+        if per_page == -1:
+            per_page = MAX_ITEMS_PER_PAGE 
+        paginated_rooms, total_items, total_pages = RoomExecutor.get_rooms_with_status(page, per_page)
 
         return {
             "rooms": [room.serialize() for room in paginated_rooms],
@@ -104,9 +112,14 @@ class RoomService:
         }
 
     @staticmethod
-    def search_rooms(page: int, per_page: int, search_name: Optional[str]) -> Dict[str, int]:
-        paginated_rooms, total_items, total_pages = RoomExecutor.filter_room_by_name(
-            page, per_page, search_name)
+    def search_rooms() -> Dict[str, int]:
+        page = int(request.args.get('page', DEFAULT_PAGE))
+        per_page = int(request.args.get('per_page', DEFAULT_PER_PAGE))
+        search_name: str = request.args.get('name', '')
+        if per_page == -1:
+            per_page = MAX_ITEMS_PER_PAGE
+        
+        paginated_rooms, total_items, total_pages = RoomExecutor.search_rooms_in_db(page, per_page, search_name)
 
         return {
             "rooms": [room.serialize() for room in paginated_rooms],

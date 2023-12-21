@@ -1,7 +1,7 @@
 from project.database.excute.booking import BookingExecutor
 from project.database.excute.user import UserExecutor
 from project.services.email_service import EmailSender
-from project.models import Room, Booking, BookingUser, User
+from project.models import Room, Booking, User
 from project.api.common.base_response import BaseResponse
 from werkzeug.exceptions import BadRequest, InternalServerError, Conflict, NotFound, UnprocessableEntity
 from flask import request
@@ -13,7 +13,7 @@ from math import ceil
 from flask_jwt_extended import get_jwt_identity
 from project import db
 from project.services.notification_service import PushNotification
-
+from project.api.common.constant import DEFAULT_PAGE, DEFAULT_PER_PAGE , MAX_ITEMS_PER_PAGE
 
 class BookingService:
     
@@ -334,8 +334,13 @@ class BookingService:
                     user_email, title, time_start, time_end, room_name, attendees)
 
     @staticmethod
-    def view_list_invite(page: int, per_page: int) -> list[Booking]:
+    def view_list_invite() -> list[Booking]:
         user_id = get_jwt_identity()
+        page = int(request.args.get('page', DEFAULT_PAGE))
+        per_page = int(request.args.get('per_page', DEFAULT_PER_PAGE))
+        if per_page == -1:
+            per_page = MAX_ITEMS_PER_PAGE
+
         bookings = BookingExecutor.view_list_invite(page, per_page, user_id)
         list_booking_invite = BookingService.show_list_booking(bookings)
         total_items = bookings.total
@@ -352,7 +357,12 @@ class BookingService:
         return result
 
     @staticmethod
-    def admin_view_booking_pending(page: int, per_page: int) -> List[Booking]:
+    def admin_view_booking_pending() -> List[Booking]:
+        page = int(request.args.get('page', DEFAULT_PAGE))
+        per_page = int(request.args.get('per_page', DEFAULT_PER_PAGE))
+        if per_page == -1:
+            per_page = MAX_ITEMS_PER_PAGE
+
         bookings=BookingExecutor.admin_view_booking_pending(page, per_page)
         list_bookings=BookingService.show_list_booking(bookings)  
         total_items = bookings.total
@@ -369,11 +379,15 @@ class BookingService:
         return result
 
     @staticmethod
-    def user_view_list_booked(page: int, per_page: int) -> List[Booking]:
-        creator_id = get_jwt_identity()
-        bookings = BookingExecutor.user_view_list_booked(
-            page, per_page, creator_id)
-        list_bookings = BookingService.show_list_booking(bookings)
+    def user_view_list_booked() -> List[Booking]:
+        creator_id=get_jwt_identity()
+        page = int(request.args.get('page', DEFAULT_PAGE))
+        per_page = int(request.args.get('per_page', DEFAULT_PER_PAGE))
+        if per_page == -1:
+            per_page = MAX_ITEMS_PER_PAGE
+
+        bookings=BookingExecutor.user_view_list_booked(page, per_page, creator_id)
+        list_bookings = BookingService.show_list_booking(bookings)   
         total_items = bookings.total
         total_pages = ceil(total_items / per_page)
         per_page = per_page
