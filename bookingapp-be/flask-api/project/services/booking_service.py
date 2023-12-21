@@ -207,9 +207,9 @@ class BookingService:
             booking.is_deleted = False
             booking.deleted_at = None
             users = [user.user for user in booking.booking_user]
+            db.session.commit()
             BookingService.send_email_accepting_the_scheduled(
                 booking, users)
-            db.session.commit()
             return BaseResponse.success(message='Booking accepted successfully')
 
         except Exception as e:
