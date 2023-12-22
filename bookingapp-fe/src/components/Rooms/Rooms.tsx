@@ -266,7 +266,7 @@ const Rooms: React.FC = () => {
                         fontSize: '1.3rem',
                       }}
                     >
-                      Trạng thái: {room.is_blocked ? 'Bận' : 'Rảnh'}
+                      Status: {room?.is_blocked ? 'Active' : 'Inactive'}
                     </p>
                   </div>
                   <div className='room-actions'>

@@ -1,40 +1,41 @@
-import { useEffect, useState } from "react";
-import { Typography, Spin, Space, Form } from "antd";
-import moment from "moment";
-import "./Booking.css";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from 'react';
+import { Typography, Spin, Space, Form } from 'antd';
+import moment from 'moment';
+import './Booking.css';
+import { useSelector } from 'react-redux';
 import {
   DateSelectArg,
   EventClickArg,
   EventContentArg,
-} from "@fullcalendar/core";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import FullCalendar from "@fullcalendar/react";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import listPlugin from "@fullcalendar/list";
-import { handleErrorShow, handleSuccessShow } from "../../ultils/ultilsApi";
-import ReusableForm from "./ResaubleForm";
-import { getCookie } from "../../helper/Cookie";
+} from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import FullCalendar from '@fullcalendar/react';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import { handleErrorShow, handleSuccessShow } from '../../ultils/ultilsApi';
+import ReusableForm from './ResaubleForm';
+import { getCookie } from '../../helper/Cookie';
 import {
   formatMonth,
   formatDate,
   timeStartWeek,
   timeEndWeek,
-} from "../../ultils/ultils";
-import Autocomplete from "./SearchRoomBooking";
-import FooterBooking from "./FooterBooking";
-import FormEditBooking from "./FormEditBooking";
-import ListBooking from "./ListBooking";
+} from '../../ultils/ultils';
+import Autocomplete from './SearchRoomBooking';
+import FooterBooking from './FooterBooking';
+import FormEditBooking from './FormEditBooking';
+import ListBooking from './ListBooking';
 import {
   BookingDataCalendar,
   BookingDataApi,
   DataType,
   Room,
-} from "../../constant/constant";
-import ActionBooking from "./ActionBooking";
-import ModalConfirm from "./ModalConfirm";
-import { get, post, put, del } from "../../ultils/request";
+} from '../../constant/constant';
+import ActionBooking from './ActionBooking';
+import ModalConfirm from './ModalConfirm';
+import { get, post, put, del } from '../../ultils/request';
+import { useDispatch } from 'react-redux';
 const { Title } = Typography;
 const CalendarBooking = () => {
   const [rooms, setRooms] = useState<Room[]>();
@@ -46,15 +47,15 @@ const CalendarBooking = () => {
   const [isEditing, setIsEditing] = useState<Boolean>(false);
   const [isDeleted, setIsDeleted] = useState<Boolean>(false);
   const [startDate, setStartDate] = useState<string>(
-    moment().startOf("week").format("YYYY-MM-DD")
+    moment().startOf('week').format('YYYY-MM-DD')
   );
   const [endDate, setEndDate] = useState<string>(
-    moment().endOf("week").format("YYYY-MM-DD")
+    moment().endOf('week').format('YYYY-MM-DD')
   );
   const [formEdit] = Form.useForm();
   const [formAdd] = Form.useForm();
-  const roles: string[] = getCookie("roles");
-  const checkAdmin: boolean = roles.includes("admin");
+  const roles: string[] = getCookie('roles');
+  const checkAdmin: boolean = roles.includes('admin');
   const [timeStartAdd, setTimeStartAdd] = useState<moment.Moment | null>(null);
   const [timeEndAdd, setTimeEndAdd] = useState<moment.Moment | null>(null);
   const [updateModal, setUpdateModal] = useState<boolean>(false);
@@ -83,7 +84,7 @@ const CalendarBooking = () => {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const response = await get("/v1/rooms", { per_page: -1 });
+      const response = await get('/v1/rooms', { per_page: -1 });
       if (response?.rooms) {
         setRooms(response.rooms);
       }
@@ -96,7 +97,7 @@ const CalendarBooking = () => {
 
   const fetchUser = async () => {
     try {
-      const response = await get("/v1/users", { per_page: -1 });
+      const response = await get('/v1/users', { per_page: -1 });
       if (response?.users) {
         setUsers(response.users);
       }
@@ -110,10 +111,10 @@ const CalendarBooking = () => {
     try {
       setLoading(true);
       if (
-        startDate === moment(startDate).format("YYYY-MM-DD") &&
-        endDate === moment(endDate).format("YYYY-MM-DD")
+        startDate === moment(startDate).format('YYYY-MM-DD') &&
+        endDate === moment(endDate).format('YYYY-MM-DD')
       ) {
-        const urlCallApi = roles.includes("admin")
+        const urlCallApi = roles.includes('admin')
           ? `/v1/bookings`
           : `/v1/user/bookings`;
         const response = await get(urlCallApi, {
@@ -127,7 +128,7 @@ const CalendarBooking = () => {
             is_accepted: is_accepted,
             start: time_start,
             end: time_end,
-            backgroundColor: is_accepted ? "#009900" : "#ff9933",
+            backgroundColor: is_accepted ? '#009900' : '#ff9933',
           };
         });
         setBookingData(updatedData);
@@ -168,11 +169,11 @@ const CalendarBooking = () => {
   const eventContent = (eventInfo: EventContentArg) => {
     const { event, view } = eventInfo;
     const content =
-      view.type === "timeGridWeek" ? (
-        <div className="time-grid-week">{event.title}</div>
+      view.type === 'timeGridWeek' ? (
+        <div className='time-grid-week'>{event.title}</div>
       ) : (
         <div
-          className="time-grid-week"
+          className='time-grid-week'
           style={{ backgroundColor: event.backgroundColor }}
         >
           <Title level={2}>{event.title}</Title>
@@ -187,18 +188,18 @@ const CalendarBooking = () => {
     const endTime = moment(end);
     setTimeStartAdd(startTime);
     setTimeEndAdd(endTime);
-    visibleModal("add", true);
+    visibleModal('add', true);
   };
 
   const visibleModal = (action: string, visible: boolean) => {
     switch (action) {
-      case "add":
+      case 'add':
         setUpdateModal(visible);
         break;
-      case "edit":
+      case 'edit':
         setIsEditing(visible);
         break;
-      case "delete":
+      case 'delete':
         setIsDeleted(visible);
         break;
     }
@@ -207,7 +208,7 @@ const CalendarBooking = () => {
   const handleAddBooking = async (values: BookingDataApi) => {
     try {
       setLoading(true);
-      const urlCallApi: string = roles.includes("admin")
+      const urlCallApi: string = roles.includes('admin')
         ? `/v1/bookings`
         : `/v1/user/bookings`;
       const response = await post(urlCallApi, {
@@ -219,7 +220,7 @@ const CalendarBooking = () => {
         time_end: values.time_end,
       });
       if (response) {
-        visibleModal("add", false);
+        visibleModal('add', false);
         fetchBookingData(startDate, endDate);
         handleSuccessShow(response);
       }
@@ -267,7 +268,7 @@ const CalendarBooking = () => {
         );
         if (response) {
           fetchBookingData(startDate, endDate);
-          visibleModal("edit", false);
+          visibleModal('edit', false);
           handleSuccessShow(response);
           setModalShow(false);
         }
@@ -289,7 +290,7 @@ const CalendarBooking = () => {
       if (response) {
         fetchBookingData(startDate, endDate);
         handleSuccessShow(response);
-        visibleModal("delete", false);
+        visibleModal('delete', false);
         setModalShow(false);
       }
     } catch (error: any) {
@@ -330,7 +331,7 @@ const CalendarBooking = () => {
           is_accepted: is_accepted,
           start: time_start,
           end: time_end,
-          backgroundColor: is_accepted ? "#009900" : "#ff9933",
+          backgroundColor: is_accepted ? '#009900' : '#ff9933',
         };
       });
       setBookingData(updatedData);
@@ -377,20 +378,20 @@ const CalendarBooking = () => {
 
   return (
     <>
-      <div className="search">
+      <div className='search'>
         <Autocomplete options={rooms ?? []} onSelect={handleSearch} />
       </div>
 
       <div>
-        <div className="action">
+        <div className='action'>
           <Spin
-            size="large"
-            tip="Loading..."
+            size='large'
+            tip='Loading...'
             spinning={loading}
-            className="loading"
+            className='loading'
           />
         </div>
-        <div className="full-calendar">
+        <div className='full-calendar'>
           <FullCalendar
             plugins={[
               dayGridPlugin,
@@ -398,11 +399,11 @@ const CalendarBooking = () => {
               listPlugin,
               interactionPlugin,
             ]}
-            initialView="timeGridWeek"
+            initialView='timeGridWeek'
             headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,listWeek",
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,listWeek',
             }}
             events={bookingData}
             eventClick={handleEventClick}
@@ -413,7 +414,7 @@ const CalendarBooking = () => {
             selectMirror={true}
             select={handleDateSelect}
             datesSet={handleDatesSet}
-            editable={roles.includes("admin") ? true : false}
+            editable={roles.includes('admin') ? true : false}
             eventDrop={handleEventDrop}
             eventResize={handleEventDrop}
           />
@@ -427,7 +428,7 @@ const CalendarBooking = () => {
         footer={
           checkAdmin ? (
             <div>
-              <Space className="space">
+              <Space className='space'>
                 <ActionBooking
                   is_accepted={selectedBookingData?.is_accepted ?? false}
                   loading={loading}
@@ -445,9 +446,9 @@ const CalendarBooking = () => {
       </ModalConfirm>
 
       <ModalConfirm
-        title="Add Booking"
+        title='Add Booking'
         visible={!!updateModal}
-        onCancel={() => visibleModal("add", false)}
+        onCancel={() => visibleModal('add', false)}
         footer={null}
       >
         <ReusableForm
@@ -463,26 +464,26 @@ const CalendarBooking = () => {
 
       <ModalConfirm
         title={
-          <div className="modal-confirm">
-            <Typography.Title level={2} className="title-modal">
+          <div className='modal-confirm'>
+            <Typography.Title level={2} className='title-modal'>
               Update Booking
             </Typography.Title>
-            <div className="modal-container-title">
-              <label className="modal-label">Title:</label>
-              <Space className="modal-value">
+            <div className='modal-container-title'>
+              <label className='modal-label'>Title:</label>
+              <Space className='modal-value'>
                 {selectedBookingData?.title}
               </Space>
             </div>
-            <div className="modal-container-title">
-              <label className="modal-label">Room Name:</label>
-              <Space className="modal-value">
+            <div className='modal-container-title'>
+              <label className='modal-label'>Room Name:</label>
+              <Space className='modal-value'>
                 {selectedBookingData?.room_name}
               </Space>
             </div>
           </div>
         }
         visible={!!isEditing}
-        onCancel={() => visibleModal("edit", false)}
+        onCancel={() => visibleModal('edit', false)}
         footer={null}
       >
         <FormEditBooking
@@ -496,13 +497,13 @@ const CalendarBooking = () => {
       </ModalConfirm>
 
       <ModalConfirm
-        title="Delete Booking"
+        title='Delete Booking'
         visible={!!isDeleted}
-        onCancel={() => visibleModal("delete", false)}
+        onCancel={() => visibleModal('delete', false)}
         footer={
           <FooterBooking
             onDelete={handleDeleteBooking}
-            onCancel={() => visibleModal("delete", false)}
+            onCancel={() => visibleModal('delete', false)}
             id={selectedBookingData?.booking_id!}
           />
         }
