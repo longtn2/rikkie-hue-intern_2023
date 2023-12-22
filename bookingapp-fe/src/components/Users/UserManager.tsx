@@ -77,7 +77,7 @@ const UsersManager = () => {
         )
       );
     }
-    getData()
+    getData();
   };
   const handleDelete = async () => {
     if (selectedUser) {
@@ -109,9 +109,11 @@ const UsersManager = () => {
   const columns: ColumnsType<DataType> = [
     {
       align: "center",
-      title: "User ID",
-      key: "user_id",
-      dataIndex: "user_id",
+      title: "Number",
+      key: "index",
+      dataIndex: "index",
+      render: (text, listUsers, index) =>
+        index + 1 + (pagination.current - 1) * pagination.pageSize,
     },
     {
       align: "center",
