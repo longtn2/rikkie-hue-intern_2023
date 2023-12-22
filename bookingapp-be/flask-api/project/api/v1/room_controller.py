@@ -92,7 +92,7 @@ def open_room(room_id: int):
     try:
         data = request.get_json()
         response_data = RoomService.open_room(room_id, data)
-        return BaseResponse.success(response_data)
+        return response_data
     except NotFound as e:
         return BaseResponse.error(e)
     except BadRequest as e:
