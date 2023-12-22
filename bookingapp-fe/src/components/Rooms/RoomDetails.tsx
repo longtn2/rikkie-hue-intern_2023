@@ -118,7 +118,7 @@ const RoomDetails: React.FC<RoomDetailsPropsType> = ({
           }
           visible={!room?.is_blocked}
           onOk={() => handleModal(true, room!.description, 'look')}
-          okText='Look'
+          okText='Lock'
           onCancel={handleClose}
           cancelText='Cancel'
         >
